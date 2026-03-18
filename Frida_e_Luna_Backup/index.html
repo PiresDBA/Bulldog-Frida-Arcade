@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sausage Patrol</title>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <div id="yt-player-container" style="position: absolute; opacity: 0; pointer-events: none; overflow: hidden; z-index: -100;">
+      <div id="yt-player"></div>
+    </div>
+    <div id="game-container">
+      <canvas id="gameCanvas" width="800" height="600"></canvas>
+      <div id="ui-layer">
+        <div id="score-display">Score: <span id="score">0</span></div>
+        <div id="phase-display">Fase: <span id="phase">1</span></div>
+        <div id="lives-display">Vidas: <span id="lives">3</span></div>
+      </div>
+      <div id="start-screen" class="overlay">
+        <h1>Sausage Patrol</h1>
+        <p>Ação Arcade! Pule buracos e atire nos alienígenas!</p>
+        <p>Setas/A-D: Move<br>Cima/Espaço/W: Pula<br>Z ou J ou Clique: Atira (Frente e Cima)</p>
+        <button id="start-btn">Iniciar Jogo</button>
+      </div>
+      <div id="game-over-screen" class="overlay hidden">
+        <h1>Game Over</h1>
+        <p>Pontuação Final: <span id="final-score">0</span></p>
+        <button id="restart-btn">Tentar Novamente</button>
+      </div>
+      <div id="phase-transition" class="overlay hidden">
+        <h1>Fase <span id="next-phase">2</span>!</h1>
+        <p>Prepare-se...</p>
+      </div>
+    </div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

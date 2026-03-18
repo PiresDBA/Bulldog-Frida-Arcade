@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Salsichinha Luna Arcade</title>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <div id="yt-player-container" style="position: absolute; opacity: 0; pointer-events: none; overflow: hidden; z-index: -100;">
+      <div id="yt-player"></div>
+    </div>
+    
+    <div id="game-container">
+      <canvas id="gameCanvas" width="800" height="600"></canvas>
+      <div id="ui-layer">
+        <div class="hud">
+          <div id="score-display">PONTOS: <span id="score">0</span></div>
+          <div id="phase-display">FASE: <span id="phase">1</span></div>
+          <div id="lives-display">❤️ <span id="lives">3</span></div>
+        </div>
+      </div>
+
+      <div id="start-screen" class="screen">
+        <h1 class="title-3d">SALSICHINHA<br>LUNA ARCADE</h1>
+        
+        <div class="luna-dialog">
+          <div class="bubble" id="luna-speech-bubble"></div>
+          <canvas id="menu-dog-canvas" width="160" height="160" class="menu-dog-anim"></canvas>
+        </div>
+
+        <div class="controls">
+          <p><span class="key">Z</span> / <span class="key">J</span> : Atirar</p>
+          <p><span class="key">↑</span> / <span class="key">Espaço</span> : Pular (Até 3x no ar!)</p>
+          <p><span class="key">←</span> / <span class="key">→</span> : Movimentar</p>
+        </div>
+        <button id="start-btn" class="btn">Topa Começar? Vamos Nessa!</button>
+      </div>
+
+      <div id="phase-complete-screen" class="screen hidden" style="background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);">
+        <div class="luna-dialog" style="margin-bottom: 20px;">
+          <div class="bubble">"Parabéns! Nós vencemos o chefão da fase com sucesso! Você é demais!"</div>
+          <canvas id="victory-dog-canvas" width="160" height="160" class="menu-dog-anim"></canvas>
+        </div>
+        <button id="continue-btn" class="btn">Continuar Aventura</button>
+      </div>
+
+      <div id="game-over-screen" class="screen hidden">
+        <h1 class="title-3d" style="color:#ff3333;text-shadow:0 0 20px #f00;">GAME OVER</h1>
+        <p style="font-size:24px;">Score Final: <span id="final-score">0</span></p>
+        <button id="restart-btn" class="btn">Tentar Novamente</button>
+      </div>
+
+      <div id="phase-transition" class="screen hidden">
+        <h1 class="phase-text">Fase <span id="next-phase">2</span>!</h1>
+      </div>
+    </div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
