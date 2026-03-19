@@ -51,6 +51,16 @@
           <p><span class="key">←</span> / <span class="key">→</span> : Movimentar</p>
         </div>
         <button id="start-btn" class="btn">Topa Começar? Vamos Nessa!</button>
+
+        <!-- Banner de instalação -->
+        <div id="install-banner" style="display:none; margin-top:10px; text-align:center;">
+          <button id="install-btn" class="btn" style="background: linear-gradient(135deg,#7b2ff7,#f107a3); font-size:13px; padding:6px 18px;">
+            📲 Instalar na tela inicial
+          </button>
+          <p id="ios-hint" style="display:none; font-size:11px; color:#aaa; margin-top:5px;">
+            No Safari: toque em <strong style='color:#fff'>⬆ Compartilhar</strong> → <strong style='color:#fff'>Adicionar à Tela de Início</strong>
+          </p>
+        </div>
       </div>
 
       <div id="phase-complete-screen" class="screen hidden" style="background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);">
@@ -144,6 +154,51 @@
           startBtn.click();
         }, { passive: false });
       }
+
+      // ===== PWA INSTALL PROMPT =====
+      let deferredPrompt = null;
+      const installBanner = document.getElementById('install-banner');
+      const installBtn = document.getElementById('install-btn');
+      const iosHint = document.getElementById('ios-hint');
+
+      // Detecta iOS (Safari não suporta beforeinstallprompt)
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches
+                                || window.navigator.standalone;
+
+      if (isIOS && !isInStandaloneMode) {
+        // Mostra dica de adição manual para usuários iOS
+        installBanner.style.display = 'block';
+        installBtn.style.display = 'none';
+        iosHint.style.display = 'block';
+      }
+
+      // Android/Chrome: captura o evento de instalação
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault(); // Impede o prompt automático
+        deferredPrompt = e;
+        if (!isInStandaloneMode) {
+          installBanner.style.display = 'block'; // Mostra nosso botão
+        }
+      });
+
+      // Quando o usuário clica em instalar
+      if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+          if (!deferredPrompt) return;
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          if (outcome === 'accepted') {
+            installBanner.style.display = 'none';
+          }
+          deferredPrompt = null;
+        });
+      }
+
+      // Se já instalado, esconde o banner
+      window.addEventListener('appinstalled', () => {
+        installBanner.style.display = 'none';
+      });
 
       // Orientação: mostra aviso se portrait
       function checkOrientation() {
