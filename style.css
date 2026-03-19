@@ -233,3 +233,75 @@ p {
   50% { transform: translateY(-5px); }
   100% { transform: translateY(0); }
 }
+
+/* ===== MOBILE TOUCH CONTROLS ===== */
+#touch-controls {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 20px;
+  justify-content: space-between;
+  z-index: 100;
+  pointer-events: none;
+}
+
+#touch-left, #touch-right {
+  display: flex;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.touch-btn {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.5);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 22px;
+  font-family: 'Righteous', cursive;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  transition: background 0.1s, transform 0.1s;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.touch-btn:active {
+  background: rgba(79, 172, 254, 0.6);
+  transform: scale(0.9);
+}
+
+.touch-action {
+  width: 80px;
+  height: 80px;
+  font-size: 14px;
+  background: rgba(30, 0, 80, 0.6);
+  border-color: rgba(150, 100, 255, 0.7);
+}
+
+/* Mostrar apenas em telas de celular/tablet */
+@media (max-width: 900px), (pointer: coarse) {
+  #touch-controls {
+    display: flex;
+  }
+
+  #game-container {
+    width: 100vw;
+    height: calc(100vh - 100px);
+    border-radius: 0;
+    border: none;
+  }
+
+  canvas {
+    border-radius: 0;
+  }
+
+  .controls {
+    display: none; /* Esconde instruções de teclado no celular */
+  }
+}

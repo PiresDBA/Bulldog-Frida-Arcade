@@ -2,9 +2,16 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Luna Arcade" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#3366ff" />
     <title>Salsichinha Luna Arcade</title>
     <link rel="stylesheet" href="./style.css">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./icon-192.png">
   </head>
   <body>
     <div id="yt-player-container" style="position: absolute; opacity: 0; pointer-events: none; overflow: hidden; z-index: -100;">
@@ -26,7 +33,7 @@
         
         <div class="luna-dialog">
           <div class="bubble" id="luna-speech-bubble"></div>
-          <canvas id="menu-dog-canvas" width="160" height="160" class="menu-dog-anim"></canvas>
+          <img id="menu-dog-img" src="./luna-menu-transparent.png" class="menu-dog-anim" alt="Luna Salsicha">
         </div>
 
         <div class="controls">
@@ -40,7 +47,7 @@
       <div id="phase-complete-screen" class="screen hidden" style="background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);">
         <div class="luna-dialog" style="margin-bottom: 20px;">
           <div class="bubble">"Parabéns! Nós vencemos o chefão da fase com sucesso! Você é demais!"</div>
-          <canvas id="victory-dog-canvas" width="160" height="160" class="menu-dog-anim"></canvas>
+          <img id="victory-dog-img" src="./luna-menu-transparent.png" class="menu-dog-anim" alt="Luna Salsicha">
         </div>
         <button id="continue-btn" class="btn">Continuar Aventura</button>
       </div>
@@ -65,6 +72,54 @@
         <h1 class="phase-text">Fase <span id="next-phase">2</span>!</h1>
       </div>
     </div>
+
+    <!-- CONTROLES TOUCH PARA CELULAR -->
+    <div id="touch-controls">
+      <div id="touch-left">
+        <button id="btn-left" class="touch-btn">◀</button>
+        <button id="btn-right" class="touch-btn">▶</button>
+      </div>
+      <div id="touch-right">
+        <button id="btn-jump" class="touch-btn touch-action">↑ PULAR</button>
+        <button id="btn-shoot" class="touch-btn touch-action">🦴 ATIRAR</button>
+      </div>
+    </div>
+
     <script type="module" src="/main.js"></script>
+    <script>
+      // Register Service Worker for PWA (installable as app)
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('SW registered:', reg.scope))
+            .catch(err => console.log('SW error:', err));
+        });
+      }
+
+      // Touch Controls wiring
+      function setupTouchControls() {
+        const controls = [
+          { id: 'btn-left',  code: 'ArrowLeft',  key: 'ArrowLeft' },
+          { id: 'btn-right', code: 'ArrowRight', key: 'ArrowRight' },
+          { id: 'btn-jump',  code: 'ArrowUp',    key: 'ArrowUp' },
+          { id: 'btn-shoot', code: 'KeyZ',       key: 'z' }
+        ];
+
+        controls.forEach(({ id, code, key }) => {
+          const btn = document.getElementById(id);
+          if (!btn) return;
+          btn.addEventListener('touchstart', e => {
+            e.preventDefault();
+            window.dispatchEvent(new KeyboardEvent('keydown', { code, key, bubbles: true }));
+          }, { passive: false });
+          btn.addEventListener('touchend', e => {
+            e.preventDefault();
+            window.dispatchEvent(new KeyboardEvent('keyup', { code, key, bubbles: true }));
+          }, { passive: false });
+        });
+      }
+
+      setupTouchControls();
+    </script>
   </body>
 </html>
