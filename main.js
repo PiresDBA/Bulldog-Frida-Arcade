@@ -306,61 +306,180 @@ function soundDogBark() {
 
 let currentBgNoise = null;
 let thunderInterval = null;
+let currentEngineOscs = [];
+
+// Pink noise - soa muito mais natural que ruído branco para vento/chuva
+function makePinkNoise(duration) {
+  const sr = audioCtx.sampleRate;
+  const buf = audioCtx.createBuffer(1, sr * duration, sr);
+  const d = buf.getChannelData(0);
+  let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+  for (let i = 0; i < d.length; i++) {
+    const w = Math.random() * 2 - 1;
+    b0 = 0.99886*b0 + w*0.0555179; b1 = 0.99332*b1 + w*0.0750759;
+    b2 = 0.96900*b2 + w*0.1538520; b3 = 0.86650*b3 + w*0.3104856;
+    b4 = 0.55000*b4 + w*0.5329522; b5 = -0.7616*b5 - w*0.0168980;
+    d[i] = (b0+b1+b2+b3+b4+b5+b6 + w*0.5362) * 0.11;
+    b6 = w * 0.115926;
+  }
+  return buf;
+}
+
+// Trovão realista: estrondo seco + rumble longo
+function soundThunderBolt() {
+  if(!audioCtx) return;
+  const t = audioCtx.currentTime;
+
+  // Estrondo inicial (noise burst curto)
+  const crackSrc = audioCtx.createBufferSource();
+  crackSrc.buffer = makePinkNoise(0.12);
+  const crackBp = audioCtx.createBiquadFilter();
+  crackBp.type = 'bandpass'; crackBp.frequency.value = 400; crackBp.Q.value = 0.5;
+  const crackGain = audioCtx.createGain();
+  crackGain.gain.setValueAtTime(2.5, t);
+  crackGain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+  crackSrc.connect(crackBp); crackBp.connect(crackGain); crackGain.connect(audioCtx.destination);
+  crackSrc.start(t); crackSrc.stop(t + 0.15);
+
+  // Rumble longo (pink noise passado por lowpass caindo)
+  const rumbleSrc = audioCtx.createBufferSource();
+  rumbleSrc.buffer = makePinkNoise(4);
+  const rumbleLp = audioCtx.createBiquadFilter();
+  rumbleLp.type = 'lowpass';
+  rumbleLp.frequency.setValueAtTime(350, t + 0.05);
+  rumbleLp.frequency.exponentialRampToValueAtTime(40, t + 4);
+  const rumbleGain = audioCtx.createGain();
+  rumbleGain.gain.setValueAtTime(1.2, t + 0.05);
+  rumbleGain.gain.exponentialRampToValueAtTime(0.001, t + 4);
+  rumbleSrc.connect(rumbleLp); rumbleLp.connect(rumbleGain); rumbleGain.connect(audioCtx.destination);
+  rumbleSrc.start(t + 0.05); rumbleSrc.stop(t + 4.1);
+}
 
 function playBgNoise(type) {
   if(!audioCtx) return;
   stopBgNoise();
-  const bufferSize = audioCtx.sampleRate * 2.0;
-  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-  currentBgNoise = audioCtx.createBufferSource();
-  currentBgNoise.buffer = buffer;
-  currentBgNoise.loop = true;
-  
-  const filter = audioCtx.createBiquadFilter();
-  const gain = audioCtx.createGain();
-  
+
   if (type === 'wind') {
-    filter.type = 'lowpass';
-    filter.frequency.value = 600;
-    gain.gain.value = 0.6;
+    // Vento: pink noise + LFO suave no filtro para simular rajadas
+    const noiseSrc = audioCtx.createBufferSource();
+    noiseSrc.buffer = makePinkNoise(4); noiseSrc.loop = true;
+    const lp = audioCtx.createBiquadFilter(); lp.type = 'bandpass'; lp.frequency.value = 700; lp.Q.value = 0.8;
+    const gain = audioCtx.createGain(); gain.gain.value = 0.5;
+    // LFO para rajadas de vento
+    const lfo = audioCtx.createOscillator(); lfo.frequency.value = 0.3;
+    const lfoGain = audioCtx.createGain(); lfoGain.gain.value = 250;
+    lfo.connect(lfoGain); lfoGain.connect(lp.frequency);
+    noiseSrc.connect(lp); lp.connect(gain); gain.connect(audioCtx.destination);
+    noiseSrc.start(); lfo.start();
+    currentBgNoise = noiseSrc;
+    currentEngineOscs.push(lfo);
+
   } else if (type === 'storm') {
-    filter.type = 'lowpass';
-    filter.frequency.value = 400;
-    gain.gain.value = 0.8;
-    thunderInterval = setInterval(() => { 
-      if(!currentBgNoise || !audioCtx) return;
+    // Tempestade: chuva (noise agudo) + trovões periódicos
+    const rainSrc = audioCtx.createBufferSource();
+    rainSrc.buffer = makePinkNoise(4); rainSrc.loop = true;
+    const rainHp = audioCtx.createBiquadFilter(); rainHp.type = 'highpass'; rainHp.frequency.value = 1200;
+    const rainLp = audioCtx.createBiquadFilter(); rainLp.type = 'lowpass'; rainLp.frequency.value = 8000;
+    const rainGain = audioCtx.createGain(); rainGain.gain.value = 0.4;
+    // Vento de fundo
+    const windSrc = audioCtx.createBufferSource();
+    windSrc.buffer = makePinkNoise(4); windSrc.loop = true;
+    const windLp = audioCtx.createBiquadFilter(); windLp.type = 'lowpass'; windLp.frequency.value = 600;
+    const windGain = audioCtx.createGain(); windGain.gain.value = 0.35;
+    rainSrc.connect(rainHp); rainHp.connect(rainLp); rainLp.connect(rainGain); rainGain.connect(audioCtx.destination);
+    windSrc.connect(windLp); windLp.connect(windGain); windGain.connect(audioCtx.destination);
+    rainSrc.start(); windSrc.start();
+    currentBgNoise = rainSrc;
+    currentEngineOscs.push(windSrc);
+    // Trovões aleatórios
+    thunderInterval = setInterval(() => { if(audioCtx) soundThunderBolt(); }, 2500 + Math.random()*2000);
+
+  } else if (type === 'car') {
+    // Motor de carro: fundamental 90Hz + harmônicos + flutter de rotação
+    const fundamental = 90;
+    const harmonicsFreqs = [1, 2, 3, 4, 6];
+    const harmonicsVol   = [0.5, 0.3, 0.2, 0.15, 0.08];
+    const masterGain = audioCtx.createGain(); masterGain.gain.value = 0.18;
+    const lp = audioCtx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900;
+    masterGain.connect(lp); lp.connect(audioCtx.destination);
+    harmonicsFreqs.forEach((mult, i) => {
       const osc = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(50, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 1.5);
-      g.gain.setValueAtTime(0.8, audioCtx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
-      osc.connect(g); g.connect(audioCtx.destination);
-      osc.start(); osc.stop(audioCtx.currentTime + 1.5);
-    }, 2500);
-  } else if (type === 'car' || type === 'motorcycle' || type === 'vacuum') {
-    filter.type = 'lowpass';
-    filter.frequency.value = type === 'motorcycle' ? 200 : (type === 'vacuum' ? 500 : 150); 
-    gain.gain.value = 0.5;
+      osc.type = 'sawtooth'; osc.frequency.value = fundamental * mult;
+      osc.detune.value = (Math.random()-0.5)*15;
+      const g = audioCtx.createGain(); g.gain.value = harmonicsVol[i];
+      osc.connect(g); g.connect(masterGain); osc.start();
+      currentEngineOscs.push(osc);
+    });
+    // Ruído residual do escapamento
+    const exhaust = audioCtx.createBufferSource(); exhaust.buffer = makePinkNoise(2); exhaust.loop = true;
+    const exGain = audioCtx.createGain(); exGain.gain.value = 0.06;
+    exhaust.connect(exGain); exGain.connect(audioCtx.destination); exhaust.start();
+    currentBgNoise = exhaust;
+    // Flutter de RPM
     thunderInterval = setInterval(() => {
-      if(!currentBgNoise || !audioCtx) return;
-      filter.frequency.linearRampToValueAtTime(type === 'motorcycle' ? 400 : 300, audioCtx.currentTime + 0.3);
-      filter.frequency.linearRampToValueAtTime(type === 'motorcycle' ? 200 : 150, audioCtx.currentTime + 0.8);
-    }, 1000);
+      if(!audioCtx) return;
+      const rev = 1 + (Math.random()*0.3);
+      currentEngineOscs.forEach(osc => {
+        if(osc.frequency) osc.frequency.linearRampToValueAtTime(osc.frequency.value*rev, audioCtx.currentTime+0.3);
+      });
+    }, 1200);
+
+  } else if (type === 'motorcycle') {
+    // Moto: mais agressiva, fundamental maior, rasgada
+    const fundamental = 160;
+    const harmonicsFreqs = [1, 1.5, 2, 3, 4];
+    const harmonicsVol   = [0.55, 0.2, 0.25, 0.15, 0.05];
+    const masterGain = audioCtx.createGain(); masterGain.gain.value = 0.2;
+    const dist = audioCtx.createWaveShaper();
+    // Distorção leve para som rasgado
+    const curve = new Float32Array(256);
+    for(let i=0;i<256;i++){const x=i*2/256-1; curve[i]=Math.tanh(x*3);}
+    dist.curve = curve;
+    masterGain.connect(dist); dist.connect(audioCtx.destination);
+    harmonicsFreqs.forEach((mult, i) => {
+      const osc = audioCtx.createOscillator();
+      osc.type = i%2===0 ? 'sawtooth' : 'square';
+      osc.frequency.value = fundamental * mult;
+      osc.detune.value = (Math.random()-0.5)*20;
+      const g = audioCtx.createGain(); g.gain.value = harmonicsVol[i];
+      osc.connect(g); g.connect(masterGain); osc.start();
+      currentEngineOscs.push(osc);
+    });
+    // Aceleração periódica
+    thunderInterval = setInterval(() => {
+      if(!audioCtx) return;
+      currentEngineOscs.forEach(osc => {
+        if(!osc.frequency) return;
+        const peak = osc.frequency.value * (1.5 + Math.random()*0.5);
+        osc.frequency.linearRampToValueAtTime(peak, audioCtx.currentTime + 0.2);
+        osc.frequency.linearRampToValueAtTime(osc.frequency.value, audioCtx.currentTime + 0.7);
+      });
+    }, 900);
+
+  } else if (type === 'vacuum') {
+    // Aspirador: motor elétrico 60Hz + zumbido + ar
+    const fundamental = 120;
+    [1,2,3,4,5].forEach((mult, i) => {
+      const osc = audioCtx.createOscillator();
+      osc.type = 'sine'; osc.frequency.value = fundamental * mult;
+      const g = audioCtx.createGain(); g.gain.value = 0.12 / (i+1);
+      osc.connect(g); g.connect(audioCtx.destination); osc.start();
+      currentEngineOscs.push(osc);
+    });
+    // Ruído de ar
+    const airSrc = audioCtx.createBufferSource(); airSrc.buffer = makePinkNoise(2); airSrc.loop = true;
+    const airBp = audioCtx.createBiquadFilter(); airBp.type = 'bandpass'; airBp.frequency.value = 3000; airBp.Q.value = 1.5;
+    const airGain = audioCtx.createGain(); airGain.gain.value = 0.3;
+    airSrc.connect(airBp); airBp.connect(airGain); airGain.connect(audioCtx.destination); airSrc.start();
+    currentBgNoise = airSrc;
   }
-  
-  currentBgNoise.connect(filter);
-  filter.connect(gain);
-  gain.connect(audioCtx.destination);
-  currentBgNoise.start();
 }
 
 function stopBgNoise() {
-  if(currentBgNoise) { currentBgNoise.stop(); currentBgNoise = null; }
+  try { if(currentBgNoise) { currentBgNoise.stop(); currentBgNoise = null; } } catch(e){}
   if(thunderInterval) { clearInterval(thunderInterval); thunderInterval = null; }
+  currentEngineOscs.forEach(o => { try { o.stop(); } catch(e){} });
+  currentEngineOscs = [];
 }
 // --- END AUDIO ---
 
