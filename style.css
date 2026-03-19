@@ -304,6 +304,10 @@ p {
 
 /* Landscape em celular: botões nas barras laterais */
 @media (max-height: 600px) and (orientation: landscape) {
+  /* Esconde banner de instalar no celular - não interfere com o jogo */
+  #install-banner {
+    display: none !important;
+  }
   #touch-controls {
     display: flex;
     position: fixed;
