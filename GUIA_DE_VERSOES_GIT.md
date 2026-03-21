@@ -6,27 +6,27 @@ Este arquivo foi criado para te ajudar a entender as últimas mudanças feitas n
 
 ## 🛠 Nossos Últimos Commits Recentes
 
-**ATENÇÃO:** Acabamos de criar a **Sexta Branch Nova** chamada `feat/terreno-diagonal-ursos`!
+**ATENÇÃO:** Nós acabamos de JUNTAR TUDO (Merge) de novo na **Branch Principal `master`**! Tudo o que fizemos nas últimas duas branches com o novo desenho e o sistema de dificuldade acabou de entrar pra valer no jogo - bem como o **Desenho Manual da Gaivota**!
 
-### Branch: `feat/terreno-diagonal-ursos` (URSOS, DECLIVES E DIFICULDADE DE TESTE)
-- **O que mudou:** `main.js`.
-- **Detalhes:**  
-  - **Terreno Inclinado / Diagonal:** A partir dos 15 segundos de todas as 10 fases, o chão do jogo inteiro começará lentamente a se inclinar num ângulo orgânico que forma uma longa ladeira ou descida maluca! O ângulo de inclinação se estabiliza momentos antes de o chefão chegar.
-  - **Mais Demorado e Difícil:** As fases foram artificialmente infladas em 50% para compensar a chegada rápida do chefe. Consequentemente, o número de buracos triplicou ao longo desse espaço perigoso.
-  - **Chuva de Torpedinhos:** A Gaivota e todos os outros chefões tiveram a taxa de lançamento de bombas do céu muito acelerada e mortal.
-  - **Novos Inimigos Terrestres:** Foi codificada a entrada dos temidos **Ursos Gigantes**. Três variações (Urso Pardo `🐻`, Urso Polar `🐻‍❄️` e o raro Panda `🐼`). Eles possuem som sintético novo de roncar agressivo e baixo, além de animações fofas com a coroa `❤️` os amansando quando recebem o alimento (inclusive eles até deitam dormindo felizes igual os gatos!).
-  - **Testando Agora:** Deixe o seu console web aberto, digite `git checkout feat/terreno-diagonal-ursos` e dê Refresh (`F5`) no navegador do PC para sofrer os novos desafios!
-  - **Como voltar a tranquilidade:** `git checkout master`
+### Branch Atual: `master`
+Aqui está a **base segura e final** do jogo neste momento.
+
+### 1. `Atualização de Cache do PWA para v8 (A Atualização Gigante)`
+- **O que mudou:** O código inteiro via `sw.js`. O `CACHE_NAME` passou para **v8**.
+- **Por que:** Seu navegador de PC ou celular estava travado guardando o jogo na versão "v7" sem as novidades que tínhamos falado (por isso ontem não mudou de cara). Mudar pra `v8` forçou o arquivo novo inteiro a descer no mesmo segundo com os Ursos, a Gaivota e o Urubu estilo Looney Tunes, o Morro Inclinado, Bico do míssil e as fases maiores!
 
 ---
 
+### *Histórico das Branches que foram Mescladas (Merges Anteriores/Antigos)*
+
+### Branch: `feat/terreno-diagonal-ursos` (URSOS, DECLIVES E DIFICULDADE DE TESTE)
+- **Detalhes:** 
+  - **Terreno Inclinado / Diagonal:** A partir dos 15 segundos da fase, o chão do jogo inteiro começará lentamente a se inclinar num ângulo orgânico formando uma longa ladeira.
+  - **Mais Demorado e Difícil:** As fases foram artificialmente infladas em 50% para compensar a chegada rápida do chefe. Consequentemente, o número de buracos triplicou ao longo desse espaço perigoso. O rate dos foguetes/torpedos foi acelerado.
+  - **Ursos Gigantes:** Variações Urso Pardo `🐻`, Urso Polar `🐻‍❄️` e o raro Panda `🐼` com rosnado próprio e sonoro!
+
 ### Branch: `feat/urubu-desenhado` (O URUBU ESTILO CARTOON)
-- **O que mudou:** `main.js`.
-- **Detalhes:**  
-  - **Deletado o Emoji:** Achei que só um emoji de Urubu (`🐦‍⬛`) não daria a cara de "vilão louco e malvado" que você pediu puxando a referência do desenho. 
-  - **Desenho Manual no Canvas:** Desenhei passo-a-passo (com curvas, linhas e preenchimento procedural de pintura) um Urubu gigante idêntico ao seu desenho! Ele possui o corpo corcunda, colar de penas brancas no pescoço longo, pele rosa na cabeça, um olho furioso com sobrancelha grossa e um bicaço laranja puxado! Asinhas batendo freneticamente!
-  - **Para Testar Só Ela (Agora!):** `git checkout feat/urubu-desenhado`
-  - **Como voltar pro Master oficial:** `git checkout master`
+- **Detalhes:** Desenho Procedural no Canvas de um Urubu gigante idêntico ao seu referencial de cartoon! Ele tem corcunda, colar de penas brancas no pescoço longo enrugado, pele rosa, um olho com pupila pequena, sobrancelha grossa e um bicaço laranja puxado! Asinhas batendo freneticamente.
 
 ---
 

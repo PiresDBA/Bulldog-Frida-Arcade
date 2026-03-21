@@ -1991,6 +1991,136 @@ function drawUrubu(ctx, flap) {
   ctx.restore();
 }
 
+function drawSeagull(ctx, flap) {
+  ctx.save();
+  ctx.translate(0, -30); // Centro da gaivota
+
+  // Asa de Tras
+  ctx.save();
+  ctx.translate(-25, 0);
+  ctx.rotate(-flap);
+  ctx.fillStyle = '#f0f0f0';
+  ctx.beginPath(); ctx.ellipse(-15, 10, 30, 15, -0.3, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+
+  // Corpo branco principal
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.ellipse(-10, 0, 35, 25, -0.1, 0, Math.PI*2);
+  ctx.fill();
+
+  // Asa da Frente batendo
+  ctx.save();
+  ctx.translate(-5, 5);
+  ctx.rotate(flap);
+  ctx.fillStyle = '#fdfdfd';
+  ctx.beginPath(); ctx.ellipse(-20, 15, 35, 15, 0.4, 0, Math.PI*2); ctx.fill();
+  // Detalhe das penas na asa
+  ctx.strokeStyle = '#e0e0e0'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-10, 5); ctx.lineTo(-30, 15); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-15, 2); ctx.lineTo(-35, 8); ctx.stroke();
+  ctx.restore();
+
+  // Base do Pescoço / Lencinho Bandana
+  ctx.save();
+  ctx.translate(20, -10);
+
+  // Lencinho Vermelho de bolinhas
+  ctx.fillStyle = '#cc1111';
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 14, 18, 0.2, 0, Math.PI*2);
+  ctx.fill();
+  
+  // Bolinhas brancas do lencinho
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath(); ctx.arc(-5, -8, 2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(2, -12, 1.5, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(4, 2, 2.5, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(-6, 5, 2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(8, -5, 1.5, 0, Math.PI*2); ctx.fill();
+  
+  // Nó do lencinho nas costas do pescoço
+  ctx.fillStyle = '#cc1111';
+  ctx.beginPath(); ctx.ellipse(-12, -15, 10, 4, -0.5, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(-14, -10, 10, 4, 0.5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath(); ctx.arc(-16, -11, 1, 0, Math.PI*2); ctx.fill();
+
+  // Cabeca Branca
+  ctx.translate(12, -4);
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 16, 18, 0, 0, Math.PI*2);
+  ctx.fill();
+  
+  // 3 peninhas arrepiadas na cabeça
+  ctx.strokeStyle = '#fdfdfd'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-6, -16); ctx.lineTo(-12, -26); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, -17); ctx.lineTo(-2, -30); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(6, -15); ctx.lineTo(10, -25); ctx.stroke();
+
+  // Bico Adunco Longo, Fino e Laranja
+  ctx.fillStyle = '#e87b1c';
+  ctx.beginPath();
+  ctx.moveTo(12, 5);
+  ctx.quadraticCurveTo(30, 20, 50, 25);
+  ctx.quadraticCurveTo(20, 25, 5, 12);
+  ctx.fill();
+  
+  ctx.strokeStyle = '#c4620f'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(15, 10); ctx.lineTo(35, 20); ctx.stroke();
+
+  // Bochechas rosadas de vergonha/cansaco
+  ctx.fillStyle = '#ff99aa';
+  ctx.beginPath(); ctx.ellipse(4, 10, 6, 4, -0.1, 0, Math.PI*2); ctx.fill();
+
+  // Oculos Gatinha Vermelho (Cat-Eye)
+  ctx.strokeStyle = '#cc1111';
+  ctx.lineWidth = 3;
+  ctx.lineJoin = 'round';
+  
+  // Lente Esquerda
+  ctx.beginPath();
+  ctx.moveTo(-11, -12); // Ponto alto esquerdo
+  ctx.quadraticCurveTo(-6, 8, 3, -6); // curva inferior
+  ctx.quadraticCurveTo(-6, -16, -11, -12); // curva superior
+  ctx.stroke();
+  
+  // Lente Direita
+  ctx.beginPath();
+  ctx.moveTo(5, -6); // Ponto interno / ponte
+  ctx.quadraticCurveTo(12, 10, 18, -4); // curva inferior
+  ctx.quadraticCurveTo(14, -18, 5, -6); // curva superior
+  ctx.stroke();
+
+  // Olhos de Cara de Boba (Cansados e Vesgos)
+  
+  // Pupilas azuis bebê e esbugalhadas pro bico (Vesga)
+  ctx.fillStyle = '#55aaff'; 
+  ctx.beginPath(); ctx.arc(-2, -6, 2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(7, -3, 2, 0, Math.PI*2); ctx.fill();
+
+  // Pálpebra fechando (olho cansado e bobo)
+  ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(-6, -7); ctx.lineTo(0, -5); ctx.stroke(); // olho esquerdo
+  ctx.beginPath(); ctx.moveTo(5, -4); ctx.lineTo(12, -2); ctx.stroke(); // olho direito
+  
+  // Cilios finos da madame
+  ctx.beginPath(); ctx.moveTo(-6, -7); ctx.lineTo(-8, -12); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-3, -6); ctx.lineTo(-4, -10); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(11, -2); ctx.lineTo(13, -7); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(8, -3); ctx.lineTo(9, -8); ctx.stroke();
+
+  ctx.restore(); // restored head & neck
+
+  // Pezinhos de gaivota laranjas balançando
+  ctx.fillStyle = '#e87b1c';
+  ctx.beginPath(); ctx.ellipse(-10, 22, 6, 4, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(-2, 22, 6, 4, 0, 0, Math.PI*2); ctx.fill();
+
+  ctx.restore(); // restored bird center
+}
+
 function drawAnimal(ctx, x, y, type, timer, badType) {
   ctx.save();
   ctx.translate(x, y + Math.sin(timer * 5) * 15); 
@@ -2269,14 +2399,8 @@ function render() {
         ctx.fillText('🏍️', 0, 0); 
         drawAngryEyes(ctx, 5, -5);
     } else if (boss.type === 'seagull') {
-        ctx.fillText('🦤', 0, 0); 
-        // Vesga e bobona
-        ctx.fillStyle = '#fff';
-        ctx.beginPath(); ctx.arc(-10, -5, 10, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.arc(10, -5, 10, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#000';
-        ctx.beginPath(); ctx.arc(-13, -5, 4, 0, Math.PI*2); ctx.fill(); // cross-eyed left
-        ctx.beginPath(); ctx.arc(7, -5, 4, 0, Math.PI*2); ctx.fill(); // cross-eyed right
+        const flap = Math.sin(boss.timer * 15) * 0.3;
+        drawSeagull(ctx, flap);
     } else if (boss.type === 'bigdog') {
         ctx.fillText('🐺', 0, 0); 
         drawAngryEyes(ctx, 0, -10);
