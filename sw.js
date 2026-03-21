@@ -1,4 +1,4 @@
-const CACHE_NAME = 'luna-arcade-v2';
+const CACHE_NAME = 'luna-arcade-v3';
 const ASSETS = [
   '/',
   '/index.html',
@@ -7,7 +7,8 @@ const ASSETS = [
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
-  '/luna-menu-transparent.png'
+  '/luna-menu-transparent.png',
+  '/bgm.mp3'
 ];
 
 self.addEventListener('install', event => {
