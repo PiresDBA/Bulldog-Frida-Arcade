@@ -471,6 +471,13 @@ function soundBear() {
   clone.volume = 1.0;
   clone.play().catch(e => console.log('Áudio de urso bloqueado por autoplay: ', e));
 }
+const crowAudio = new Audio('crow.mp3');
+function soundCrow() {
+  const clone = crowAudio.cloneNode(true);
+  clone.volume = 1.0;
+  clone.play().catch(e => console.log('Crow audio blocked: ', e));
+}
+
 // --- END AUDIO ---
 
 let _t = 0;
@@ -1115,6 +1122,7 @@ function update(dt) {
         type: types[Math.floor(Math.random() * types.length)],
         badType: badTypes[Math.floor(Math.random() * badTypes.length)]
       });
+      soundCrow();
     }
   }
 
