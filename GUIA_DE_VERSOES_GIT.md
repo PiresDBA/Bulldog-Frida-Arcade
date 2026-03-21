@@ -6,7 +6,22 @@ Este arquivo foi criado para te ajudar a entender as últimas mudanças feitas n
 
 ## 🛠 Nossos Últimos Commits Recentes
 
-**ATENÇÃO:** Nós acabamos de criar uma **Branch Nova Segunda** chamada `correcoes-finais-animais`!
+**ATENÇÃO:** Nós acabamos de criar uma **Terceira Branch Nova** chamada `feat/novos-chefes`!
+
+### Branch: `feat/novos-chefes` (A EXPANSÃO DOS CHEFÕES)
+- **O que mudou:** `main.js`.
+- **Detalhes:**  
+  - **Dobro de Chefões:** Expandimos de 5 para 10 os Medos do Final da Fase para parear com a quantidade nova de cenários.
+  - **Novos Inimigos Finais:** Foram adicionados e desenhados:
+    1. `🦤` **A Gaivota Bobona:** Voa fazendo vento. E é a única com os olhos bobões originais ("Vesga").
+    2. `🐺` **O Cachorrão Negro:** Usa latidos misturados de forma monstruosa com sons graves do motor do carro para assustar.
+    3. `🧹` **A Vassoura:** Tomou a vassoura de volta do aspirador, com um som seco de ar varrendo! (Obs: O Aspirador virou um Imã Gigante `🧲` para representar puxão magnético/sucção visualmente).
+    4. `🎇` **Fogos de Artifício:** Soltando estrondos baseados no gerador de tempestades.
+    5. `🚿` **Mangueira de Banho:** Jorrando águas caoticamente sob a forma espalhada pelo vento.
+  - **Para Testar Só Ela (Agora!):** `git checkout feat/novos-chefes`
+  - **Como voltar pro Master oficial:** `git checkout master`
+
+---
 
 ### Branch: `correcoes-finais-animais` (A MAIS NOVA E PERFEITA)
 - **O que mudou:** `main.js`.

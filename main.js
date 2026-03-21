@@ -329,7 +329,14 @@ function playBgNoise(type) {
   if(!audioCtx) return;
   stopBgNoise();
 
-  if (type === 'wind') {
+  let soundType = type;
+  if (type === 'seagull') soundType = 'wind';
+  if (type === 'hose') soundType = 'wind';
+  if (type === 'broom') soundType = 'vacuum';
+  if (type === 'fireworks') soundType = 'storm';
+  if (type === 'bigdog') soundType = 'car';
+
+  if (soundType === 'wind') {
     // Vento: pink noise + LFO suave no filtro para simular rajadas
     const noiseSrc = audioCtx.createBufferSource();
     noiseSrc.buffer = makePinkNoise(4); noiseSrc.loop = true;
@@ -946,13 +953,17 @@ function update(dt) {
   game.bgOffset += game.speed * dt;
 
   if (game.timeInPhase > game.phaseDuration && !boss) {
-    let bType = 'storm';
-    const bPhase = game.phase % 5;
+    let bType = 'motorcycle';
+    const bPhase = game.phase % 10;
     if (bPhase === 1) bType = 'wind';
     else if (bPhase === 2) bType = 'storm';
     else if (bPhase === 3) bType = 'vacuum';
     else if (bPhase === 4) bType = 'car';
-    else bType = 'motorcycle';
+    else if (bPhase === 5) bType = 'seagull';
+    else if (bPhase === 6) bType = 'bigdog';
+    else if (bPhase === 7) bType = 'broom';
+    else if (bPhase === 8) bType = 'fireworks';
+    else if (bPhase === 9) bType = 'hose';
 
     boss = {
       x: canvas.width + 100, y: 150, 
@@ -2055,13 +2066,34 @@ function render() {
         ctx.fillText('🌩️', 0, 0); 
         drawAngryEyes(ctx, 0, 10);
     } else if (boss.type === 'vacuum') {
-        ctx.fillText('🧹', 0, 0); 
+        ctx.fillText('🧲', 0, 0); // Magnet representing vacuum suction
         drawAngryEyes(ctx, 0, -10);
     } else if (boss.type === 'car') {
         ctx.fillText('🚘', 0, 0); 
         drawAngryEyes(ctx, 0, 5);
-    } else {
+    } else if (boss.type === 'motorcycle') {
         ctx.fillText('🏍️', 0, 0); 
+        drawAngryEyes(ctx, 5, -5);
+    } else if (boss.type === 'seagull') {
+        ctx.fillText('🦤', 0, 0); 
+        // Vesga e bobona
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.arc(-10, -5, 10, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(10, -5, 10, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.beginPath(); ctx.arc(-13, -5, 4, 0, Math.PI*2); ctx.fill(); // cross-eyed left
+        ctx.beginPath(); ctx.arc(7, -5, 4, 0, Math.PI*2); ctx.fill(); // cross-eyed right
+    } else if (boss.type === 'bigdog') {
+        ctx.fillText('🐺', 0, 0); 
+        drawAngryEyes(ctx, 0, -10);
+    } else if (boss.type === 'broom') {
+        ctx.fillText('🧹', 0, 0); 
+        drawAngryEyes(ctx, 0, -10);
+    } else if (boss.type === 'fireworks') {
+        ctx.fillText('🎇', 0, 0); 
+        drawAngryEyes(ctx, 0, -5);
+    } else if (boss.type === 'hose') {
+        ctx.fillText('🚿', 0, 0); 
         drawAngryEyes(ctx, 5, -5);
     }
     
@@ -2083,6 +2115,12 @@ function render() {
     else if (boss.type === 'storm') fearName = 'TROVÃO';
     else if (boss.type === 'vacuum') fearName = 'ASPIRADOR';
     else if (boss.type === 'car') fearName = 'CARRO';
+    else if (boss.type === 'motorcycle') fearName = 'MOTO';
+    else if (boss.type === 'seagull') fearName = 'GAIVOTA BOBONA';
+    else if (boss.type === 'bigdog') fearName = 'CACHORRÃO';
+    else if (boss.type === 'broom') fearName = 'VASSOURA';
+    else if (boss.type === 'fireworks') fearName = 'FOGOS';
+    else if (boss.type === 'hose') fearName = 'BANHO';
 
     ctx.fillText(fearName, 0, 60);
 
