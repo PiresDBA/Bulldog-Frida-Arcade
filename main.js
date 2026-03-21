@@ -459,29 +459,17 @@ function stopBgNoise() {
   currentEngineOscs = [];
 }
 
-function soundBear() {
-  if(!audioCtx) return;
-  const t = audioCtx.currentTime;
-  const osc = audioCtx.createOscillator();
-  osc.type = 'sawtooth';
-  osc.frequency.setValueAtTime(80, t);
-  osc.frequency.exponentialRampToValueAtTime(30, t + 0.3);
-  const lp = audioCtx.createBiquadFilter();
-  lp.type = 'lowpass';
-  lp.frequency.setValueAtTime(400, t);
-  lp.frequency.exponentialRampToValueAtTime(100, t + 0.3);
-  const gain = audioCtx.createGain();
-  gain.gain.setValueAtTime(2.0, t);
-  gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
-  osc.connect(lp); lp.connect(gain); gain.connect(audioCtx.destination);
-  osc.start(t); osc.stop(t+0.35);
+const bearAudioPool = [
+  'bear1.mp3',
+  'bear2.mp3',
+  'bear3.mp3'
+].map(src => new Audio(src));
 
-  const osc2= audioCtx.createOscillator(); osc2.type = 'sawtooth';
-  osc2.frequency.setValueAtTime(80, t+0.2); osc2.frequency.exponentialRampToValueAtTime(30, t+0.5);
-  const lp2= audioCtx.createBiquadFilter(); lp2.type='lowpass'; lp2.frequency.setValueAtTime(400, t+0.2); lp2.frequency.exponentialRampToValueAtTime(100, t+0.5);
-  const gain2= audioCtx.createGain(); gain2.gain.setValueAtTime(2.0, t+0.2); gain2.gain.exponentialRampToValueAtTime(0.01, t+0.5);
-  osc2.connect(lp2); lp2.connect(gain2); gain2.connect(audioCtx.destination);
-  osc2.start(t+0.2); osc2.stop(t+0.55);
+function soundBear() {
+  const audio = bearAudioPool[Math.floor(Math.random() * bearAudioPool.length)];
+  const clone = audio.cloneNode(true);
+  clone.volume = 1.0;
+  clone.play().catch(e => console.log('Áudio de urso bloqueado por autoplay: ', e));
 }
 // --- END AUDIO ---
 
