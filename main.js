@@ -1080,7 +1080,8 @@ function update(dt) {
   }
   if (Math.random() < baseEnemyChance) { 
     if (enemies.length < maxEnemies) { 
-      const types = ['🦦','🐈','🐒','🕊️','🦁','🐯','🐘','🦓','🐻','🦒','🐼','🐨','🦘','🐧','🦏','🦛','🦍','🐢','🐊','🐍','🐪', '🐆', '🦥'];
+      // Apenas animais com corpos inteiros (sem rostos avulsos como urso ou panda)
+      const types = ['🐈','🐒','🕊️','🐅','🐎','🐂','🐄','🐖','🐏','🐑','🐐','🐪','🦌','🐇','🐿️'];
       const badTypes = ['🐦‍⬛'];
       enemies.push({ 
         x: canvas.width + 50, 
@@ -1849,6 +1850,10 @@ function drawAnimal(ctx, x, y, type, timer, badType) {
   ctx.lineTo(0, 30);
   ctx.stroke();
 
+  // Animação de pânico (chacoalha) do bichinho segurado
+  const panicWobble = Math.sin(timer * 20) * 0.15;
+  ctx.rotate(panicWobble);
+
   ctx.font = '40px Arial';
   ctx.fillText(type, 0, 40); 
   
@@ -2137,18 +2142,28 @@ function render() {
   }
 
   for(let b of bombs) {
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(Math.PI * 0.75); // Gira 135 graus para que o bico caia apontando para o chão!
+
     ctx.font = '45px Arial'; 
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.shadowColor = 'rgba(0,0,0,0.6)';
     ctx.shadowBlur = 10;
-    ctx.fillText('🚀', b.x, b.y); 
+    ctx.fillText('🚀', 0, 0); 
     ctx.shadowBlur = 0;
+    ctx.restore();
   }
 
   for(let sa of savedAnimals) {
     ctx.save();
     ctx.translate(sa.x, sa.y);
+    
+    // Animação do paraquedas balançando suavemente
+    const swing = Math.sin(Date.now() * 0.003) * 0.2;
+    ctx.rotate(swing);
+
     ctx.font = '40px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';

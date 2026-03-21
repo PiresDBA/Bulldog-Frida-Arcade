@@ -6,7 +6,20 @@ Este arquivo foi criado para te ajudar a entender as últimas mudanças feitas n
 
 ## 🛠 Nossos Últimos Commits Recentes
 
-**ATENÇÃO:** Nós acabamos de JUNTAR TUDO (Merge) na **Branch Principal `master`**! Tudo o que fizemos nas branches separadas agora faz parte oficialmente do jogo para todos.
+**ATENÇÃO:** Nós acabamos de criar a **Quarta Branch Nova** chamada `feat/corpos-animais-torpedo`!
+
+### Branch: `feat/corpos-animais-torpedo` (A REFINAÇÃO TOTAL)
+- **O que mudou:** `main.js`.
+- **Detalhes:**  
+  - **Fim das Cabeças Flutuantes:** A lista de animais resgatados foi inteiramente limpa e reduzida apenas aos animais que garantidamente exibem o "Corpo Inteiro" sempre (Gatos, Macacos, Pássaros, Tigres, Cavalos, Bois, Vacas, Porcos, Carneiros, Ovelhas, Bodes, Camelos, Cervos, Coelhos e Esquilos). Nada de rostos da zebra cortados!
+  - **Torpedo Apontando Pro Chão:** Aplicado um cálculo reverso de giros de câmera (Math.PI * 0.75 / 135 graus) que força o foguetinho `🚀` a perder aquele bico obliquo dele, caindo perfeitamente projetado e embicado para o chão reto enquanto ameaça!
+  - **Novas Animações (Movimentação):** 
+    - Efeito de **Pânico**: Os bichinhos que estão sendo sequestrados amarrados na corda do pássaro Urubu agora chacoalham alucinadamente tentado se soltar.
+    - Efeito de **Pouso Suave**: Após libertados com o tiro, os paraquedas não descem mais na marra, o eixo deles balança num movimento pendular super realista pra esquerda e pra direita graças a uma onda `Senoidal`.
+  - **Para Testar Só Ela (Agora!):** `git checkout feat/corpos-animais-torpedo`
+  - **Como voltar pro Master oficial:** `git checkout master`
+
+---
 
 ### Branch Autal: `master`
 Aqui estão as mudanças antigas e novas, que agora formam a **base segura e final** do jogo.
