@@ -458,6 +458,31 @@ function stopBgNoise() {
   currentEngineOscs.forEach(o => { try { o.stop(); } catch(e){} });
   currentEngineOscs = [];
 }
+
+function soundBear() {
+  if(!audioCtx) return;
+  const t = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(80, t);
+  osc.frequency.exponentialRampToValueAtTime(30, t + 0.3);
+  const lp = audioCtx.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.setValueAtTime(400, t);
+  lp.frequency.exponentialRampToValueAtTime(100, t + 0.3);
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(2.0, t);
+  gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+  osc.connect(lp); lp.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(t); osc.stop(t+0.35);
+
+  const osc2= audioCtx.createOscillator(); osc2.type = 'sawtooth';
+  osc2.frequency.setValueAtTime(80, t+0.2); osc2.frequency.exponentialRampToValueAtTime(30, t+0.5);
+  const lp2= audioCtx.createBiquadFilter(); lp2.type='lowpass'; lp2.frequency.setValueAtTime(400, t+0.2); lp2.frequency.exponentialRampToValueAtTime(100, t+0.5);
+  const gain2= audioCtx.createGain(); gain2.gain.setValueAtTime(2.0, t+0.2); gain2.gain.exponentialRampToValueAtTime(0.01, t+0.5);
+  osc2.connect(lp2); lp2.connect(gain2); gain2.connect(audioCtx.destination);
+  osc2.start(t+0.2); osc2.stop(t+0.55);
+}
 // --- END AUDIO ---
 
 let _t = 0;
@@ -498,7 +523,7 @@ let game = {
   bgSpeed: 50, 
   bgOffset: 0,
   timeInPhase: 0,
-  phaseDuration: 30000,
+  phaseDuration: 45000,
 };
 
 let player = {
@@ -822,6 +847,7 @@ function resetPhase() {
   player.dead = false;
   player.invincible = false;
   player.invincibleTimer = 0;
+  game.cameraAngle = 0;
   bullets = [];
   upBullets = [];
   holes = [];
@@ -1054,11 +1080,17 @@ function update(dt) {
   if(game.difficulty === 'easy') spawnMult = 0.5;
   if(game.difficulty === 'hard') spawnMult = 1.5;
 
-  const baseHoleChance = (boss || game.timeInPhase > game.phaseDuration - 2000) ? 0 : (0.001 + (game.phase * 0.0003)) * spawnMult;
+  const baseHoleChance = (boss || game.timeInPhase > game.phaseDuration - 2000) ? 0 : (0.003 + (game.phase * 0.0006)) * spawnMult;
   const baseBulldogChance = boss ? 0 : (0.002 + (game.phase * 0.0005)) * spawnMult;
   
   const maxEnemies = boss ? 0 : Math.max(1, Math.ceil((1 + game.phase) * spawnMult)); 
-  const baseEnemyChance = boss ? 0 : (0.002 + (game.phase * 0.001)) * spawnMult; 
+  const baseEnemyChance = boss ? 0 : (0.003 + (game.phase * 0.001)) * spawnMult; 
+
+  let targetAngle = 0; // Inclinação Diagonal do Terreno
+  if (!boss && game.timeInPhase > 15000 && game.timeInPhase < game.phaseDuration - 8000) {
+    targetAngle = Math.sin(game.timeInPhase * 0.0002) * 0.15; 
+  }
+  game.cameraAngle = (game.cameraAngle || 0) + (targetAngle - (game.cameraAngle || 0)) * dt * 1.5;
 
   if (Math.random() < baseHoleChance) {
     if (holes.length === 0 || holes[holes.length-1].x < canvas.width - 350) {
@@ -1071,11 +1103,14 @@ function update(dt) {
       if (Math.abs(h.x - canvas.width) < h.width * 2 + 100) valid = false;
     }
     if (valid && bulldogs.length < 2) { 
-      const t = Math.random() > 0.5 ? 'frida' : 'cinder';
-      let w = t === 'cinder' ? 60 : 110; 
-      let h = t === 'cinder' ? 35 : 50;
+      const kinds = ['cinder', 'frida', 'white_bear', 'brown_bear', 'panda_bear'];
+      const t = kinds[Math.floor(Math.random() * kinds.length)];
+      let w = t === 'cinder' ? 60 : (t === 'frida' ? 110 : 90); 
+      let h = t === 'cinder' ? 35 : (t === 'frida' ? 50 : 60);
       bulldogs.push({ x: canvas.width, y: GROUND_Y, width: w, height: h, state: 'idle', animTimer: 0, kind: t }); 
-      if (t === 'cinder') soundMeow(); else soundDogBark();
+      if (t === 'cinder') soundMeow(); 
+      else if (t.includes('bear')) soundBear(); 
+      else soundDogBark();
     }
   }
   if (Math.random() < baseEnemyChance) { 
@@ -1167,9 +1202,9 @@ function update(dt) {
         boss.x = canvas.width / 2 + Math.sin(boss.timer * 1.5) * (canvas.width / 2 - 50);
         boss.y = 150 + Math.sin(boss.timer * 3.5) * 80;
         
-        // Boss shoots fast bombs
-        if (Math.random() < 0.03 + (game.phase * 0.01)) {
-           bombs.push({ x: boss.x, y: boss.y + 40, vy: 300 });
+        // Boss joga torpedos muito mais rapido agora (rate maior)
+        if (Math.random() < 0.05 + (game.phase * 0.015)) {
+           bombs.push({ x: boss.x, y: boss.y + 40, vy: 400 });
         }
       }
 
@@ -1814,6 +1849,45 @@ function drawBulldog(ctx, x, y, width, height, timer, state) {
   }
 }
 
+function drawBear(ctx, x, y, kind, timer, state) {
+  ctx.save();
+  ctx.translate(x, y);
+
+  // Placa de nome
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.fillRect(-25, -70, 50, 15);
+  ctx.fillStyle = '#fff';
+  ctx.font = '10px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  let name = "URSO";
+  if(kind === 'white_bear') name = "POLAR";
+  if(kind === 'panda_bear') name = "PANDA";
+  ctx.fillText(name, 0, -62);
+
+  let emoji = '🐻';
+  if(kind === 'white_bear') emoji = '🐻‍❄️';
+  if(kind === 'panda_bear') emoji = '🐼';
+
+  if (state === 'eating' || state === 'jumping_to_eat') {
+     ctx.font = '50px Arial';
+     ctx.fillText('❤️', 0, -30);
+     if (state === 'eating') {
+         ctx.translate(-20, 0); 
+         ctx.rotate(Math.PI/2 - 0.2); // deita pra dormir feliz
+         ctx.fillText(emoji, 0, -10);
+     } else { // Pulo
+         ctx.rotate(timer * 15);
+         ctx.fillText(emoji, 0, -10);
+     }
+  } else {
+     ctx.translate(0, -30 + Math.sin(timer * 10) * 5); // movimento de caminhar pesado
+     ctx.font = '60px Arial';
+     ctx.fillText(emoji, 0, 0);
+  }
+  ctx.restore();
+}
+
 function drawUrubu(ctx, flap) {
   ctx.save();
   ctx.translate(0, -35); // Centro do Pássaro
@@ -1996,14 +2070,22 @@ function drawStone(ctx, x, y, rot) {
 function render() {
   const theme = getTheme(game.phase);
   
-  const skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  const skyGrad = ctx.createLinearGradient(0, -400, 0, canvas.height + 400);
   skyGrad.addColorStop(0, theme.sky);
   if (theme.type === 'forest') skyGrad.addColorStop(1, '#afeeee');
   else if (theme.type === 'mountain') skyGrad.addColorStop(1, '#ffc0cb');
   else skyGrad.addColorStop(1, '#000');
 
   ctx.fillStyle = skyGrad;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // Preenche uma grande area para nao aparecer bordas vazias quando o jogo inclina!
+  ctx.fillRect(-600, -600, canvas.width + 1200, canvas.height + 1200);
+
+  ctx.save();
+  if (game.cameraAngle) {
+    ctx.translate(canvas.width / 2, Math.min(GROUND_Y, canvas.height / 2 + 100)); 
+    ctx.rotate(game.cameraAngle);
+    ctx.translate(-canvas.width / 2, -Math.min(GROUND_Y, canvas.height / 2 + 100));
+  }
 
   if (theme.starAlpha > 0) {
     ctx.fillStyle = '#fff';
@@ -2067,17 +2149,17 @@ function render() {
     ctx.shadowBlur = 0;
   }
 
-  const g1Grad = ctx.createLinearGradient(0, GROUND_Y, 0, canvas.height);
+  const g1Grad = ctx.createLinearGradient(0, GROUND_Y, 0, canvas.height + 600);
   g1Grad.addColorStop(0, theme.g1);
   g1Grad.addColorStop(1, '#111'); 
   ctx.fillStyle = g1Grad;
-  ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
+  ctx.fillRect(-600, GROUND_Y, canvas.width + 1200, canvas.height - GROUND_Y + 600);
   
   ctx.fillStyle = theme.g2; 
   ctx.beginPath();
-  let startX = -(game.bgOffset % 40); 
-  ctx.moveTo(0, GROUND_Y - 20); 
-  for(let x = startX; x <= canvas.width + 40; x += 20) {
+  let startX = -(game.bgOffset % 40) - 600; 
+  ctx.moveTo(-600, GROUND_Y - 20); 
+  for(let x = startX; x <= canvas.width + 640; x += 20) {
     let bump = Math.sin((x + game.bgOffset) * 0.05) * 8;
     ctx.lineTo(x, GROUND_Y + bump - 15);
   }
@@ -2241,7 +2323,8 @@ function render() {
 
   for(let b of bulldogs) {
     if (b.kind === 'frida') drawBulldog(ctx, b.x, b.y, b.width, b.height, b.animTimer, b.state);
-    else drawCat(ctx, b.x, b.y, b.width, b.height, b.animTimer, b.state);
+    else if (b.kind === 'cinder') drawCat(ctx, b.x, b.y, b.width, b.height, b.animTimer, b.state);
+    else drawBear(ctx, b.x, b.y, b.kind, b.animTimer, b.state);
   }
 
   for(let e of enemies) {
@@ -2344,6 +2427,9 @@ function render() {
   if (player.x > -50) {
     drawDog(ctx, player.x, player.y, player.width, player.height, player.animTimer, player.isJumping, player.isFalling);
   }
+
+  // Desfaz o tilt da camera
+  ctx.restore();
 }
 
 function gameLoop(timestamp) {

@@ -6,7 +6,19 @@ Este arquivo foi criado para te ajudar a entender as últimas mudanças feitas n
 
 ## 🛠 Nossos Últimos Commits Recentes
 
-**ATENÇÃO:** Nós acabamos de criar a **Quinta Branch Nova** chamada `feat/urubu-desenhado`!
+**ATENÇÃO:** Acabamos de criar a **Sexta Branch Nova** chamada `feat/terreno-diagonal-ursos`!
+
+### Branch: `feat/terreno-diagonal-ursos` (URSOS, DECLIVES E DIFICULDADE DE TESTE)
+- **O que mudou:** `main.js`.
+- **Detalhes:**  
+  - **Terreno Inclinado / Diagonal:** A partir dos 15 segundos de todas as 10 fases, o chão do jogo inteiro começará lentamente a se inclinar num ângulo orgânico que forma uma longa ladeira ou descida maluca! O ângulo de inclinação se estabiliza momentos antes de o chefão chegar.
+  - **Mais Demorado e Difícil:** As fases foram artificialmente infladas em 50% para compensar a chegada rápida do chefe. Consequentemente, o número de buracos triplicou ao longo desse espaço perigoso.
+  - **Chuva de Torpedinhos:** A Gaivota e todos os outros chefões tiveram a taxa de lançamento de bombas do céu muito acelerada e mortal.
+  - **Novos Inimigos Terrestres:** Foi codificada a entrada dos temidos **Ursos Gigantes**. Três variações (Urso Pardo `🐻`, Urso Polar `🐻‍❄️` e o raro Panda `🐼`). Eles possuem som sintético novo de roncar agressivo e baixo, além de animações fofas com a coroa `❤️` os amansando quando recebem o alimento (inclusive eles até deitam dormindo felizes igual os gatos!).
+  - **Testando Agora:** Deixe o seu console web aberto, digite `git checkout feat/terreno-diagonal-ursos` e dê Refresh (`F5`) no navegador do PC para sofrer os novos desafios!
+  - **Como voltar a tranquilidade:** `git checkout master`
+
+---
 
 ### Branch: `feat/urubu-desenhado` (O URUBU ESTILO CARTOON)
 - **O que mudou:** `main.js`.
