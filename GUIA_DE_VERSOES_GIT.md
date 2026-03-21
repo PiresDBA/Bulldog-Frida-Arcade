@@ -11,13 +11,21 @@ Este arquivo foi criado para te ajudar a entender as últimas mudanças feitas n
 ### Branch Atual: `master`
 Aqui está a **base segura e final** do jogo neste momento.
 
-### 1. `Atualização de Cache do PWA para v12 (O Som do Urubu/Corvo)`
-- **O que mudou:** O código subiu para a versão `sw.js` **v12**.
-- **Por que:** Integração do áudio `crow.mp3` para os inimigos voadores (Urubus/Corvos). Agora, sempre que um pássaro surgir no topo da tela para lançar torpedos, ele emitirá seu guincho característico! Tudo devidamente cacheado para o modo offline.
+### 1. `Atualização de Cache do PWA para v13 (Recordes e Perigos)`
+- **O que mudou:** `sw.js` agora para **v13**.
+- **Novidades de Jogabilidade:**
+  1. **Tabela de Recordes (High Scores):** Agora o jogo salva localmente os seus **5 melhores placares**! Sempre que você der Game Over, verá a lista dos recordistas com a data da proeza!
+  2. **A Geometria das Fases:** O terreno agora respeita regras fixas de inclinação:
+     - Fases 1 e 2: Retas.
+     - Fase 3: Oscilando livre.
+     - Fase 4: **Apenas Subida!** (Morro acima direto).
+     - Fase 5: **Apenas Descida!** (Ladeira abaixo).
+     - Fase 6+: Montanha-russa completa (sobe e desce).
+  3. **O Mergulho da Gaivota:** Cuidado! A Gaivota Bobona agora **ataca de verdade!** A cada poucos segundos ela abre o bico e mergulha em direção ao chão para tentar morder a Luna! Se ela encostar em você, é derrota imediata! Desvie e atire petiscos enquanto ela estiver em mergulho!
 
 ---
 
-### 2. `Atualização de Cache do PWA para v11 (Sons Reais dos Ursos)`
+### 2. `Atualização de Cache do PWA para v12 (O Som do Urubu/Corvo)`
   1. **Novos Chefes nas Primeiras Fases:** Agora a Gaivota será a Fase 1! O Cachorrão (Fase 2). A Vassoura, os Fogos e a Mangueira fecham as Fases 3, 4 e 5! 
   2. **Ilda, o Cão (A Vida Real):** O temido chefe Cachorrão deixou de ser apenas a "cara do lobo flutuante" num emoji de lua cheia! Eu tirei do céu e a coloquei **nas telas/chão**. Desenhei programaticamente a "ILDA O CÃO", um gigantesco vira-lata de lona preta, com focinho feio e agressivo, olho vermelho malvado, babando entre os dentes afiados!
   3. **A Ilda Te Persegue no Chão:** Sendo o primeiro chefe focado em combate de solo (Melee), a Ilda não fica oscilando entre as nuvens lançando bombas. Ela cai literalmente com quatro patas no asfalto e **corre de frente a frente pela tela para te caçar!** A colisão dela fará o cachorro dar Game Over! Corra dela e atire petiscos para vencê-la!

@@ -90,6 +90,14 @@
       <div id="game-over-screen" class="screen hidden">
         <h1 class="title-3d" style="color:#ff3333;text-shadow:0 0 20px #f00;">GAME OVER</h1>
         <p style="font-size:24px;">Score Final: <span id="final-score">0</span></p>
+        
+        <div id="high-scores-container" style="margin: 20px 0; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; width: 300px; border: 1px solid rgba(255,255,255,0.2);">
+          <h2 style="color: #ffcc00; font-size: 14px; text-shadow: 1px 1px #000; margin-bottom: 15px;">🏆 OS MELHORES RECORDES</h2>
+          <div id="high-scores-list" style="font-size: 16px; color: #fff; text-align: left; line-height: 1.6;">
+            <!-- preenchido via JS -->
+          </div>
+        </div>
+
         <button id="restart-btn" class="btn">Tentar Novamente</button>
       </div>
 

@@ -19,7 +19,8 @@ const UI = {
   btnNoContinue: document.getElementById('btn-no-continue'),
   continuesLeftText: document.getElementById('continues-left'),
   continueTimerText: document.getElementById('continue-timer'),
-  difficultySelect: document.getElementById('difficulty-select')
+  difficultySelect: document.getElementById('difficulty-select'),
+  highScoresList: document.getElementById('high-scores-list')
 };
 
 // --- IMAGE ASSETS ---
@@ -72,11 +73,33 @@ function rejectContinue() {
 function triggerGameOver() {
   gameState = 'GAMEOVER';
   UI.finalScore.innerText = game.score;
+  updateHighScores(game.score);
+  renderHighScores();
   setTimeout(() => {
     UI.gameOverScreen.classList.remove('hidden');
   }, 1000);
   stopBGM();
   saveGame();
+}
+
+function updateHighScores(newScore) {
+    let scores = JSON.parse(localStorage.getItem('luna_high_scores')) || [];
+    scores.push({ score: newScore, date: new Date().toLocaleDateString('pt-BR') });
+    scores.sort((a, b) => b.score - a.score);
+    scores = scores.slice(0, 5); // top 5
+    localStorage.setItem('luna_high_scores', JSON.stringify(scores));
+}
+
+function renderHighScores() {
+    const scores = JSON.parse(localStorage.getItem('luna_high_scores')) || [];
+    if (UI.highScoresList) {
+        UI.highScoresList.innerHTML = scores.map((s, i) => `
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dotted rgba(255,255,255,0.3); padding: 5px 0;">
+                <span>${i + 1}º - ${s.score} pts</span>
+                <span style="font-size: 10px; opacity: 0.6;">${s.date}</span>
+            </div>
+        `).join('') || '<p style="text-align:center; opacity:0.5;">Nenhum recorde ainda!</p>';
+    }
 }
 
 const GROUND_Y = 500;
@@ -1083,8 +1106,17 @@ function update(dt) {
   const baseEnemyChance = boss ? 0 : (0.003 + (game.phase * 0.001)) * spawnMult; 
 
   let targetAngle = 0; // Inclinação Diagonal do Terreno
-  if (!boss && game.timeInPhase > 15000 && game.timeInPhase < game.phaseDuration - 8000) {
-    targetAngle = Math.sin(game.timeInPhase * 0.0002) * 0.15; 
+  if (!boss && game.timeInPhase > 12000 && game.timeInPhase < game.phaseDuration - 8000) {
+    const rawSin = Math.sin(game.timeInPhase * 0.0002);
+    if (game.phase === 3) {
+        targetAngle = rawSin * 0.15;
+    } else if (game.phase === 4) {
+        targetAngle = Math.abs(rawSin) * 0.15; // Mudar para subir
+    } else if (game.phase === 5) {
+        targetAngle = -Math.abs(rawSin) * 0.15; // Mudar para descer
+    } else if (game.phase >= 6) {
+        targetAngle = rawSin * 0.15; // Sobe e desce
+    }
   }
   game.cameraAngle = (game.cameraAngle || 0) + (targetAngle - (game.cameraAngle || 0)) * dt * 1.5;
 
@@ -1200,6 +1232,30 @@ function update(dt) {
            // Hilda the ground charger
            boss.y = Math.min(boss.y + 200 * dt, GROUND_Y - 40);
            boss.x = canvas.width / 2 + Math.sin(boss.timer * 2.0) * (canvas.width / 2 - 20); 
+        } else if (boss.type === 'seagull') {
+           // Gaivota Dive Attack!
+           if (!boss.mode) boss.mode = 'FLYING';
+           if (!boss.modeTimer) boss.modeTimer = 0;
+           boss.modeTimer += dt;
+           
+           if (boss.mode === 'FLYING') {
+              boss.x = canvas.width / 2 + Math.sin(boss.timer * 1.5) * (canvas.width / 2 - 50);
+              boss.y = 150 + Math.sin(boss.timer * 3.5) * 80;
+              if (boss.modeTimer > 6) { // Volta a mergulhar a cada 6s
+                  boss.mode = 'DIVING';
+                  boss.modeTimer = 0;
+              }
+           } else {
+              // Mergulho (Diving)
+              const targetY = GROUND_Y - 50;
+              const targetX = player.x + 100; // tenta passar por cima
+              boss.x += (targetX - boss.x) * dt * 2;
+              boss.y += (targetY - boss.y) * dt * 3;
+              if (boss.modeTimer > 3) { // 3 segundos de mergulho
+                  boss.mode = 'FLYING';
+                  boss.modeTimer = 0;
+              }
+           }
         } else {
            // Flying bosses loop sky
            boss.x = canvas.width / 2 + Math.sin(boss.timer * 1.5) * (canvas.width / 2 - 50);
@@ -2149,7 +2205,7 @@ function drawUrubu(ctx, flap) {
   ctx.restore();
 }
 
-function drawSeagull(ctx, flap) {
+function drawSeagull(ctx, flap, beakOpen) {
   ctx.save();
   ctx.translate(0, -30); // Base
 
@@ -2210,8 +2266,12 @@ function drawSeagull(ctx, flap) {
   ctx.beginPath(); ctx.moveTo(8, -26); ctx.lineTo(10, -42); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(15, -20); ctx.lineTo(25, -35); ctx.stroke();
 
-  // Bico Adunco Extenso
+  // Bico Adunco Extenso (Animado para abrir/fechar)
+  const bO = beakOpen ? 15 : 0; // angulo da mandíbula de baixo
   ctx.fillStyle = '#e87b1c';
+  
+  // Parte de cima do bico
+  ctx.save();
   ctx.beginPath();
   ctx.moveTo(25, 0); 
   ctx.quadraticCurveTo(60, 5, 70, 15); 
@@ -2219,6 +2279,20 @@ function drawSeagull(ctx, flap) {
   ctx.fill();
   ctx.strokeStyle = '#ba6216'; ctx.lineWidth = 1.5;
   ctx.beginPath(); ctx.moveTo(25, 5); ctx.lineTo(60, 12); ctx.stroke();
+  ctx.restore();
+
+  // Parte de baixo do bico (mandíbula)
+  if (beakOpen) {
+      ctx.save();
+      ctx.translate(25, 10);
+      ctx.rotate(0.3); // abre a boca
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.quadraticCurveTo(30, 10, 45, 15);
+      ctx.quadraticCurveTo(20, 15, 0, 5);
+      ctx.fill();
+      ctx.restore();
+  }
 
   // Bochechas da vergonha
   ctx.fillStyle = '#ff99aa';
@@ -2540,7 +2614,7 @@ function render() {
         drawAngryEyes(ctx, 5, -5);
     } else if (boss.type === 'seagull') {
         const flap = Math.sin(boss.timer * 15) * 0.3;
-        drawSeagull(ctx, flap);
+        drawSeagull(ctx, flap, boss.mode === 'DIVING');
     } else if (boss.type === 'bigdog') {
         drawHilda(ctx, boss.timer);
     } else if (boss.type === 'broom') {
