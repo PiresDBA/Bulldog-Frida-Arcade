@@ -979,17 +979,18 @@ function update(dt) {
   game.bgOffset += game.speed * dt;
 
   if (game.timeInPhase > game.phaseDuration && !boss) {
-    let bType = 'motorcycle';
+    let bType = 'seagull';
     const bPhase = game.phase % 10;
-    if (bPhase === 1) bType = 'wind';
-    else if (bPhase === 2) bType = 'storm';
-    else if (bPhase === 3) bType = 'vacuum';
-    else if (bPhase === 4) bType = 'car';
-    else if (bPhase === 5) bType = 'seagull';
-    else if (bPhase === 6) bType = 'bigdog';
-    else if (bPhase === 7) bType = 'broom';
-    else if (bPhase === 8) bType = 'fireworks';
-    else if (bPhase === 9) bType = 'hose';
+    if (bPhase === 1) bType = 'seagull';
+    else if (bPhase === 2) bType = 'bigdog';
+    else if (bPhase === 3) bType = 'broom';
+    else if (bPhase === 4) bType = 'fireworks';
+    else if (bPhase === 5) bType = 'hose';
+    else if (bPhase === 6) bType = 'wind';
+    else if (bPhase === 7) bType = 'storm';
+    else if (bPhase === 8) bType = 'vacuum';
+    else if (bPhase === 9) bType = 'car';
+    else bType = 'motorcycle';
 
     boss = {
       x: canvas.width + 100, y: 150, 
@@ -1198,9 +1199,23 @@ function update(dt) {
       if (boss.x < canvas.width / 2) boss.state = 'fighting';
     } else if (boss.state === 'fighting') {
       if (!boss.dead) {
-        // Sweeps across the entire screen!
-        boss.x = canvas.width / 2 + Math.sin(boss.timer * 1.5) * (canvas.width / 2 - 50);
-        boss.y = 150 + Math.sin(boss.timer * 3.5) * 80;
+        // Define o movimento do Boss de acordo com o tipo
+        if (boss.type === 'bigdog') {
+           // Hilda the ground charger
+           boss.y = Math.min(boss.y + 200 * dt, GROUND_Y - 40);
+           boss.x = canvas.width / 2 + Math.sin(boss.timer * 2.0) * (canvas.width / 2 - 20); 
+        } else {
+           // Flying bosses loop sky
+           boss.x = canvas.width / 2 + Math.sin(boss.timer * 1.5) * (canvas.width / 2 - 50);
+           boss.y = 150 + Math.sin(boss.timer * 3.5) * 80;
+        }
+        
+        // Dano Corpo-a-Corpo caso o Chefe colida diretamente (ex: Ilda o Cão!)
+        if (!player.isFalling && !player.invincible && boss.y > 200 &&
+            Math.abs(player.x - boss.x) < 50 &&
+            Math.abs((player.y - player.height/2) - boss.y) < 50) {
+           die();
+        }
         
         // Boss joga torpedos muito mais rapido agora (rate maior)
         if (Math.random() < 0.05 + (game.phase * 0.015)) {
@@ -1888,6 +1903,74 @@ function drawBear(ctx, x, y, kind, timer, state) {
   ctx.restore();
 }
 
+function drawHilda(ctx, timer) {
+  ctx.save();
+  ctx.translate(0, -10);
+  ctx.scale(1.8, 1.8); // Hilda é um cachorrão gigante!
+
+  // Leg movement
+  const walk1 = Math.sin(timer * 15) * 5;
+  const walk2 = Math.cos(timer * 15) * 5;
+  
+  // Back legs
+  ctx.fillStyle = '#111';
+  ctx.beginPath(); ctx.ellipse(-20 + walk1, 20, 6, 12, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10 + walk2, 20, 6, 12, 0, 0, Math.PI*2); ctx.fill();
+  
+  // Body (Cachorro de rua preto / Vira-lata agressivo)
+  ctx.fillStyle = '#222';
+  ctx.beginPath(); ctx.ellipse(-5, 0, 35, 18, 0, 0, Math.PI*2); ctx.fill();
+  
+  // Front legs
+  ctx.fillStyle = '#1a1a1a';
+  ctx.beginPath(); ctx.ellipse(-10 - walk1, 22, 6, 12, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(20 - walk2, 22, 6, 12, 0, 0, Math.PI*2); ctx.fill();
+
+  // Rabo agressivo rápido 
+  ctx.save();
+  ctx.translate(30, -5);
+  ctx.rotate((Math.sin(timer * 25) * 0.4) + 0.3);
+  ctx.fillStyle = '#222';
+  ctx.beginPath(); ctx.ellipse(10, 0, 15, 3, 0, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+  
+  // Head
+  ctx.translate(-35, -15);
+  ctx.fillStyle = '#222';
+  ctx.beginPath(); ctx.ellipse(0, 0, 18, 15, -0.2, 0, Math.PI*2); ctx.fill();
+  
+  // Orelhas caídas que dão cara de vira-lata
+  ctx.fillStyle = '#111';
+  ctx.beginPath(); ctx.ellipse(5, -12, 5, 10, 0.5, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(-10, -8, 5, 12, -0.8, 0, Math.PI*2); ctx.fill(); 
+
+  // Focinho
+  ctx.fillStyle = '#333';
+  ctx.beginPath(); ctx.ellipse(-12, 5, 12, 8, -0.2, 0, Math.PI*2); ctx.fill();
+  
+  // Nariz Black
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(-22, 2, 4, 0, Math.PI*2); ctx.fill();
+  
+  // Olho Maligno Vermelho
+  ctx.fillStyle = '#ff0000';
+  ctx.beginPath(); ctx.arc(-4, -3, 5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#ffcc00'; 
+  ctx.beginPath(); ctx.arc(-4, -3, 2, 0, Math.PI*2); ctx.fill();
+  
+  // Sobrancelha zangada colada no olho
+  ctx.lineWidth = 3; ctx.strokeStyle = '#000';
+  ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(2, -8); ctx.lineTo(-10, -5); ctx.stroke();
+
+  // Dentes pontiagudos saindo da boca  
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.moveTo(-20, 10); ctx.lineTo(-15, 15); ctx.lineTo(-12, 10); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(-12, 10); ctx.lineTo(-8, 15); ctx.lineTo(-5, 10); ctx.fill();
+  
+  ctx.restore();
+}
+
 function drawUrubu(ctx, flap) {
   ctx.save();
   ctx.translate(0, -35); // Centro do Pássaro
@@ -2402,8 +2485,7 @@ function render() {
         const flap = Math.sin(boss.timer * 15) * 0.3;
         drawSeagull(ctx, flap);
     } else if (boss.type === 'bigdog') {
-        ctx.fillText('🐺', 0, 0); 
-        drawAngryEyes(ctx, 0, -10);
+        drawHilda(ctx, boss.timer);
     } else if (boss.type === 'broom') {
         ctx.fillText('🧹', 0, 0); 
         drawAngryEyes(ctx, 0, -10);
@@ -2435,7 +2517,7 @@ function render() {
     else if (boss.type === 'car') fearName = 'CARRO';
     else if (boss.type === 'motorcycle') fearName = 'MOTO';
     else if (boss.type === 'seagull') fearName = 'GAIVOTA BOBONA';
-    else if (boss.type === 'bigdog') fearName = 'CACHORRÃO';
+    else if (boss.type === 'bigdog') fearName = 'ILDA O CÃO';
     else if (boss.type === 'broom') fearName = 'VASSOURA';
     else if (boss.type === 'fireworks') fearName = 'FOGOS';
     else if (boss.type === 'hose') fearName = 'BANHO';
