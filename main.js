@@ -30,6 +30,11 @@ const UI = {
 const menuDogImg = new Image();
 menuDogImg.src = 'luna-menu-transparent.png';
 
+const airplaneBodyImg = new Image();
+airplaneBodyImg.src = 'airplane_body.png';
+const pilotHeadImg = new Image();
+pilotHeadImg.src = 'pilot_head.png';
+
 let continueInterval = null;
 
 function showContinueScreen() {
@@ -289,24 +294,38 @@ function soundFreeAnimal() {
   setTimeout(() => playTone(880.00, 'sine', 0.2, 0.1), 100); 
 }
 
-function soundDie() {
+
+function soundMarioWin() {
   if(!audioCtx) return;
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.type = 'triangle';
-  osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 1.0);
-  gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-  gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1.0);
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-  osc.start();
+  const playNote = (freq, delay, dur) => {
+    const t = audioCtx.currentTime + delay;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(freq, t);
+    gain.gain.setValueAtTime(0.1, t);
+    gain.gain.linearRampToValueAtTime(0, t + dur);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t + dur);
+  };
+  playNote(660, 0, 0.1);
+  playNote(660, 0.15, 0.1);
+  playNote(660, 0.3, 0.1);
+  playNote(510, 0.45, 0.1);
+  playNote(660, 0.6, 0.1);
+  playNote(770, 0.75, 0.2);
 }
 
-// Helicopter Real Sound Player
-const heliAudio = new Audio('https://www.soundjay.com/transportation/helicopter-fly-over-01.mp3');
+function speak(text) {
+  const utterance = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=pt-BR&client=tw-ob`);
+  utterance.volume = 1.0;
+  utterance.play().catch(e => console.log("TTS blocked:", e));
+}
+
+// Helicopter Real Sound Player (Local File)
+const heliAudio = new Audio('helicoptero.mp3');
 heliAudio.loop = true;
-heliAudio.volume = 0.4;
+heliAudio.volume = 0.5;
 
 function updateHeliSound() {
   if (helicopters.length > 0) {
@@ -320,6 +339,10 @@ function updateHeliSound() {
     }
   }
 }
+
+// Plane Flyby Sound
+const planeAudio = new Audio('https://www.soundjay.com/transportation/airplane-propeller-1.mp3');
+planeAudio.volume = 0.4;
 
 const realMeow = new Audio('https://storage.googleapis.com/eleven-public-cdn/audio/sound-effects-library/cat-meow/11L-cat_meow-10828053.mp3');
 const realBark = new Audio('https://www.myinstants.com/media/sounds/dog-bark.mp3');
@@ -1518,10 +1541,12 @@ function update(dt) {
 
   updateHeliSound();
 
-  // Plane Spawn
-  const planeChance = (Math.random() < 0.003) && planes.length === 0;
+  // Plane Spawn (Decreased frequency as requested)
+  const planeChance = (Math.random() < 0.001) && planes.length === 0;
   if (planeChance) {
-    planes.push({ x: canvas.width + 100, y: 50 + Math.random() * 50, vx: -350, hp: 1, timer: 0 });
+    planes.push({ x: canvas.width + 100, y: 70 + Math.random() * 80, vx: -350, hp: 1, timer: 0 });
+    planeAudio.currentTime = 0;
+    planeAudio.play().catch(e => {});
   }
 
   for(let i = planes.length - 1; i >= 0; i--) {
@@ -1604,7 +1629,8 @@ function update(dt) {
 
     if (h.hp <= 0) {
       createExplosion(h.x, h.y, '#ffea00', 60);
-      soundPoof();
+      soundMarioWin();
+      speak("Tiro Triplo!");
       player.tripleShotTimer = 60000; // 1 minute
       helicopters.splice(i, 1);
       updateHeliSound(); // stop sound immediately
@@ -2918,12 +2944,29 @@ function render() {
   for(let p of planes) {
     ctx.save();
     ctx.translate(p.x, p.y);
-    // Rotate to make drawing horizontal
-    ctx.rotate(-Math.PI / 4); 
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = '55px Arial';
-    ctx.fillText('✈️', 0, 0);
+    
+    // Draw Custom Airplane Body
+    if (airplaneBodyImg.complete) {
+      // Body (it already looks horizontal in the drawing, but we can adjust if needed)
+      ctx.drawImage(airplaneBodyImg, -50, -40, 100, 80);
+      
+      // Draw Pilot inside the cockpit area
+      if (pilotHeadImg.complete) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(-5, -15, 15, 0, Math.PI*2);
+        ctx.clip(); // Keep head inside a circle/cockpit
+        ctx.drawImage(pilotHeadImg, -20, -30, 30, 30);
+        ctx.restore();
+      }
+    } else {
+      // Fallback emoji
+      ctx.rotate(-Math.PI / 4); 
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = '55px Arial';
+      ctx.fillText('✈️', 0, 0);
+    }
     ctx.restore();
   }
 
