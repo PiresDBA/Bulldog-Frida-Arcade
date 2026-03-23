@@ -703,8 +703,6 @@ const ttsVoice = new Audio('https://translate.google.com/translate_tts?ie=UTF-8&
 let introIndex = 0;
 let voiced = false;
 
-
-
 function typeWriter() {
   if (gameState !== 'START') return;
   if (!voiced) {
@@ -713,13 +711,11 @@ function typeWriter() {
      voiced = true;
   }
   if (introIndex < introText.length) {
-    bubbleEl.innerHTML += introText.charAt(introIndex);
+    if(bubbleEl) bubbleEl.innerHTML += introText.charAt(introIndex);
     introIndex++;
-    setTimeout(typeWriter, 35); // typing speed
+    setTimeout(typeWriter, 35);
   }
 }
-// Start typing!
-setTimeout(typeWriter, 500);
 
 let game = {
   score: 0,
@@ -732,6 +728,9 @@ let game = {
   timeInPhase: 0,
   phaseDuration: 45000,
 };
+
+// Inicia o texto animado DEPOIS de gameState e game estarem prontos
+setTimeout(typeWriter, 500);
 
 let player = {
   x: 200,
