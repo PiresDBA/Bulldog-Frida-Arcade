@@ -30,10 +30,8 @@ const UI = {
 const menuDogImg = new Image();
 menuDogImg.src = 'luna-menu-transparent.png';
 
-const airplaneBodyImg = new Image();
-airplaneBodyImg.src = 'airplane_body.png';
-const pilotHeadImg = new Image();
-pilotHeadImg.src = 'pilot_head.png';
+const customPlaneImg = new Image();
+customPlaneImg.src = 'custom_plane.png';
 
 let continueInterval = null;
 
@@ -1593,9 +1591,9 @@ function update(dt) {
      }
 
      if (p.hp <= 0) {
-        createExplosion(p.x, p.y, '#ffea00', 40);
-        soundPoof();
-        player.doubleShotTimer = 60000; // 1 min double shot
+        createExplosion(p.x, p.y, '#fff', 40);
+        soundHappy(); // Som diferente (feliz/agudo)
+        player.doubleShotTimer = 5000; // 5 seconds
         planes.splice(i, 1);
      } else if (p.x < -100) {
         planes.splice(i, 1);
@@ -2961,21 +2959,11 @@ function render() {
     ctx.save();
     ctx.translate(p.x, p.y);
     
-    // Draw Custom Airplane Body with Safety Check
-    if (airplaneBodyImg.complete && airplaneBodyImg.naturalWidth > 0) {
-      ctx.drawImage(airplaneBodyImg, -50, -40, 100, 80);
-      
-      // Draw Pilot inside the cockpit area with Safety Check
-      if (pilotHeadImg.complete && pilotHeadImg.naturalWidth > 0) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(-5, -15, 15, 0, Math.PI*2);
-        ctx.clip(); 
-        ctx.drawImage(pilotHeadImg, -20, -30, 30, 30);
-        ctx.restore();
-      }
+    // Draw Single Combined Airplane Image with Safety Check
+    if (customPlaneImg.complete && customPlaneImg.naturalWidth > 0) {
+      ctx.drawImage(customPlaneImg, -60, -45, 120, 90);
     } else {
-      // Emergency Fallback emoji if images fail
+      // Emergency Fallback emoji if image fails
       ctx.rotate(-Math.PI / 4); 
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
