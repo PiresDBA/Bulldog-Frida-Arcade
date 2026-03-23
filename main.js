@@ -30,29 +30,52 @@ const UI = {
 const menuDogImg = new Image();
 menuDogImg.src = 'luna-menu-transparent.png';
 
-const airplaneFinalImg = new Image();
-airplaneFinalImg.src = 'airplane_final.png';
-const cleanedPlaneCanvas = document.createElement('canvas');
-let planeImgCleaned = false;
+const planeSkeletonImg = new Image();
+planeSkeletonImg.src = 'plane_skeleton.png';
+const pilotFaceImg = new Image();
+pilotFaceImg.src = 'pilot_face.png';
 
-airplaneFinalImg.onload = () => {
-    cleanedPlaneCanvas.width = airplaneFinalImg.width;
-    cleanedPlaneCanvas.height = airplaneFinalImg.height;
-    const ctxC = cleanedPlaneCanvas.getContext('2d');
-    ctxC.drawImage(airplaneFinalImg, 0, 0);
-    const imgData = ctxC.getImageData(0, 0, cleanedPlaneCanvas.width, cleanedPlaneCanvas.height);
-    const data = imgData.data;
-    // Remove qualquer fundo branco ou cinza claro (que pode ser o quadriculado)
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i], g = data[i+1], b = data[i+2];
-      // Se for muito branco ou cinza (quadriculado)
-      if (r > 230 && g > 230 && b > 230) {
-        data[i+3] = 0; // Torna transparente!
-      }
-    }
-    ctxC.putImageData(imgData, 0, 0);
-    planeImgCleaned = true;
-};
+const combinedPlaneCanvas = document.createElement('canvas');
+let planeCombinedReady = false;
+
+function assembleAirplane() {
+  if (!planeSkeletonImg.complete || !pilotFaceImg.complete) return;
+  
+  combinedPlaneCanvas.width = 150; // Largura final
+  combinedPlaneCanvas.height = 120;
+  const ctxP = combinedPlaneCanvas.getContext('2d');
+  
+  // 1. Desenha e Limpa o Avião
+  const offC = document.createElement('canvas');
+  offC.width = planeSkeletonImg.width; offC.height = planeSkeletonImg.height;
+  const offCtx = offC.getContext('2d');
+  offCtx.drawImage(planeSkeletonImg, 0, 0);
+  const pData = offCtx.getImageData(0,0,offC.width, offC.height);
+  for(let i=0; i<pData.data.length; i+=4) {
+    if(pData.data[i]>220 && pData.data[i+1]>220 && pData.data[i+2]>220) pData.data[i+3]=0;
+  }
+  offCtx.putImageData(pData, 0, 0);
+  ctxP.drawImage(offC, 0, 0, 150, 110);
+  
+  // 2. Desenha e Limpa o Rosto do Piloto
+  const faceC = document.createElement('canvas');
+  faceC.width = pilotFaceImg.width; faceC.height = pilotFaceImg.height;
+  const faceCtx = faceC.getContext('2d');
+  faceCtx.drawImage(pilotFaceImg, 0, 0);
+  const fData = faceCtx.getImageData(0,0,faceC.width, faceC.height);
+  for(let i=0; i<fData.data.length; i+=4) {
+    if(fData.data[i]>220 && fData.data[i+1]>220 && fData.data[i+2]>220) fData.data[i+3]=0;
+  }
+  faceCtx.putImageData(fData, 0, 0);
+  
+  // Posiciona o piloto no cockpit (ajustado para a imagem original)
+  ctxP.drawImage(faceC, 28, 15, 35, 35);
+  
+  planeCombinedReady = true;
+}
+
+planeSkeletonImg.onload = assembleAirplane;
+pilotFaceImg.onload = assembleAirplane;
 
 let continueInterval = null;
 
@@ -377,6 +400,9 @@ function updateHeliSound() {
 // Plane Flyby Sound
 const planeAudio = new Audio('https://www.soundjay.com/transportation/airplane-propeller-1.mp3');
 planeAudio.volume = 0.4;
+
+const seagullAudio = new Audio('https://www.myinstants.com/media/sounds/seagull.mp3');
+seagullAudio.volume = 0.6;
 
 const realMeow = new Audio('https://storage.googleapis.com/eleven-public-cdn/audio/sound-effects-library/cat-meow/11L-cat_meow-10828053.mp3');
 const realBark = new Audio('https://www.myinstants.com/media/sounds/dog-bark.mp3');
@@ -1395,11 +1421,18 @@ function update(dt) {
               const targetX = player.x + 100; // tenta passar por cima
               boss.x += (targetX - boss.x) * dt * 2;
               boss.y += (targetY - boss.y) * dt * 3;
-              if (boss.modeTimer > 3) { // 3 segundos de mergulho
-                  boss.mode = 'FLYING';
-                  boss.modeTimer = 0;
-              }
-           }
+              // Rotate seagull towards player during dive
+              boss.rotation = Math.atan2(player.y - boss.y, player.x - boss.x);
+               if (boss.modeTimer > 3) { // 3 segundos de mergulho
+                   boss.mode = 'FLYING';
+                   boss.modeTimer = 0;
+               }
+               // Sound on dive start
+               if (boss.modeTimer < 0.1) {
+                 seagullAudio.currentTime = 0;
+                 seagullAudio.play().catch(e=>{});
+               }
+            }
         } else {
            // Flying bosses loop sky
            boss.x = canvas.width / 2 + Math.sin(boss.timer * 1.5) * (canvas.width / 2 - 50);
@@ -1668,7 +1701,7 @@ function update(dt) {
       createExplosion(h.x, h.y, '#ffea00', 60);
       soundMarioWin();
       speak("Tiro Triplo!");
-      player.tripleShotTimer = 3000; // 3 seconds
+      player.tripleShotTimer = 12000; // 12 seconds
       helicopters.splice(i, 1);
       updateHeliSound(); // stop sound immediately
     } else if (h.x < -150) {
@@ -2458,9 +2491,10 @@ function drawUrubu(ctx, flap) {
   ctx.restore();
 }
 
-function drawSeagull(ctx, flap, beakOpen) {
+function drawSeagull(ctx, flap, beakOpen, angle = 0) {
   ctx.save();
   ctx.translate(0, -30); // Base
+  ctx.rotate(angle); // Rotação para o mergulho!
 
   // Asa Traseira
   ctx.save();
@@ -2867,7 +2901,12 @@ function render() {
         drawAngryEyes(ctx, 5, -5);
     } else if (boss.type === 'seagull') {
         const flap = Math.sin(boss.timer * 15) * 0.3;
-        drawSeagull(ctx, flap, boss.mode === 'DIVING');
+        let angle = 0;
+        if (boss.mode === 'DIVING') {
+           // Aponta o bico na direção da Luna
+           angle = Math.atan2(player.y - boss.y, player.x - boss.x) + 0.2;
+        }
+        drawSeagull(ctx, flap, boss.mode === 'DIVING', angle);
     } else if (boss.type === 'bigdog') {
         drawHilda(ctx, boss.timer);
     } else if (boss.type === 'broom') {
@@ -2982,11 +3021,11 @@ function render() {
     ctx.save();
     ctx.translate(p.x, p.y);
     
-    // Draw Cleaned Airplane Image with Force-Transparency
-    if (planeImgCleaned) {
-      ctx.drawImage(cleanedPlaneCanvas, -60, -45, 120, 90);
+    // Draw Manually Assembled Airplane
+    if (planeCombinedReady) {
+      ctx.drawImage(combinedPlaneCanvas, -75, -55, 150, 110);
     } else {
-      // Fallback emoji
+      // Fallback
       ctx.rotate(-Math.PI / 4); 
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
