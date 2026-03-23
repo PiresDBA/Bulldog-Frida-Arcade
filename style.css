@@ -324,7 +324,7 @@ p {
   #touch-left {
     /* Ocupa a barra escura da esquerda */
     width: calc((100vw - 100vh * 1.3334) / 2);
-    min-width: 120px;
+    min-width: 60px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -338,7 +338,7 @@ p {
   #touch-right {
     /* Ocupa a barra escura da direita */
     width: calc((100vw - 100vh * 1.3334) / 2);
-    min-width: 120px;
+    min-width: 60px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -350,15 +350,15 @@ p {
   }
 
   .touch-btn {
-    width: 108px;
-    height: 108px;
-    font-size: 40px;
+    width: 54px;
+    height: 54px;
+    font-size: 20px;
   }
 
   .touch-action {
-    width: 116px;
-    height: 116px;
-    font-size: 22px;
+    width: 58px;
+    height: 58px;
+    font-size: 11px;
   }
 }
 

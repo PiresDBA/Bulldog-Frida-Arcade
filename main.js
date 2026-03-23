@@ -149,7 +149,6 @@ function initAudio() {
   }
 }
 
-<<<<<<< HEAD
 // YT BGM Player
 let ytPlayer = null;
 
@@ -201,19 +200,12 @@ function startBGM() {
   } else {
     ytPlayer.playVideo();
   }
-=======
-// Local MP3 BGM Player
-const bgmAudio = new Audio('bgm.mp3');
-bgmAudio.loop = true;
-bgmAudio.volume = 0.5;
-
-function startBGM() {
-  bgmAudio.play().catch(e => console.log("BGM autoplay prevented:", e));
->>>>>>> 5ea3b83654fd2bb2bc20f0b26327495d5a5c42dc
 }
 
 function stopBGM() {
-  bgmAudio.pause();
+  if (ytPlayer && ytPlayer.pauseVideo) {
+    ytPlayer.pauseVideo();
+  }
 }
 
 function playTone(freq, type, duration, vol=0.1) {
@@ -309,7 +301,42 @@ function soundDie() {
   osc.connect(gain);
   gain.connect(audioCtx.destination);
   osc.start();
-  osc.stop(audioCtx.currentTime + 1.0);
+}
+
+// Helicopter Sound Generator (Sons Físicos)
+let heliSoundOsc = null;
+let heliSoundGain = null;
+
+function updateHeliSound() {
+  if (!audioCtx) return;
+  if (helicopters.length > 0) {
+    if (!heliSoundOsc) {
+      heliSoundOsc = audioCtx.createOscillator();
+      heliSoundGain = audioCtx.createGain();
+      heliSoundOsc.type = 'square';
+      heliSoundOsc.frequency.value = 45; // Baixa frequência para o "thump"
+      
+      const lfo = audioCtx.createOscillator();
+      const lfoGain = audioCtx.createGain();
+      lfo.frequency.value = 14; // Velocidade das pás
+      lfoGain.gain.value = 0.6;
+      lfo.connect(lfoGain);
+      lfoGain.connect(heliSoundGain.gain);
+      
+      heliSoundGain.gain.value = 0.2;
+      heliSoundOsc.connect(heliSoundGain);
+      heliSoundGain.connect(audioCtx.destination);
+      
+      heliSoundOsc.start();
+      lfo.start();
+    }
+  } else {
+    if (heliSoundOsc) {
+      try { heliSoundOsc.stop(); } catch(e){}
+      heliSoundOsc = null;
+      heliSoundGain = null;
+    }
+  }
 }
 
 const realMeow = new Audio('https://storage.googleapis.com/eleven-public-cdn/audio/sound-effects-library/cat-meow/11L-cat_meow-10828053.mp3');
@@ -619,10 +646,12 @@ let player = {
   animTimer: 0,
   lastShootTime: 0,
   outfit: 'sailor',
-  tripleShotTimer: 0
+  tripleShotTimer: 0,
+  doubleShotTimer: 0
 };
 
 let helicopters = [];
+let planes = [];
 
 let bullets = [];
 let upBullets = [];
@@ -943,13 +972,9 @@ function resetPhase() {
   particles = [];
   decorations = [];
   boss = null;
-  helicopters = [];
   stopBgNoise();
   initMountains();
   updateUI();
-  
-  // Check if BGM needs to change for this phase
-  startBGM(); 
 }
 
 function nextPhase() {
@@ -1005,6 +1030,8 @@ function shoot() {
   const timeSinceLast = now - player.lastShootTime;
   if (timeSinceLast < 100) return; 
   
+  const isSpread = timeSinceLast > 0 && timeSinceLast < 400; 
+  
   player.lastShootTime = now;
   
   soundShoot();
@@ -1013,12 +1040,18 @@ function shoot() {
   
   bullets.push({ x: player.x + player.width/2 - 10, y: player.y - 12, vx: 600, rot: 0, type: currentAmmo });
   
-  // Power-up logic: Triple Shot
+  // Shooting logic priority
   if (player.tripleShotTimer > 0) {
+    // 3 bullets
     upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -600, vx: 0, rot: 0, type: currentAmmo }); 
     upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -450, vx: -400, rot: 0, type: currentAmmo }); 
     upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -450, vx: 400, rot: 0, type: currentAmmo }); 
+  } else if (player.doubleShotTimer > 0) {
+    // 2 bullets (Spread)
+    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -450, vx: -200, rot: 0, type: currentAmmo }); 
+    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -450, vx: 200, rot: 0, type: currentAmmo }); 
   } else {
+    // 1 bullet
     upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -600, vx: 0, rot: 0, type: currentAmmo });
   }
 }
@@ -1494,15 +1527,68 @@ function update(dt) {
     if (particles[i].life <= 0) particles.splice(i, 1);
   }
 
-<<<<<<< HEAD
-  // Helicopter Update
-  const heliSpawnChance = (game.timeInPhase < 5000 || (game.timeInPhase > game.phaseDuration - 5000 && !boss)) ? 0.005 : 0;
-  if (Math.random() < heliSpawnChance && helicopters.length === 0) {
+  if (player.tripleShotTimer > 0) {
+    player.tripleShotTimer -= dt * 1000;
+  }
+  if (player.doubleShotTimer > 0) {
+    player.doubleShotTimer -= dt * 1000;
+  }
+
+  updateHeliSound();
+
+  // Plane Spawn
+  const planeChance = (Math.random() < 0.003) && planes.length === 0;
+  if (planeChance) {
+    planes.push({ x: canvas.width + 100, y: 50 + Math.random() * 50, vx: -350, hp: 1, timer: 0 });
+  }
+
+  for(let i = planes.length - 1; i >= 0; i--) {
+     let p = planes[i];
+     p.x += p.vx * dt;
+     p.timer += dt;
+     
+     // Smoke tail
+     if (Math.random() < 0.3) {
+       particles.push({
+         x: p.x + 30, y: p.y,
+         vx: 50, vy: (Math.random()-0.5)*20,
+         life: 1.0, maxLife: 1.0,
+         color: '#aaa', size: 4 + Math.random()*4
+       });
+     }
+
+     // Bullet vs Plane
+     for(let j = bullets.length -1; j >= 0; j--) {
+       if (Math.abs(bullets[j].x - p.x) < 40 && Math.abs(bullets[j].y - p.y) < 40) {
+          p.hp--; bullets.splice(j, 1); soundTink(); createExplosion(p.x, p.y, '#fff', 5);
+       }
+     }
+     for(let j = upBullets.length -1; j >= 0; j--) {
+       if (Math.abs(upBullets[j].x - p.x) < 40 && Math.abs(upBullets[j].y - p.y) < 40) {
+          p.hp--; upBullets.splice(j, 1); soundTink(); createExplosion(p.x, p.y, '#fff', 5);
+       }
+     }
+
+     if (p.hp <= 0) {
+        createExplosion(p.x, p.y, '#ffea00', 40);
+        soundPoof();
+        player.doubleShotTimer = 60000; // 1 min double shot
+        planes.splice(i, 1);
+     } else if (p.x < -100) {
+        planes.splice(i, 1);
+     }
+  }
+
+  // Helicopter Update (1-hit kill update)
+  const heliSpawnChance = (game.currentPhaseTime < 5000 || (game.currentPhaseTime > game.phaseDuration - 5000 && !boss)) ? 0.005 : 0; // Using timeInPhase check
+  const actualHeliChance = (game.timeInPhase < 5000 || (game.timeInPhase > game.phaseDuration - 7000 && !boss)) ? 0.005 : 0;
+  
+  if (Math.random() < actualHeliChance && helicopters.length === 0) {
     helicopters.push({
       x: canvas.width + 100,
       y: 80,
       vx: -200,
-      hp: 5,
+      hp: 1, // 1 shot kill now!
       timer: 0
     });
   }
@@ -1515,7 +1601,7 @@ function update(dt) {
 
     // Bullets vs Helicopter
     for(let j = bullets.length - 1; j >= 0; j--) {
-      if (Math.abs(bullets[j].x - h.x) < 40 && Math.abs(bullets[j].y - h.y) < 40) {
+      if (Math.abs(bullets[j].x - h.x) < 45 && Math.abs(bullets[j].y - h.y) < 45) {
         h.hp--;
         bullets.splice(j, 1);
         soundTink();
@@ -1523,29 +1609,29 @@ function update(dt) {
       }
     }
     for(let j = upBullets.length - 1; j >= 0; j--) {
-      if (Math.abs(upBullets[j].x - h.x) < 40 && Math.abs(upBullets[j].y - h.y) < 40) {
-        h.hp--;
-        upBullets.splice(j, 1);
-        soundTink();
-        createExplosion(h.x, h.y, '#fff', 5);
+      if (Math.abs(upBullets[i] ? upBullets[i].x : 0 - h.x) < 45 && Math.abs(upBullets[i] ? upBullets[i].y : 0 - h.y) < 45) {
+        // fix loop index safety
       }
+    }
+    // Re-check collision with a simpler loop for safety
+    for(let k = upBullets.length - 1; k >= 0; k--) {
+       if (Math.abs(upBullets[k].x - h.x) < 45 && Math.abs(upBullets[k].y - h.y) < 45) {
+         h.hp--; upBullets.splice(k, 1); soundTink(); createExplosion(h.x, h.y, '#fff', 5);
+       }
     }
 
     if (h.hp <= 0) {
-      createExplosion(h.x, h.y, '#ffea00', 50);
+      createExplosion(h.x, h.y, '#ffea00', 60);
       soundPoof();
       player.tripleShotTimer = 60000; // 1 minute
       helicopters.splice(i, 1);
-    } else if (h.x < -100) {
+      updateHeliSound(); // stop sound immediately
+    } else if (h.x < -150) {
       helicopters.splice(i, 1);
+      updateHeliSound();
     }
   }
 
-  if (player.tripleShotTimer > 0) {
-    player.tripleShotTimer -= dt * 1000;
-  }
-
-=======
   if (player.invincible) {
     player.invincibleTimer -= dt;
     if (player.invincibleTimer <= 0) {
@@ -1553,7 +1639,6 @@ function update(dt) {
     }
   }
 
->>>>>>> 5ea3b83654fd2bb2bc20f0b26327495d5a5c42dc
   player.animTimer += dt;
 }
 
@@ -2791,25 +2876,6 @@ function render() {
     drawAnimal(ctx, e.x, e.y, e.type, e.timer, e.badType);
   }
 
-  for(let h of helicopters) {
-    ctx.save();
-    ctx.translate(h.x, h.y);
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = '60px Arial';
-    ctx.shadowColor = 'rgba(0,0,0,0.5)';
-    ctx.shadowBlur = 15;
-    ctx.fillText('🚁', 0, 0);
-    
-    // HP Bar for Helicopter
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = '#333';
-    ctx.fillRect(-20, -40, 40, 6);
-    ctx.fillStyle = '#0f0';
-    ctx.fillRect(-20, -40, 40 * (h.hp / 5), 6);
-    ctx.restore();
-  }
-
   for(let b of bombs) {
     ctx.save();
     ctx.translate(b.x, b.y);
@@ -2840,6 +2906,40 @@ function render() {
     ctx.shadowBlur = 5;
     ctx.fillText('🪂', 0, -40); 
     ctx.fillText(sa.type, 0, 0); 
+    ctx.restore();
+  }
+
+  for(let h of helicopters) {
+    ctx.save();
+    ctx.translate(h.x, h.y);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '60px Arial';
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 15;
+    ctx.fillText('🚁', 0, 0);
+    
+    // Spinning Blade
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#333';
+    ctx.save();
+    ctx.translate(0, -25);
+    ctx.rotate(h.timer * 50);
+    ctx.beginPath();
+    ctx.moveTo(-40, 0); ctx.lineTo(40, 0);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  for(let p of planes) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '55px Arial';
+    ctx.fillText('✈️', 0, 0);
     ctx.restore();
   }
 
