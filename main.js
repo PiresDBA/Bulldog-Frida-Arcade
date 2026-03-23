@@ -352,8 +352,24 @@ function updateHeliSound() {
 const seagullAudio = new Audio('https://www.myinstants.com/media/sounds/seagull.mp3');
 seagullAudio.volume = 0.6;
 
-const torpedoAudio = new Audio('https://www.myinstants.com/media/sounds/explosion.mp3');
-torpedoAudio.volume = 0.5;
+function soundBombImpact() {
+  if(!audioCtx) return;
+  const t = audioCtx.currentTime;
+  
+  // Ruído rosa curto para simular impacto físico
+  const noiseSrc = audioCtx.createBufferSource();
+  noiseSrc.buffer = makePinkNoise(0.2); 
+  const lp = audioCtx.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.setValueAtTime(250, t); // Impacto grave
+  lp.frequency.exponentialRampToValueAtTime(30, t + 0.15);
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(3.0, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+  
+  noiseSrc.connect(lp); lp.connect(gain); gain.connect(audioCtx.destination);
+  noiseSrc.start(t); noiseSrc.stop(t + 0.2);
+}
 
 let ufoOsc = null;
 function startUfoSound() {
@@ -1489,10 +1505,8 @@ function update(dt) {
     }
     
     if (bombs[i].y > GROUND_Y) {
-      soundPoof(); // Usamos o poof como base
-      torpedoAudio.currentTime = 0;
-      torpedoAudio.play().catch(e=>{}); // Som do torpedo real!
-      playTone(100, 'triangle', 0.3, 0.2); 
+      soundBombImpact(); // Som sintético de lata latência 0!
+      soundPoof(); // Usamos o poof como base complementar
       createExplosion(bombs[i].x, GROUND_Y, '#ffaa00', 10);
       bombs.splice(i, 1);
     }
