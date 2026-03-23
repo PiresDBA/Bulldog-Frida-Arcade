@@ -30,6 +30,9 @@ const UI = {
 const menuDogImg = new Image();
 menuDogImg.src = 'luna-menu-transparent.png';
 
+// --- VARIÁVEIS GLOBAIS ---
+let continueInterval = null;
+
 // Avião removido conforme pedido do usuário!
 function showContinueScreen() {
   if (game.continues <= 0) {
@@ -765,6 +768,7 @@ let particles = [];
 let stars = [];
 let mountains = [];
 let decorations = [];
+let ufos = [];
 
 // loadGame removed - to avoid crash due to player.outfit before player is defined
 
