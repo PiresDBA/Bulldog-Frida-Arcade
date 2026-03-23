@@ -30,13 +30,7 @@ const UI = {
 const menuDogImg = new Image();
 menuDogImg.src = 'luna-menu-transparent.png';
 
-const airplaneBodyImg = new Image();
-airplaneBodyImg.src = 'airplane_body.png';
-const pilotFaceImg = new Image();
-pilotFaceImg.src = 'pilot_face.png';
-
-let continueInterval = null;
-
+// Avião removido conforme pedido do usuário!
 function showContinueScreen() {
   if (game.continues <= 0) {
     triggerGameOver();
@@ -355,10 +349,7 @@ function updateHeliSound() {
   }
 }
 
-// Plane Flyby Sound
-const planeAudio = new Audio('https://www.soundjay.com/transportation/airplane-propeller-1.mp3');
-planeAudio.volume = 0.4;
-
+// Plane removed
 const seagullAudio = new Audio('https://www.myinstants.com/media/sounds/seagull.mp3');
 seagullAudio.volume = 0.6;
 
@@ -997,7 +988,6 @@ function resetPhase() {
   bombs = [];
   particles = [];
   decorations = [];
-  player.doubleShotTimer = 0;
   player.tripleShotTimer = 0;
   boss = null;
   stopBgNoise();
@@ -1074,12 +1064,9 @@ function shoot() {
     upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -600, vx: 0, rot: 0, type: currentAmmo }); 
     upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -450, vx: -400, rot: 0, type: currentAmmo }); 
     upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -450, vx: 400, rot: 0, type: currentAmmo }); 
-  } else if (player.doubleShotTimer > 0) {
-    // 2 bullets (Spread)
-    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -450, vx: -200, rot: 0, type: currentAmmo }); 
-    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -450, vx: 200, rot: 0, type: currentAmmo }); 
   } else {
-    // 1 bullet
+    // 1 forward bullet, 1 up bullet
+    bullets.push({ x: player.x + player.width/2 - 10, y: player.y - 12, vx: 600, rot: 0, type: currentAmmo });
     upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -600, vx: 0, rot: 0, type: currentAmmo });
   }
 }
@@ -1382,9 +1369,6 @@ function update(dt) {
               const targetX = player.x + 100; // tenta passar por cima
               boss.x += (targetX - boss.x) * dt * 2;
               boss.y += (targetY - boss.y) * dt * 3;
-              // Rotate seagull towards player during dive (adjusting for its left-facing default)
-              let ang = Math.atan2(player.y - boss.y, player.x - boss.x);
-              boss.rotation = ang - Math.PI; 
                if (boss.modeTimer > 3) { // 3 segundos de mergulho
                    boss.mode = 'FLYING';
                    boss.modeTimer = 0;
@@ -1569,56 +1553,10 @@ function update(dt) {
   if (player.tripleShotTimer > 0) {
     player.tripleShotTimer -= dt * 1000;
   }
-  if (player.doubleShotTimer > 0) {
-    player.doubleShotTimer -= dt * 1000;
-  }
 
   updateHeliSound();
 
-  // Plane Spawn (Decreased frequency as requested)
-  const planeChance = (Math.random() < 0.001) && planes.length === 0;
-  if (planeChance) {
-    planes.push({ x: canvas.width + 100, y: 70 + Math.random() * 80, vx: -350, hp: 1, timer: 0 });
-    planeAudio.currentTime = 0;
-    planeAudio.play().catch(e => {});
-  }
-
-  for(let i = planes.length - 1; i >= 0; i--) {
-     let p = planes[i];
-     p.x += p.vx * dt;
-     p.timer += dt;
-     
-     // Smoke tail
-     if (Math.random() < 0.3) {
-       particles.push({
-         x: p.x + 30, y: p.y,
-         vx: 50, vy: (Math.random()-0.5)*20,
-         life: 1.0, maxLife: 1.0,
-         color: '#aaa', size: 4 + Math.random()*4
-       });
-     }
-
-     // Bullet vs Plane
-     for(let j = bullets.length -1; j >= 0; j--) {
-       if (Math.abs(bullets[j].x - p.x) < 40 && Math.abs(bullets[j].y - p.y) < 40) {
-          p.hp--; bullets.splice(j, 1); soundTink(); createExplosion(p.x, p.y, '#fff', 5);
-       }
-     }
-     for(let j = upBullets.length -1; j >= 0; j--) {
-       if (Math.abs(upBullets[j].x - p.x) < 40 && Math.abs(upBullets[j].y - p.y) < 40) {
-          p.hp--; upBullets.splice(j, 1); soundTink(); createExplosion(p.x, p.y, '#fff', 5);
-       }
-     }
-
-     if (p.hp <= 0) {
-        createExplosion(p.x, p.y, '#fff', 40);
-        soundHappy(); // Som diferente (feliz/agudo)
-        player.doubleShotTimer = 3000; // 3 seconds
-        planes.splice(i, 1);
-     } else if (p.x < -100) {
-        planes.splice(i, 1);
-     }
-  }
+  // Plane logic and array completely removed as requested!
 
   // Helicopter Update (1-hit kill update)
   const heliSpawnChance = (game.currentPhaseTime < 5000 || (game.currentPhaseTime > game.phaseDuration - 5000 && !boss)) ? 0.005 : 0; // Using timeInPhase check
@@ -2455,10 +2393,15 @@ function drawUrubu(ctx, flap) {
   ctx.restore();
 }
 
-function drawSeagull(ctx, flap, beakOpen, angle = 0) {
+function drawSeagull(ctx, flap, isDiving) {
   ctx.save();
   ctx.translate(0, -30); // Base
-  ctx.rotate(angle); // Rotação para o mergulho!
+  
+  if (isDiving) {
+      // Vira a gaivota para a esquerda e bico pra baixo!
+      ctx.scale(-1, 1); 
+      ctx.rotate(0.8); // ~45 graus para baixo
+  }
 
   // Asa Traseira
   ctx.save();
@@ -2865,12 +2808,7 @@ function render() {
         drawAngryEyes(ctx, 5, -5);
     } else if (boss.type === 'seagull') {
         const flap = Math.sin(boss.timer * 15) * 0.3;
-        let angle = 0;
-        if (boss.mode === 'DIVING') {
-           // Aponta o bico na direção da Luna. A Gaivota original mira para a Esquerda (PI)
-           angle = Math.atan2(player.y - boss.y, player.x - boss.x) - Math.PI;
-        }
-        drawSeagull(ctx, flap, boss.mode === 'DIVING', angle);
+        drawSeagull(ctx, flap, boss.mode === 'DIVING');
     } else if (boss.type === 'bigdog') {
         drawHilda(ctx, boss.timer);
     } else if (boss.type === 'broom') {
@@ -2978,38 +2916,6 @@ function render() {
     ctx.stroke();
     ctx.restore();
 
-    ctx.restore();
-  }
-
-  for(let p of planes) {
-    ctx.save();
-    ctx.translate(p.x, p.y);
-    
-    // Draw Airplane Body Stacked
-    if (airplaneBodyImg.complete && airplaneBodyImg.naturalWidth > 0) {
-      ctx.save();
-      ctx.scale(-1, 1); // Flip horizontal para voar para a esquerda!
-      ctx.drawImage(airplaneBodyImg, -50, -40, 100, 80);
-      
-      // Draw Pilot inside the cockpit area
-      if (pilotFaceImg.complete && pilotFaceImg.naturalWidth > 0) {
-        ctx.save();
-        ctx.beginPath();
-        // Cockpit area
-        ctx.arc(-5, -15, 15, 0, Math.PI*2);
-        ctx.clip(); 
-        ctx.drawImage(pilotFaceImg, -20, -30, 30, 30);
-        ctx.restore();
-      }
-      ctx.restore();
-    } else {
-      // Fallback
-      ctx.rotate(-Math.PI / 4); 
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.font = '55px Arial';
-      ctx.fillText('✈️', 0, 0);
-    }
     ctx.restore();
   }
 
