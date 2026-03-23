@@ -349,12 +349,60 @@ function updateHeliSound() {
   }
 }
 
-// Plane removed
 const seagullAudio = new Audio('https://www.myinstants.com/media/sounds/seagull.mp3');
 seagullAudio.volume = 0.6;
 
 const torpedoAudio = new Audio('https://www.myinstants.com/media/sounds/explosion.mp3');
 torpedoAudio.volume = 0.5;
+
+let ufoOsc = null;
+function startUfoSound() {
+  if(!audioCtx) return;
+  stopUfoSound();
+  ufoOsc = audioCtx.createOscillator();
+  const lfo = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  
+  ufoOsc.type = 'sine';
+  ufoOsc.frequency.value = 600;
+  
+  lfo.type = 'sine';
+  lfo.frequency.value = 8; // 8 Hz vibrato
+  
+  const lfoGain = audioCtx.createGain();
+  lfoGain.gain.value = 200; // depth
+  
+  lfo.connect(lfoGain);
+  lfoGain.connect(ufoOsc.frequency);
+  
+  gain.gain.value = 0.3;
+  ufoOsc.connect(gain);
+  gain.connect(audioCtx.destination);
+  
+  ufoOsc.start();
+  lfo.start();
+  ufoOsc.lfo = lfo;
+}
+function stopUfoSound() {
+  if (ufoOsc) {
+    try { ufoOsc.stop(); ufoOsc.lfo.stop(); } catch(e){}
+    ufoOsc = null;
+  }
+}
+
+function soundPowerDown() {
+  if(!audioCtx) return;
+  const t = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(300, t);
+  osc.frequency.exponentialRampToValueAtTime(50, t + 0.6);
+  gain.gain.setValueAtTime(0.5, t);
+  gain.gain.linearRampToValueAtTime(0, t + 0.6);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(t); osc.stop(t + 0.6);
+}
 
 const realMeow = new Audio('https://storage.googleapis.com/eleven-public-cdn/audio/sound-effects-library/cat-meow/11L-cat_meow-10828053.mp3');
 const realBark = new Audio('https://www.myinstants.com/media/sounds/dog-bark.mp3');
@@ -988,9 +1036,12 @@ function resetPhase() {
   bombs = [];
   particles = [];
   decorations = [];
+  ufos = [];
+  player.doubleShotTimer = 0;
   player.tripleShotTimer = 0;
   boss = null;
   stopBgNoise();
+  stopUfoSound();
   initMountains();
   updateUI();
 }
@@ -1552,11 +1603,58 @@ function update(dt) {
 
   if (player.tripleShotTimer > 0) {
     player.tripleShotTimer -= dt * 1000;
+    if (player.tripleShotTimer <= 0) soundPowerDown();
+  }
+  if (player.doubleShotTimer > 0) {
+    player.doubleShotTimer -= dt * 1000;
+    if (player.doubleShotTimer <= 0) soundPowerDown();
   }
 
   updateHeliSound();
 
-  // Plane logic and array completely removed as requested!
+  // UFO Logic
+  const ufoChance = (Math.random() < 0.001) && ufos.length === 0;
+  if (ufoChance) {
+    ufos.push({ x: canvas.width + 100, y: 70 + Math.random() * 80, vx: -250, hp: 1, timer: 0 });
+    startUfoSound();
+  }
+
+  let ufoActive = false;
+  for(let i = ufos.length - 1; i >= 0; i--) {
+     let u = ufos[i];
+     u.x += u.vx * dt;
+     u.timer += dt;
+     u.y += Math.sin(u.timer * 5) * 1.5; // Faz o disco "tremer" no ar
+     
+     ufoActive = true;
+
+     // Colisão balas com UFO
+     for(let j = bullets.length -1; j >= 0; j--) {
+       if (Math.abs(bullets[j].x - u.x) < 40 && Math.abs(bullets[j].y - u.y) < 40) {
+          u.hp--; bullets.splice(j, 1); soundTink(); createExplosion(u.x, u.y, '#fff', 5);
+       }
+     }
+     for(let j = upBullets.length -1; j >= 0; j--) {
+       if (Math.abs(upBullets[j].x - u.x) < 40 && Math.abs(upBullets[j].y - u.y) < 40) {
+          u.hp--; upBullets.splice(j, 1); soundTink(); createExplosion(u.x, u.y, '#fff', 5);
+       }
+     }
+
+     if (u.hp <= 0) {
+        createExplosion(u.x, u.y, '#55ff55', 60);
+        soundHappy(); 
+        player.doubleShotTimer = 5000; // 5 segundos de duplo
+        ufos.splice(i, 1);
+        ufoActive = false;
+        stopUfoSound();
+     } else if (u.x < -100) {
+        ufos.splice(i, 1);
+        ufoActive = false;
+        stopUfoSound();
+     }
+  }
+
+  if (!ufoActive) stopUfoSound();
 
   // Helicopter Update (1-hit kill update)
   const heliSpawnChance = (game.currentPhaseTime < 5000 || (game.currentPhaseTime > game.phaseDuration - 5000 && !boss)) ? 0.005 : 0; // Using timeInPhase check
@@ -2393,14 +2491,14 @@ function drawUrubu(ctx, flap) {
   ctx.restore();
 }
 
-function drawSeagull(ctx, flap, isDiving) {
+function drawSeagull(ctx, flap, isDiving, angle = 0) {
   ctx.save();
   ctx.translate(0, -30); // Base
   
   if (isDiving) {
-      // Vira a gaivota para a esquerda e bico pra baixo!
+      // Vira a gaivota para a esquerda com scale(-1, 1) e aplica o angulo calculado para o bico descer!
       ctx.scale(-1, 1); 
-      ctx.rotate(0.8); // ~45 graus para baixo
+      ctx.rotate(angle);
   }
 
   // Asa Traseira
@@ -2808,7 +2906,15 @@ function render() {
         drawAngryEyes(ctx, 5, -5);
     } else if (boss.type === 'seagull') {
         const flap = Math.sin(boss.timer * 15) * 0.3;
-        drawSeagull(ctx, flap, boss.mode === 'DIVING');
+        let angle = 0;
+        if (boss.mode === 'DIVING') {
+           // Como usamos scale(-1, 1) no draw, a gaivota mira para a ESQUERDA.
+           // Precisamos do ângulo calculando o dx invertido para que ela olhe pra baixo 
+           let dx = player.x - boss.x;
+           let dy = player.y - boss.y;
+           angle = Math.atan2(dy, -dx); // Angulo real positivo
+        }
+        drawSeagull(ctx, flap, boss.mode === 'DIVING', angle);
     } else if (boss.type === 'bigdog') {
         drawHilda(ctx, boss.timer);
     } else if (boss.type === 'broom') {
@@ -2848,6 +2954,33 @@ function render() {
     else if (boss.type === 'hose') fearName = 'BANHO';
 
     ctx.fillText(fearName, 0, 60);
+
+    ctx.restore();
+  }
+
+  for(let u of ufos) {
+    ctx.save();
+    ctx.translate(u.x, u.y);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '60px Arial';
+    
+    // Rotação suave do disco voador
+    ctx.rotate(Math.sin(u.timer * 3) * 0.1);
+
+    // Efeito de luz do disco
+    ctx.shadowColor = '#55ff55';
+    ctx.shadowBlur = 15;
+    ctx.fillText('🛸', 0, 0);
+    ctx.shadowBlur = 0;
+    
+    // Luz piscante (Alien light)
+    if (Math.floor(u.timer * 10) % 2 === 0) {
+       ctx.fillStyle = '#ff3333';
+       ctx.beginPath();
+       ctx.arc(0, 15, 4, 0, Math.PI*2);
+       ctx.fill();
+    }
 
     ctx.restore();
   }
