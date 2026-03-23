@@ -30,8 +30,29 @@ const UI = {
 const menuDogImg = new Image();
 menuDogImg.src = 'luna-menu-transparent.png';
 
-const customPlaneImg = new Image();
-customPlaneImg.src = 'aviao_clean.png';
+const airplaneFinalImg = new Image();
+airplaneFinalImg.src = 'airplane_final.png';
+const cleanedPlaneCanvas = document.createElement('canvas');
+let planeImgCleaned = false;
+
+airplaneFinalImg.onload = () => {
+    cleanedPlaneCanvas.width = airplaneFinalImg.width;
+    cleanedPlaneCanvas.height = airplaneFinalImg.height;
+    const ctxC = cleanedPlaneCanvas.getContext('2d');
+    ctxC.drawImage(airplaneFinalImg, 0, 0);
+    const imgData = ctxC.getImageData(0, 0, cleanedPlaneCanvas.width, cleanedPlaneCanvas.height);
+    const data = imgData.data;
+    // Remove qualquer fundo branco ou cinza claro (que pode ser o quadriculado)
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i], g = data[i+1], b = data[i+2];
+      // Se for muito branco ou cinza (quadriculado)
+      if (r > 230 && g > 230 && b > 230) {
+        data[i+3] = 0; // Torna transparente!
+      }
+    }
+    ctxC.putImageData(imgData, 0, 0);
+    planeImgCleaned = true;
+};
 
 let continueInterval = null;
 
@@ -2961,11 +2982,11 @@ function render() {
     ctx.save();
     ctx.translate(p.x, p.y);
     
-    // Draw Single Combined Airplane Image with Safety Check
-    if (customPlaneImg.complete && customPlaneImg.naturalWidth > 0) {
-      ctx.drawImage(customPlaneImg, -60, -45, 120, 90);
+    // Draw Cleaned Airplane Image with Force-Transparency
+    if (planeImgCleaned) {
+      ctx.drawImage(cleanedPlaneCanvas, -60, -45, 120, 90);
     } else {
-      // Emergency Fallback emoji if image fails
+      // Fallback emoji
       ctx.rotate(-Math.PI / 4); 
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
