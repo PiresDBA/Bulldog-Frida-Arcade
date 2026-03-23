@@ -139,6 +139,12 @@ function loadGame() {
   }
 }
 
+function updateUI() {
+  if (UI.score) UI.score.innerText = Math.floor(game.score);
+  if (UI.phase) UI.phase.innerText = game.phase;
+  if (UI.lives) UI.lives.innerText = game.lives;
+}
+
 function initAudio() {
   if (!audioCtx) {
     audioCtx = new AudioContext();
@@ -418,6 +424,20 @@ function soundPowerDown() {
   gain.gain.linearRampToValueAtTime(0, t + 0.6);
   osc.connect(gain); gain.connect(audioCtx.destination);
   osc.start(t); osc.stop(t + 0.6);
+}
+
+function soundPowerUp() {
+  if(!audioCtx) return;
+  const t = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(440, t);
+  osc.frequency.exponentialRampToValueAtTime(880, t + 0.2);
+  gain.gain.setValueAtTime(0.1, t);
+  gain.gain.linearRampToValueAtTime(0, t + 0.2);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(t); osc.stop(t + 0.2);
 }
 
 const realMeow = new Audio('https://storage.googleapis.com/eleven-public-cdn/audio/sound-effects-library/cat-meow/11L-cat_meow-10828053.mp3');
@@ -1627,7 +1647,7 @@ function update(dt) {
   updateHeliSound();
 
   // UFO Logic
-  const ufoChance = (Math.random() < 0.001) && ufos.length === 0;
+  const ufoChance = (Math.random() < 0.003) && ufos.length === 0;
   if (ufoChance) {
     ufos.push({ x: canvas.width + 100, y: 70 + Math.random() * 80, vx: -250, hp: 1, timer: 0 });
     startUfoSound();
@@ -1656,7 +1676,7 @@ function update(dt) {
 
      if (u.hp <= 0) {
         createExplosion(u.x, u.y, '#55ff55', 60);
-        soundHappy(); 
+        soundPowerUp(); 
         player.doubleShotTimer = 5000; // 5 segundos de duplo
         ufos.splice(i, 1);
         ufoActive = false;
@@ -1699,12 +1719,6 @@ function update(dt) {
         createExplosion(h.x, h.y, '#fff', 5);
       }
     }
-    for(let j = upBullets.length - 1; j >= 0; j--) {
-      if (Math.abs(upBullets[i] ? upBullets[i].x : 0 - h.x) < 45 && Math.abs(upBullets[i] ? upBullets[i].y : 0 - h.y) < 45) {
-        // fix loop index safety
-      }
-    }
-    // Re-check collision with a simpler loop for safety
     for(let k = upBullets.length - 1; k >= 0; k--) {
        if (Math.abs(upBullets[k].x - h.x) < 45 && Math.abs(upBullets[k].y - h.y) < 45) {
          h.hp--; upBullets.splice(k, 1); soundTink(); createExplosion(h.x, h.y, '#fff', 5);
@@ -1828,17 +1842,8 @@ function drawLunaMenu(ctx, x, y, size, timer) {
 }
 
 function drawMenuDogs(timer) {
-  if (UI.menuDogCanvas && gameState === 'START') {
-    const ctx1 = UI.menuDogCanvas.getContext('2d');
-    ctx1.clearRect(0, 0, 160, 160);
-    drawLunaMenu(ctx1, 80, 80, 100, timer);
-  }
-  if (UI.victoryDogCanvas && gameState === 'PHASE_COMPLETE') {
-    const ctx2 = UI.victoryDogCanvas.getContext('2d');
-    ctx2.clearRect(0, 0, 160, 160);
-    let bounce = Math.abs(Math.sin(timer * 8) * 15);
-    drawLunaMenu(ctx2, 80, 80 + bounce, 100, timer); 
-  }
+  // Canva components removed, using CSS animation for the icon img
+  return;
 }
 
 function drawDog(ctx, x, y, width, height, timer, isJumping, isFalling) {
@@ -3128,6 +3133,23 @@ function render() {
 
   if (player.x > -50) {
     drawDog(ctx, player.x, player.y, player.width, player.height, player.animTimer, player.isJumping, player.isFalling);
+    
+    // Power-up Timer Clock
+    if (player.tripleShotTimer > 0 || player.doubleShotTimer > 0) {
+      let remaining = player.tripleShotTimer > 0 ? player.tripleShotTimer : player.doubleShotTimer;
+      let secs = Math.ceil(remaining / 1000);
+      
+      ctx.fillStyle = '#fff';
+      if (secs <= 2 && Math.floor(Date.now() / 150) % 2 === 0) {
+         ctx.fillStyle = '#f00'; // Pisca vermelho quando vai acabar
+      }
+      ctx.font = 'bold 20px Arial';
+      ctx.textAlign = 'center';
+      
+      // Ícone baseado no poder
+      let icon = player.tripleShotTimer > 0 ? '🚁 ' : '🛸 ';
+      ctx.fillText(icon + secs + 's', player.x, player.y - player.height - 30);
+    }
   }
 
   // Desfaz o tilt da camera
