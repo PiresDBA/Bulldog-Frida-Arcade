@@ -21,10 +21,14 @@ Este é um jogo de plataforma Arcade protagonizado pela destemida Luna Salsicha!
 - **Recompensa:** Som de **Vitória do Mario**, aviso por voz (**Tiro Triplo!**) e 1 minuto de poder.
 
 ### Avião ✈️ (Especial)
-- **Visual:** Avião personalizado com o **Piloto Especial** no cockpit.
+- **Visual:** Avião personalizado com o **Piloto Especial** (com sistema de transparência automática).
 - **Comportamento:** Passa raramente como um bônus de tela, com rastro de fumaça e som de motor.
 - **Resistência:** Morre com apenas **1 tiro**.
-- **Recompensa:** Concede o **Tiro Duplo** por **1 minuto**.
+- **Recompensa:** Concede o **Tiro Duplo** por **3 segundos**.
+
+### Tiro e Poderes 🔫
+- **Tiro Normal:** 1 para frente e 1 para cima.
+- **Tiro Duplo/Triplo:** Agora duram apenas **3 segundos** e são resetados automaticamente ao mudar de fase.
 
 ## 🎧 Trilhas Sonoras
 
