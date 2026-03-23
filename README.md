@@ -10,7 +10,10 @@ Este é um jogo de plataforma Arcade protagonizado pela destemida Luna Salsicha!
     *   **Atirar:** Botão `🦴` ou Tecla `Z` / `J`.
     *   **Movimentar:** Setas do teclado ou BOTÕES LATERAIS no mobile.
 
-## 🚁 Inimigos e Power-ups!
+## 👾 Inimigos e Power-ups!
+
+### Gaivota Vesga 🦅 (Chefe)
+- O primeiro grande desafio de Luna foi renomeado e recebeu novas animações e sons de impacto de torpedo.
 
 ### Helicóptero 🚁
 - **Comportamento:** Sobrevoa a fase com hélice animada e **som original (`helicoptero.mp3`)**.
