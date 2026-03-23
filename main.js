@@ -303,38 +303,20 @@ function soundDie() {
   osc.start();
 }
 
-// Helicopter Sound Generator (Sons Físicos)
-let heliSoundOsc = null;
-let heliSoundGain = null;
+// Helicopter Real Sound Player
+const heliAudio = new Audio('https://www.soundjay.com/transportation/helicopter-fly-over-01.mp3');
+heliAudio.loop = true;
+heliAudio.volume = 0.4;
 
 function updateHeliSound() {
-  if (!audioCtx) return;
   if (helicopters.length > 0) {
-    if (!heliSoundOsc) {
-      heliSoundOsc = audioCtx.createOscillator();
-      heliSoundGain = audioCtx.createGain();
-      heliSoundOsc.type = 'square';
-      heliSoundOsc.frequency.value = 45; // Baixa frequência para o "thump"
-      
-      const lfo = audioCtx.createOscillator();
-      const lfoGain = audioCtx.createGain();
-      lfo.frequency.value = 14; // Velocidade das pás
-      lfoGain.gain.value = 0.6;
-      lfo.connect(lfoGain);
-      lfoGain.connect(heliSoundGain.gain);
-      
-      heliSoundGain.gain.value = 0.2;
-      heliSoundOsc.connect(heliSoundGain);
-      heliSoundGain.connect(audioCtx.destination);
-      
-      heliSoundOsc.start();
-      lfo.start();
+    if (heliAudio.paused) {
+      heliAudio.play().catch(e => console.log("Heli audio blocked:", e));
     }
   } else {
-    if (heliSoundOsc) {
-      try { heliSoundOsc.stop(); } catch(e){}
-      heliSoundOsc = null;
-      heliSoundGain = null;
+    if (!heliAudio.paused) {
+      heliAudio.pause();
+      heliAudio.currentTime = 0;
     }
   }
 }
@@ -2936,6 +2918,8 @@ function render() {
   for(let p of planes) {
     ctx.save();
     ctx.translate(p.x, p.y);
+    // Rotate to make drawing horizontal
+    ctx.rotate(-Math.PI / 4); 
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.font = '55px Arial';
