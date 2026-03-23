@@ -13,12 +13,13 @@ Este é um jogo de plataforma Arcade protagonizado pela destemida Luna Salsicha!
 ## 🚁 Inimigos e Power-ups!
 
 ### Helicóptero 🚁
-- **Comportamento:** Sobrevoa a fase com hélice animada e **som real de motor (MP3)**.
+- **Comportamento:** Sobrevoa a fase com hélice animada e **som original (`helicoptero.mp3`)**.
 - **Resistência:** Agora morre com apenas **1 tiro**!
-- **Recompensa:** Concede o **Tiro Triplo** por **1 minuto**.
+- **Recompensa:** Som de **Vitória do Mario**, aviso por voz (**Tiro Triplo!**) e 1 minuto de poder.
 
-### Avião ✈️
-- **Comportamento:** Passa rápido pela tela em **vôo horizontal** deixando um rastro de fumaça.
+### Avião ✈️ (Especial)
+- **Visual:** Avião personalizado com o **Piloto Especial** no cockpit.
+- **Comportamento:** Passa raramente como um bônus de tela, com rastro de fumaça e som de motor.
 - **Resistência:** Morre com apenas **1 tiro**.
 - **Recompensa:** Concede o **Tiro Duplo** por **1 minuto**.
 
