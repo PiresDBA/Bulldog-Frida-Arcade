@@ -137,13 +137,13 @@ window.onYouTubeIframeAPIReady = function() {
   ytPlayer = new YT.Player('yt-player', {
     height: '200',
     width: '200',
-    videoId: 'yi6qpbUo-w8', // Pure Piano Instrumental
+    videoId: 'isGaq0fvCCI', // Cartoon Background Music Funny Animation Free
     playerVars: {
       'autoplay': 0,
       'controls': 0,
       'disablekb': 1,
       'loop': 1,
-      'playlist': 'yi6qpbUo-w8' 
+      'playlist': 'isGaq0fvCCI' 
     },
     events: {
       'onReady': function(event) {
@@ -154,7 +154,22 @@ window.onYouTubeIframeAPIReady = function() {
 };
 
 function startBGM() {
-  if (ytPlayer && ytPlayer.playVideo) {
+  if (!ytPlayer || !ytPlayer.loadVideoById) return;
+  
+  let targetId = 'isGaq0fvCCI'; // Default Cartoon Music
+  if (game.phase === 11) {
+    targetId = 'yi6qpbUo-w8'; // Pure Piano Instrumental (Moving from default to phase 11)
+  }
+  
+  // Only change if different to avoid restarting music
+  const currentData = ytPlayer.getVideoData ? ytPlayer.getVideoData() : {};
+  if (currentData.video_id !== targetId) {
+    ytPlayer.loadVideoById({
+      videoId: targetId,
+      startSeconds: 0,
+      suggestedQuality: 'small'
+    });
+  } else {
     ytPlayer.playVideo();
   }
 }
@@ -540,8 +555,11 @@ let player = {
   isFalling: false,
   animTimer: 0,
   lastShootTime: 0,
-  outfit: 'sailor'
+  outfit: 'sailor',
+  tripleShotTimer: 0
 };
+
+let helicopters = [];
 
 let bullets = [];
 let upBullets = [];
@@ -841,9 +859,13 @@ function resetPhase() {
   particles = [];
   decorations = [];
   boss = null;
+  helicopters = [];
   stopBgNoise();
   initMountains();
   updateUI();
+  
+  // Check if BGM needs to change for this phase
+  startBGM(); 
 }
 
 function nextPhase() {
@@ -891,8 +913,6 @@ function shoot() {
   const timeSinceLast = now - player.lastShootTime;
   if (timeSinceLast < 100) return; 
   
-  const isSpread = timeSinceLast > 0 && timeSinceLast < 400; 
-  
   player.lastShootTime = now;
   
   soundShoot();
@@ -901,7 +921,8 @@ function shoot() {
   
   bullets.push({ x: player.x + player.width/2 - 10, y: player.y - 12, vx: 600, rot: 0, type: currentAmmo });
   
-  if (isSpread) {
+  // Power-up logic: Triple Shot
+  if (player.tripleShotTimer > 0) {
     upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -600, vx: 0, rot: 0, type: currentAmmo }); 
     upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -450, vx: -400, rot: 0, type: currentAmmo }); 
     upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -450, vx: 400, rot: 0, type: currentAmmo }); 
@@ -1307,6 +1328,56 @@ function update(dt) {
     particles[i].y += particles[i].vy * dt;
     particles[i].life -= dt;
     if (particles[i].life <= 0) particles.splice(i, 1);
+  }
+
+  // Helicopter Update
+  const heliSpawnChance = (game.timeInPhase < 5000 || (game.timeInPhase > game.phaseDuration - 5000 && !boss)) ? 0.005 : 0;
+  if (Math.random() < heliSpawnChance && helicopters.length === 0) {
+    helicopters.push({
+      x: canvas.width + 100,
+      y: 80,
+      vx: -200,
+      hp: 5,
+      timer: 0
+    });
+  }
+
+  for(let i = helicopters.length - 1; i >= 0; i--) {
+    let h = helicopters[i];
+    h.x += h.vx * dt;
+    h.timer += dt;
+    h.y = 80 + Math.sin(h.timer * 4) * 20;
+
+    // Bullets vs Helicopter
+    for(let j = bullets.length - 1; j >= 0; j--) {
+      if (Math.abs(bullets[j].x - h.x) < 40 && Math.abs(bullets[j].y - h.y) < 40) {
+        h.hp--;
+        bullets.splice(j, 1);
+        soundTink();
+        createExplosion(h.x, h.y, '#fff', 5);
+      }
+    }
+    for(let j = upBullets.length - 1; j >= 0; j--) {
+      if (Math.abs(upBullets[j].x - h.x) < 40 && Math.abs(upBullets[j].y - h.y) < 40) {
+        h.hp--;
+        upBullets.splice(j, 1);
+        soundTink();
+        createExplosion(h.x, h.y, '#fff', 5);
+      }
+    }
+
+    if (h.hp <= 0) {
+      createExplosion(h.x, h.y, '#ffea00', 50);
+      soundPoof();
+      player.tripleShotTimer = 60000; // 1 minute
+      helicopters.splice(i, 1);
+    } else if (h.x < -100) {
+      helicopters.splice(i, 1);
+    }
+  }
+
+  if (player.tripleShotTimer > 0) {
+    player.tripleShotTimer -= dt * 1000;
   }
 
   player.animTimer += dt;
@@ -2093,6 +2164,25 @@ function render() {
 
   for(let e of enemies) {
     drawAnimal(ctx, e.x, e.y, e.type, e.timer, e.badType);
+  }
+
+  for(let h of helicopters) {
+    ctx.save();
+    ctx.translate(h.x, h.y);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '60px Arial';
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 15;
+    ctx.fillText('🚁', 0, 0);
+    
+    // HP Bar for Helicopter
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#333';
+    ctx.fillRect(-20, -40, 40, 6);
+    ctx.fillStyle = '#0f0';
+    ctx.fillRect(-20, -40, 40 * (h.hp / 5), 6);
+    ctx.restore();
   }
 
   for(let b of bombs) {

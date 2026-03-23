@@ -254,13 +254,13 @@ p {
 }
 
 .touch-btn {
-  width: 70px;
-  height: 70px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
-  border: 3px solid rgba(255,255,255,0.5);
+  border: 4px solid rgba(255,255,255,0.5);
   background: rgba(0, 0, 0, 0.5);
   color: #fff;
-  font-size: 22px;
+  font-size: 40px;
   font-family: 'Righteous', cursive;
   cursor: pointer;
   backdrop-filter: blur(4px);
@@ -268,7 +268,7 @@ p {
   touch-action: manipulation;
   user-select: none;
   transition: background 0.1s, transform 0.1s;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
 }
 
 .touch-btn:active {
@@ -277,9 +277,9 @@ p {
 }
 
 .touch-action {
-  width: 80px;
-  height: 80px;
-  font-size: 14px;
+  width: 160px;
+  height: 160px;
+  font-size: 24px;
   background: rgba(30, 0, 80, 0.6);
   border-color: rgba(150, 100, 255, 0.7);
 }
@@ -324,7 +324,7 @@ p {
   #touch-left {
     /* Ocupa a barra escura da esquerda */
     width: calc((100vw - 100vh * 1.3334) / 2);
-    min-width: 60px;
+    min-width: 120px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -338,7 +338,7 @@ p {
   #touch-right {
     /* Ocupa a barra escura da direita */
     width: calc((100vw - 100vh * 1.3334) / 2);
-    min-width: 60px;
+    min-width: 120px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -350,15 +350,15 @@ p {
   }
 
   .touch-btn {
-    width: 54px;
-    height: 54px;
-    font-size: 20px;
+    width: 108px;
+    height: 108px;
+    font-size: 40px;
   }
 
   .touch-action {
-    width: 58px;
-    height: 58px;
-    font-size: 11px;
+    width: 116px;
+    height: 116px;
+    font-size: 22px;
   }
 }
 
