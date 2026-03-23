@@ -30,52 +30,10 @@ const UI = {
 const menuDogImg = new Image();
 menuDogImg.src = 'luna-menu-transparent.png';
 
-const planeSkeletonImg = new Image();
-planeSkeletonImg.src = 'plane_skeleton.png';
+const airplaneBodyImg = new Image();
+airplaneBodyImg.src = 'airplane_body.png';
 const pilotFaceImg = new Image();
 pilotFaceImg.src = 'pilot_face.png';
-
-const combinedPlaneCanvas = document.createElement('canvas');
-let planeCombinedReady = false;
-
-function assembleAirplane() {
-  if (!planeSkeletonImg.complete || !pilotFaceImg.complete) return;
-  
-  combinedPlaneCanvas.width = 150; // Largura final
-  combinedPlaneCanvas.height = 120;
-  const ctxP = combinedPlaneCanvas.getContext('2d');
-  
-  // 1. Desenha e Limpa o Avião
-  const offC = document.createElement('canvas');
-  offC.width = planeSkeletonImg.width; offC.height = planeSkeletonImg.height;
-  const offCtx = offC.getContext('2d');
-  offCtx.drawImage(planeSkeletonImg, 0, 0);
-  const pData = offCtx.getImageData(0,0,offC.width, offC.height);
-  for(let i=0; i<pData.data.length; i+=4) {
-    if(pData.data[i]>220 && pData.data[i+1]>220 && pData.data[i+2]>220) pData.data[i+3]=0;
-  }
-  offCtx.putImageData(pData, 0, 0);
-  ctxP.drawImage(offC, 0, 0, 150, 110);
-  
-  // 2. Desenha e Limpa o Rosto do Piloto
-  const faceC = document.createElement('canvas');
-  faceC.width = pilotFaceImg.width; faceC.height = pilotFaceImg.height;
-  const faceCtx = faceC.getContext('2d');
-  faceCtx.drawImage(pilotFaceImg, 0, 0);
-  const fData = faceCtx.getImageData(0,0,faceC.width, faceC.height);
-  for(let i=0; i<fData.data.length; i+=4) {
-    if(fData.data[i]>220 && fData.data[i+1]>220 && fData.data[i+2]>220) fData.data[i+3]=0;
-  }
-  faceCtx.putImageData(fData, 0, 0);
-  
-  // Posiciona o piloto no cockpit (ajustado para a imagem original)
-  ctxP.drawImage(faceC, 28, 15, 35, 35);
-  
-  planeCombinedReady = true;
-}
-
-planeSkeletonImg.onload = assembleAirplane;
-pilotFaceImg.onload = assembleAirplane;
 
 let continueInterval = null;
 
@@ -404,6 +362,9 @@ planeAudio.volume = 0.4;
 const seagullAudio = new Audio('https://www.myinstants.com/media/sounds/seagull.mp3');
 seagullAudio.volume = 0.6;
 
+const torpedoAudio = new Audio('https://www.myinstants.com/media/sounds/explosion.mp3');
+torpedoAudio.volume = 0.5;
+
 const realMeow = new Audio('https://storage.googleapis.com/eleven-public-cdn/audio/sound-effects-library/cat-meow/11L-cat_meow-10828053.mp3');
 const realBark = new Audio('https://www.myinstants.com/media/sounds/dog-bark.mp3');
 
@@ -503,7 +464,7 @@ function playBgNoise(type) {
   stopBgNoise();
 
   let soundType = type;
-  if (type === 'seagull') soundType = 'wind';
+  if (type === 'seagull') soundType = 'none'; // Sem vento na gaivota!
   if (type === 'hose') soundType = 'wind';
   if (type === 'broom') soundType = 'vacuum';
   if (type === 'fireworks') soundType = 'storm';
@@ -1421,8 +1382,9 @@ function update(dt) {
               const targetX = player.x + 100; // tenta passar por cima
               boss.x += (targetX - boss.x) * dt * 2;
               boss.y += (targetY - boss.y) * dt * 3;
-              // Rotate seagull towards player during dive
-              boss.rotation = Math.atan2(player.y - boss.y, player.x - boss.x);
+              // Rotate seagull towards player during dive (adjusting for its left-facing default)
+              let ang = Math.atan2(player.y - boss.y, player.x - boss.x);
+              boss.rotation = ang - Math.PI; 
                if (boss.modeTimer > 3) { // 3 segundos de mergulho
                    boss.mode = 'FLYING';
                    boss.modeTimer = 0;
@@ -1493,7 +1455,9 @@ function update(dt) {
     
     if (bombs[i].y > GROUND_Y) {
       soundPoof(); // Usamos o poof como base
-      playTone(100, 'triangle', 0.3, 0.2); // Som de impacto do torpedo
+      torpedoAudio.currentTime = 0;
+      torpedoAudio.play().catch(e=>{}); // Som do torpedo real!
+      playTone(100, 'triangle', 0.3, 0.2); 
       createExplosion(bombs[i].x, GROUND_Y, '#ffaa00', 10);
       bombs.splice(i, 1);
     }
@@ -2903,8 +2867,8 @@ function render() {
         const flap = Math.sin(boss.timer * 15) * 0.3;
         let angle = 0;
         if (boss.mode === 'DIVING') {
-           // Aponta o bico na direção da Luna
-           angle = Math.atan2(player.y - boss.y, player.x - boss.x) + 0.2;
+           // Aponta o bico na direção da Luna. A Gaivota original mira para a Esquerda (PI)
+           angle = Math.atan2(player.y - boss.y, player.x - boss.x) - Math.PI;
         }
         drawSeagull(ctx, flap, boss.mode === 'DIVING', angle);
     } else if (boss.type === 'bigdog') {
@@ -3021,9 +2985,23 @@ function render() {
     ctx.save();
     ctx.translate(p.x, p.y);
     
-    // Draw Manually Assembled Airplane
-    if (planeCombinedReady) {
-      ctx.drawImage(combinedPlaneCanvas, -75, -55, 150, 110);
+    // Draw Airplane Body Stacked
+    if (airplaneBodyImg.complete && airplaneBodyImg.naturalWidth > 0) {
+      ctx.save();
+      ctx.scale(-1, 1); // Flip horizontal para voar para a esquerda!
+      ctx.drawImage(airplaneBodyImg, -50, -40, 100, 80);
+      
+      // Draw Pilot inside the cockpit area
+      if (pilotFaceImg.complete && pilotFaceImg.naturalWidth > 0) {
+        ctx.save();
+        ctx.beginPath();
+        // Cockpit area
+        ctx.arc(-5, -15, 15, 0, Math.PI*2);
+        ctx.clip(); 
+        ctx.drawImage(pilotFaceImg, -20, -30, 30, 30);
+        ctx.restore();
+      }
+      ctx.restore();
     } else {
       // Fallback
       ctx.rotate(-Math.PI / 4); 
