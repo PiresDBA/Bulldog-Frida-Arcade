@@ -9,12 +9,18 @@ Este arquivo foi criado para te ajudar a entender as últimas mudanças feitas n
 **ATENÇÃO:** Nós acabamos de JUNTAR TUDO (Merge) de novo na **Branch Principal `master`**! Tudo o que fizemos nas últimas duas branches com o novo desenho e o sistema de dificuldade acabou de entrar pra valer no jogo - bem como o **Desenho Manual da Gaivota**!
 
 ### Branch Atual: `master`
-Aqui está a **base segura e final** do jogo neste momento.
+Aqui está a **base segura e estável** do jogo neste momento.
 
-### 1. `Atualização de Cache do PWA para v14 (Identidade nos Recordes)`
-- **O que mudou:** `sw.js` agora para **v14**.
-- **Novidade Principal:** Agora você pode **digitar o seu nome (máximo 10 letras)** quando bater um recorde! 
-- Ao final de cada partida, aparecerá um campo para você se identificar. Basta clicar em "Salvar Recorde" e seu nome ficará imortalizado no Top 5 de recordistas locais do jogo!
+### 🌟 `v37: A Versão Estável (Ponto de Restauração)`
+- **O que mudou:** Esta é a versão oficial de trabalho após a correção da tela preta.
+*   **Hash:** `50e540e`
+*   **Tag:** `v37` (Você pode voltar aqui a qualquer momento usando `git checkout v37`)
+- **Destaques:**
+    *   Fim do erro de tela preta no carregamento.
+    *   Música local MP3 funcionando perfeitamente.
+    *   Tiro Duplo (UFO) ajustado para 7 segundos.
+    *   Documentação pedagógica completa no código JS.
+    *   Servidor Python (`servidor_luna.py`) configurado para evitar conflitos de porta.
 
 ---
 
