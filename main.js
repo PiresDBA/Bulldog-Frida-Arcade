@@ -1,29 +1,57 @@
+/**
+ * ============================================================================
+ *           BEM-VINDO AO CÓDIGO DO JOGO: SALSICHINHA LUNA ARCADE
+ * ============================================================================
+ * 
+ * Se você nunca programou antes, não se preocupe! Este código é como uma 
+ * "receita de bolo" que diz ao computador exatamente o que desenhar e como
+ * os personagens devem se comportar.
+ * 
+ * --- CONCEITOS IMPORTANTES ---
+ * 1. CANVAS (TELA): É como uma lousa mágica onde o jogo é desenhado 60 vezes 
+ *    por segundo para criar a ilusão de movimento.
+ * 2. CTX (CONTEXTO): É o nosso "pincel". Usamos ele para pintar formas, cores
+ *    e imagens na lousa (Canvas).
+ * 3. VARIÁVEIS (let e const): São gavetas onde guardamos informações, como
+ *    os pontos que você fez ou quantas vidas a Luna ainda tem.
+ * 4. FUNÇÕES (function): São pequenos "trabalhadores" que executam uma tarefa
+ *    específica (como "pular", "atirar" ou "tocar som").
+ */
+
+// Aqui pegamos a "lousa" (canvas) que está lá no nosso arquivo HTML (index.html)
 const canvas = document.getElementById('gameCanvas');
+
+// E aqui pegamos o "pincel" (ctx) para podermos desenhar nela
 const ctx = canvas.getContext('2d');
 
+/** 
+ * UI (User Interface - Interface do Usuário): 
+ * Este objeto guarda todas as gavetas que conectam o nosso código com as 
+ * mensagens e botões que aparecem na tela (pontos, vidas, telas de Game Over).
+ */
 const UI = {
-  score: document.getElementById('score'),
-  phase: document.getElementById('phase'),
-  lives: document.getElementById('lives'),
-  startScreen: document.getElementById('start-screen'),
-  gameOverScreen: document.getElementById('game-over-screen'),
-  phaseTransition: document.getElementById('phase-transition'),
-  nextPhase: document.getElementById('next-phase'),
-  finalScore: document.getElementById('final-score'),
-  startBtn: document.getElementById('start-btn'),
-  restartBtn: document.getElementById('restart-btn'),
-  phaseCompleteScreen: document.getElementById('phase-complete-screen'),
-  continueBtn: document.getElementById('continue-btn'),
-  continueScreen: document.getElementById('continue-screen'),
-  btnYesContinue: document.getElementById('btn-yes-continue'),
-  btnNoContinue: document.getElementById('btn-no-continue'),
-  continuesLeftText: document.getElementById('continues-left'),
-  continueTimerText: document.getElementById('continue-timer'),
-  difficultySelect: document.getElementById('difficulty-select'),
-  highScoresList: document.getElementById('high-scores-list'),
-  playerNameInput: document.getElementById('player-name'),
-  saveScoreBtn: document.getElementById('save-score-btn'),
-  recordInputContainer: document.getElementById('record-input-container')
+  score: document.getElementById('score'),               // Onde aparecem os Pontos
+  phase: document.getElementById('phase'),               // Onde mostra a Fase
+  lives: document.getElementById('lives'),               // Quantidade de Vidinhas (Corações)
+  startScreen: document.getElementById('start-screen'),   // A tela de Início (Menu)
+  gameOverScreen: document.getElementById('game-over-screen'), // Tela de quando você perde
+  phaseTransition: document.getElementById('phase-transition'), // Mensagem de "Fase 2, 3..."
+  nextPhase: document.getElementById('next-phase'),       // O número da próxima fase
+  finalScore: document.getElementById('final-score'),     // Pontuação final mostrada no final
+  startBtn: document.getElementById('start-btn'),         // O botão verde pra começar
+  restartBtn: document.getElementById('restart-btn'),     // O botão pra jogar de novo
+  phaseCompleteScreen: document.getElementById('phase-complete-screen'), // Tela de fase vitoriosa
+  continueBtn: document.getElementById('continue-btn'),   // Botão de continuar jogando
+  continueScreen: document.getElementById('continue-screen'), // Tela de contagem regressiva (10..9..8)
+  btnYesContinue: document.getElementById('btn-yes-continue'), // Botão "SIM" pra continuar
+  btnNoContinue: document.getElementById('btn-no-continue'),   // Botão "NÃO" pra desistir
+  continuesLeftText: document.getElementById('continues-left'), // Quantas vezes ainda pode continuar
+  continueTimerText: document.getElementById('continue-timer'), // O reloginho da contagem 
+  difficultySelect: document.getElementById('difficulty-select'), // Seleção de Fácil/Médio/Difícil
+  highScoresList: document.getElementById('high-scores-list'),   // Lista dos Recordes salvos
+  playerNameInput: document.getElementById('player-name'),       // Caixinha pra você digitar seu nome
+  saveScoreBtn: document.getElementById('save-score-btn'),       // Botão pra salvar seu Recorde
+  recordInputContainer: document.getElementById('record-input-container') // Onde fica a caixinha do nome
 };
 
 // --- IMAGE ASSETS ---
@@ -116,17 +144,26 @@ const EARS_COLOR = '#5C2E0A';
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx = null;
 
+/**
+ * SISTEMA DE SALVAMENTO (LocalStorage):
+ * Imagina que o seu navegador tem um "caderninho de notas" secreto. 
+ * A gente usa o 'localStorage' para anotar os seus pontos e em que fase você parou.
+ * Assim, se você fechar o jogo e voltar amanhã, o jogo lê esse caderninho e você 
+ * não perde o seu progresso!
+ */
 function saveGame() {
   const data = {
-    score: game.score,
-    phase: game.phase,
-    lives: game.lives,
-    continues: game.continues,
-    outfit: player.outfit
+    score: game.score,      // Pontos atuais
+    phase: game.phase,      // Fase atual
+    lives: game.lives,      // Vidas
+    continues: game.continues, // Quantos continues restam
+    outfit: player.outfit   // A roupinha que a Luna está usando
   };
+  // Salva no caderninho sob o nome 'luna_arcade_save'
   localStorage.setItem('luna_arcade_save', JSON.stringify(data));
 }
 
+// Essa função lê o caderninho quando você abre o jogo
 function loadGame() {
   const saved = localStorage.getItem('luna_arcade_save');
   if (saved) {
@@ -137,21 +174,32 @@ function loadGame() {
       game.lives = data.lives || 5;
       game.continues = data.continues || 5;
       player.outfit = data.outfit || 'sailor';
-      updateUI();
-    } catch(e) { console.error("Load error:", e); }
+      updateUI(); // Atualiza os textos na tela com os dados carregados
+    } catch(e) { console.error("Erro ao carregar:", e); }
   }
 }
 
+/**
+ * ATUALIZAÇÃO DA TELA (updateUI):
+ * Essa função serve para pegar os números das nossas gavetas (variáveis)
+ * e escrever eles lá no nosso arquivo de texto (HTML) para o jogador ver.
+ */
 function updateUI() {
   if (UI.score) UI.score.innerText = Math.floor(game.score);
   if (UI.phase) UI.phase.innerText = game.phase;
   if (UI.lives) UI.lives.innerText = game.lives;
 }
 
+/**
+ * SISTEMA DE ÁUDIO (Web Audio API):
+ * O computador precisa de uma "mesa de som" (audioCtx) para criar sons de "piiii", 
+ * "pow" e "kabum". A gente inicia essa mesa aqui.
+ */
 function initAudio() {
   if (!audioCtx) {
     audioCtx = new AudioContext();
   }
+  // Os navegadores modernos pedem que o jogador clique em algo antes de soltar som
   if (audioCtx.state === 'suspended') {
     audioCtx.resume();
   }
@@ -282,8 +330,11 @@ function soundPoof() {
 }
 
 function soundTink() { 
-  playTone(880, 'sine', 0.1, 0.1);
-  setTimeout(() => playTone(1200, 'sine', 0.1, 0.1), 50);
+  // O "Pim-Pim-Pim-Pim" que o usuário pediu - 4 notas subindo
+  playTone(880, 'sine', 0.1, 0.1); 
+  setTimeout(() => playTone(1050, 'sine', 0.1, 0.1), 50);
+  setTimeout(() => playTone(1200, 'sine', 0.1, 0.1), 100);
+  setTimeout(() => playTone(1350, 'sine', 0.1, 0.1), 150);
 }
 
 function soundHappy() {
@@ -362,22 +413,7 @@ const seagullAudio = new Audio('https://www.myinstants.com/media/sounds/seagull.
 seagullAudio.volume = 0.6;
 
 function soundBombImpact() {
-  if(!audioCtx) return;
-  const t = audioCtx.currentTime;
-  
-  // Ruído rosa curto para simular impacto físico
-  const noiseSrc = audioCtx.createBufferSource();
-  noiseSrc.buffer = makePinkNoise(0.2); 
-  const lp = audioCtx.createBiquadFilter();
-  lp.type = 'lowpass';
-  lp.frequency.setValueAtTime(250, t); // Impacto grave
-  lp.frequency.exponentialRampToValueAtTime(30, t + 0.15);
-  const gain = audioCtx.createGain();
-  gain.gain.setValueAtTime(3.0, t);
-  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
-  
-  noiseSrc.connect(lp); lp.connect(gain); gain.connect(audioCtx.destination);
-  noiseSrc.start(t); noiseSrc.stop(t + 0.2);
+  soundTink(); // Agora a bomba ao cair faz o som de "acerto" solicitado
 }
 
 let ufoOsc = null;
@@ -400,7 +436,7 @@ function startUfoSound() {
   lfo.connect(lfoGain);
   lfoGain.connect(ufoOsc.frequency);
   
-  gain.gain.value = 0.3;
+  gain.gain.value = 0.1;
   ufoOsc.connect(gain);
   gain.connect(audioCtx.destination);
   
@@ -981,15 +1017,28 @@ function drawCat(ctx, x, y, width, height, timer, state) {
   ctx.restore();
 }
 
+/**
+ * CONTROLES (Event Listeners):
+ * Aqui o computador fica "ouvindo" o que você faz.
+ * Se você aperta uma tecla (keydown) ou clica no mouse (mousedown), 
+ * o computador executa uma ação de jogo.
+ */
+
+// Quando uma tecla é apertada...
 window.addEventListener('keydown', e => { 
-  keys[e.code] = true;
+  keys[e.code] = true; // Guardamos que a tecla está "apertada"
   if (gameState === 'PLAYING') {
+    // Se apertar Z ou J, a Luna atira!
     if (e.code === 'KeyZ' || e.code === 'KeyJ') shoot();
+    // Se apertar Espaço, Seta pra Cima ou W, a Luna pula!
     if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') jump();
   }
 });
+
+// Quando soltamos a tecla, limpamos a gaveta
 window.addEventListener('keyup', e => keys[e.code] = false);
 
+// Clicar com o mouse também atira
 canvas.addEventListener('mousedown', () => {
   if (gameState === 'PLAYING') shoot();
 });
@@ -1028,30 +1077,40 @@ document.querySelectorAll('.diff-btn').forEach(btn => {
 // menuDogCanvas click removed - element no longer in HTML
 
 
+/**
+ * PULAR (jump):
+ * Faz a Luna subir no ar. Ela pode pular até 3 vezes (pulo triplo!).
+ */
 function jump() {
+  // Verificamos se ela ainda tem pulos sobrando e se não está caindo num buraco
   if (player.jumpCount < player.maxJumps && !player.isFalling) {
-    player.vy = player.jumpPower; 
-    player.isJumping = true;
-    player.jumpCount++;
-    soundJump();
-    createExplosion(player.x, player.y + player.height/2, '#fff', 8); // Nuvenzinha ao pular no ar
+    player.vy = player.jumpPower;   // Dá um "impulso" para cima (número negativo sobe)
+    player.isJumping = true;        // Avisa que está pulando
+    player.jumpCount++;             // Aumenta o contador de pulos
+    soundJump();                    // Toca o som do pulinho
+    createExplosion(player.x, player.y + player.height/2, '#fff', 8); // Cria uma fumaça branca
   }
 }
 
+/**
+ * COMEÇAR O JOGO (startGame):
+ * Reinicia todos os valores para o padrão de uma nova partida.
+ */
 function startGame() {
-  gameState = 'PLAYING';
-  game.score = 0;
-  game.phase = 1;
-  game.lives = 5;
-  game.continues = 5;
+  gameState = 'PLAYING';            // Muda o estado para "Jogando"
+  game.score = 0;                   // Zera os pontos
+  game.phase = 1;                   // Volta para a fase 1
+  game.lives = 5;                   // Dá 5 vidas
+  game.continues = 5;               // Dá 5 chances extras
+  // Pega a dificuldade que você escolheu nos botões coloridos
   game.difficulty = document.querySelector('.diff-btn.selected')?.dataset.val || 'medium';
-  resetPhase();
-  UI.startScreen.classList.add('hidden');
-  UI.gameOverScreen.classList.add('hidden');
-  UI.playerNameInput.value = ''; // limpa o nome anterior
+  resetPhase();                     // Prepara o cenário
+  UI.startScreen.classList.add('hidden'); // Esconde o menu inicial
+  UI.gameOverScreen.classList.add('hidden'); // Esconde a tela de derrota
+  UI.playerNameInput.value = '';             // Limpa a caixinha de nome
   if(UI.phaseTransition) UI.phaseTransition.classList.add('hidden');
   
-  startBGM(); 
+  startBGM(); // Inicia a música de fundo
 }
 
 function resetPhase() {
@@ -1094,6 +1153,7 @@ function resetPhase() {
 
 function nextPhase() {
   gameState = 'TRANSITION';
+  stopUfoSound();
   game.phase++;
   UI.nextPhase.innerText = game.phase;
   if(UI.phaseTransition) UI.phaseTransition.classList.remove('hidden');
@@ -1162,8 +1222,9 @@ function shoot() {
     upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -450, vx: -400, rot: 0, type: currentAmmo }); 
     upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -450, vx: 400, rot: 0, type: currentAmmo }); 
   } else if (player.doubleShotTimer > 0) {
-    // double front bullet, no up bullet
-    bullets.push({ x: player.x + player.width/2 - 10, y: player.y - 12 - 15, vx: 600, rot: 0, type: currentAmmo });
+    // 1 forward (line 1156), 2 upward
+    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -600, vx: -50, rot: 0, type: currentAmmo });
+    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -600, vx: 50, rot: 0, type: currentAmmo });
   } else {
     // 1 forward bullet, 1 up bullet
     upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -600, vx: 0, rot: 0, type: currentAmmo });
@@ -1380,35 +1441,52 @@ function update(dt) {
     if (holes[i].x + holes[i].width < -150) holes.splice(i, 1);
   }
   
+  /**
+   * ATUALIZAÇÃO DOS BULLDOGS (bulldogs):
+   * Os bulldogs são "inimigos" que ficam parados, mas se você der um osso, eles
+   * ficam felizes e começam a pular de alegria (state = 'eating').
+   */
   for(let i = bulldogs.length - 1; i >= 0; i--) {
     let b = bulldogs[i];
+    
+    // ESTADO: Pulando para comer o osso que você atirou
     if (b.state === 'jumping_to_eat') {
-      b.y += (b.vy * dt);
-      b.vy += 1500 * dt; 
-      b.x -= game.speed * dt;
-      if (b.y >= GROUND_Y) {
+      b.y += (b.vy * dt);          // Move na vertical
+      b.vy += 1500 * dt;           // Gravidade puxando pra baixo
+      b.x -= game.speed * dt;      // O chão se move, então ele vai pra trás
+      if (b.y >= GROUND_Y) {       // Tocou o chão!
          b.y = GROUND_Y;
-         b.state = 'eating';
+         b.state = 'eating';       // Agora ele está comendo/feliz
          b.animTimer = 0;
-         soundHappy();
-         createExplosion(b.x, b.y - 30, '#ffb6c1', 20); 
-         game.score += 20;
+         soundHappy();             // Som de cachorro feliz
+         createExplosion(b.x, b.y - 30, '#ffb6c1', 20); // Coraçõezinhos!
+         game.score += 20;         // Você ganha pontos por alimentar ele
          updateUI();
       }
-    } else if (b.state === 'eating') {
+    } 
+    // ESTADO: Comendo/Feliz (ele não te machuca mais)
+    else if (b.state === 'eating') {
       b.x -= game.speed * dt; 
       b.animTimer += dt;
       if (Math.random() < 0.05) { 
-        createExplosion(b.x, b.y - 30, '#ffb6c1', 2);
+        createExplosion(b.x, b.y - 30, '#ffb6c1', 2); // Efeito visual de alegria
       }
-      if (b.x + b.width < -100) bulldogs.splice(i, 1);
-    } else {
+      if (b.x + b.width < -100) bulldogs.splice(i, 1); // Sumiu da tela, a gente remove
+    } 
+    // ESTADO: Bravo (Se você encostar nele, você perde vida!)
+    else {
       b.x -= game.speed * dt;
       b.animTimer += dt;
+      
+      /**
+       * DETECÇÃO DE COLISÃO:
+       * A gente calcula a distância entre a Luna e o Bulldog.
+       * Se a distância for muito pequena, significa que eles se bateram!
+       */
       if (!player.isFalling && 
           Math.abs(player.x - b.x) < player.width/2 + b.width/2 - 10 &&
           Math.abs(player.y - player.height/2 - (b.y - b.height/2)) < player.height/2 + b.height/2 - 10) {
-        die();
+        die(); // Luna se machucou :(
       }
       if (b.x + b.width < -100) bulldogs.splice(i, 1);
     }
@@ -1760,7 +1838,16 @@ function update(dt) {
   player.animTimer += dt;
 }
 
-// DRAW FUNCTIONS
+/**
+ * ============================================================================
+ *               FUNÇÕES DE DESENHO (O Nosso Pincel Mágico)
+ * ============================================================================
+ * 
+ * Aqui é onde a mágica visual acontece! Imagine que o computador é um 
+ * artista muito rápido. Ele desenha cada coisa (Luna, inimigos, nuvens) 
+ * muitas vezes por segundo.
+ */
+// --- FUNÇÕES DE PINTURA (DRAW) ---
 function drawLunaMenu(ctx, x, y, size, timer) {
   if (menuDogImg.complete && menuDogImg.naturalWidth > 0) {
     ctx.save();
@@ -1858,32 +1945,56 @@ function drawMenuDogs(timer) {
   return;
 }
 
+/**
+ * DESENHANDO A LUNA (drawDog):
+ * Esta é a função mais importante! Ela desenha a nossa heroína Luna.
+ * A gente usa formas geométricas (retângulos arredondados, círculos) 
+ * para montar o corpo dela.
+ */
 function drawDog(ctx, x, y, width, height, timer, isJumping, isFalling) {
-  if (player.dead) return;
-  const drawY = y + 20; // Anchor on dirt
+  if (player.dead) return; // Se a Luna "morrer", a gente para de desenhar ela
+  
+  // Ajustamos a posição da Luna no chão (Terra firme)
+  const drawY = y + 20; 
 
+  /**
+   * CONTEXTO (save e restore):
+   * Quando usamos 'ctx.save()', é como se tirássemos uma foto das configurações
+   * atuais do pincel. Depois, podemos girar a tela, mudar a cor, e quando 
+   * damos 'ctx.restore()', o pincel volta ao normal para não bagunçar o resto.
+   */
   ctx.save();
+  
+  // Se a Luna pegou uma estrela (invencível), ela fica piscando (transparente)
   if (player.invincible) {
     ctx.globalAlpha = (Math.floor(Date.now() / 150) % 2 === 0) ? 0.3 : 0.8;
   }
+  
+  // Posicionamos o "pincel" no lugar onde a Luna está
   ctx.translate(x, drawY); 
+  
+  // Se ela estiver pulando ou caindo, a gente inclina o corpinho dela
   ctx.scale(player.scale || 1, player.scale || 1);
   if (player.isFalling) ctx.rotate(player.rotation || 0);
   else if (isJumping) ctx.rotate(-Math.PI / 12);
   
+  // Sombra para ela não parecer "flutuando" no papel
   ctx.shadowColor = 'rgba(0,0,0,0.6)';
   ctx.shadowBlur = 10;
   ctx.shadowOffsetY = 8;
   
+  // Degradê de cores para o pelo ficar bonito
   const bodyGrad = ctx.createLinearGradient(0, -height - 10, 0, 0);
-  bodyGrad.addColorStop(0, '#B2663E');
-  bodyGrad.addColorStop(1, '#5C2E0A');
+  bodyGrad.addColorStop(0, '#B2663E'); // Marrom claro em cima
+  bodyGrad.addColorStop(1, '#5C2E0A'); // Marrom escuro embaixo
 
+  // Desenha o corpo (um retângulo com cantos redondos)
   ctx.fillStyle = bodyGrad;
   ctx.beginPath();
   ctx.roundRect(-width/2, -height - 10, width, height, height/2);
   ctx.fill();
 
+  // Removemos a sombra para os olhos e nariz ficarem nítidos
   ctx.shadowBlur = 0; 
   ctx.shadowOffsetY = 0;
 
