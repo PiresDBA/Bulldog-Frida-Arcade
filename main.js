@@ -31,7 +31,7 @@ const menuDogImg = new Image();
 menuDogImg.src = 'luna-menu-transparent.png';
 
 const customPlaneImg = new Image();
-customPlaneImg.src = 'aviao5.png';
+customPlaneImg.src = 'aviao_clean.png';
 
 let continueInterval = null;
 
@@ -989,6 +989,8 @@ function resetPhase() {
   bombs = [];
   particles = [];
   decorations = [];
+  player.doubleShotTimer = 0;
+  player.tripleShotTimer = 0;
   boss = null;
   stopBgNoise();
   initMountains();
@@ -1593,7 +1595,7 @@ function update(dt) {
      if (p.hp <= 0) {
         createExplosion(p.x, p.y, '#fff', 40);
         soundHappy(); // Som diferente (feliz/agudo)
-        player.doubleShotTimer = 5000; // 5 seconds
+        player.doubleShotTimer = 3000; // 3 seconds
         planes.splice(i, 1);
      } else if (p.x < -100) {
         planes.splice(i, 1);
@@ -1645,7 +1647,7 @@ function update(dt) {
       createExplosion(h.x, h.y, '#ffea00', 60);
       soundMarioWin();
       speak("Tiro Triplo!");
-      player.tripleShotTimer = 60000; // 1 minute
+      player.tripleShotTimer = 3000; // 3 seconds
       helicopters.splice(i, 1);
       updateHeliSound(); // stop sound immediately
     } else if (h.x < -150) {
