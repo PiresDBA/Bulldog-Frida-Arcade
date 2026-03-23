@@ -1,4 +1,4 @@
-# 🐕 Salsichinha Luna Arcade (v3.0)
+# 🐕 Salsichinha Luna Arcade (v3.5)
 
 Este é um jogo de plataforma Arcade protagonizado pela destemida Luna Salsicha! Resgate seus amigos animais e vença seus medos nesta aventura emocionante.
 
@@ -10,22 +10,27 @@ Este é um jogo de plataforma Arcade protagonizado pela destemida Luna Salsicha!
     *   **Atirar:** Botão `🦴` ou Tecla `Z` / `J`.
     *   **Movimentar:** Setas do teclado ou BOTÕES LATERAIS no mobile.
 
-## 🚁 Novidades do Jogo!
+## 🚁 Inimigos e Power-ups!
 
-- **Inimigo Helicóptero:** Agora, um helicóptero misterioso sobrevoa a fase no início e perto da chegada do chefe. Destrua-o para ganhar recompensas!
-- **Power-up de Tiro Triplo:** Ao derrubar o helicóptero, Luna ganha o **Tiro Triplo** durante **1 minuto** (60 segundos). Aproveite para detonar os chefes!
-- **Fases e Músicas:**
-    *   A música padrão foi atualizada para um tema divertido de desenho animado.
-    *   Ao atingir a **Fase 11**, o jogo tocará uma versão instrumental nostálgica de piano.
-- **Melhorias no Mobile:** Os botões estão **dobrados de tamanho** para facilitar o jogo no celular!
+### Helicóptero 🚁
+- **Comportamento:** Sobrevoa a fase com hélice animada e som de motor.
+- **Resistência:** Agora morre com apenas **1 tiro**!
+- **Recompensa:** Concede o **Tiro Triplo** por **1 minuto**.
 
-## 🎧 Créditos de Música
+### Avião ✈️
+- **Comportamento:** Passa rápido pela tela deixando um rastro de fumaça.
+- **Resistência:** Morre com apenas **1 tiro**.
+- **Recompensa:** Concede o **Tiro Duplo** por **1 minuto**.
 
-Agradecemos imensamente aos criadores das trilhas sonoras:
+## 🎧 Trilhas Sonoras
 
-- **Trilha Principal:** ["Cartoon Background Music Funny Animation Free"](https://www.youtube.com/watch?v=isGaq0fvCCI) por **Cartoon Background Music**.
-- **Trilha da Fase 11:** ["Pure Piano Instrumental"](https://www.youtube.com/watch?v=yi6qpbUo-w8).
-- **Trilha de Backup (Salchicha):** Inspirado por ["El Show Del Perro Salchicha"](https://www.youtube.com/watch?v=gS59E21yP50) de **María Elena Walsh**.
+- **Trilha Principal (Youtube):** [Cartoon Background Music](https://www.youtube.com/watch?v=isGaq0fvCCI).
+- **Trilha Fase 11 (Youtube):** [Pure Piano Instrumental](https://www.youtube.com/watch?v=yi6qpbUo-w8).
+- **Efeitos de Som:** Gerados via Web Audio API (Helicóptero, Tiros, Pulos) e MP3 locais.
+
+## 📱 Mobile
+- Botões de ação **dobrados de tamanho** para melhor jogabilidade.
+- Suporte a instalação PWA (Adicionar à tela de início).
 
 ---
 Desenvolvido com carinho para Luna e Frida! 🐾
