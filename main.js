@@ -205,62 +205,23 @@ function initAudio() {
   }
 }
 
-// YT BGM Player
-let ytPlayer = null;
-
-const tag = document.createElement('script');
-tag.src = "https://www.youtube.com/iframe_api";
-const firstScriptTag = document.getElementsByTagName('script')[0];
-if(firstScriptTag && firstScriptTag.parentNode) {
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-} else {
-  document.head.appendChild(tag);
-}
-
-window.onYouTubeIframeAPIReady = function() {
-  ytPlayer = new YT.Player('yt-player', {
-    height: '200',
-    width: '200',
-    videoId: 'isGaq0fvCCI', // Cartoon Background Music Funny Animation Free
-    playerVars: {
-      'autoplay': 0,
-      'controls': 0,
-      'disablekb': 1,
-      'loop': 1,
-      'playlist': 'isGaq0fvCCI' 
-    },
-    events: {
-      'onReady': function(event) {
-        event.target.setVolume(50); 
-      }
-    }
-  });
-};
+// BGM Player (HTML5 Audio para compatibilidade mobile)
+let bgmAudio = null;
 
 function startBGM() {
-  if (!ytPlayer || !ytPlayer.loadVideoById) return;
-  
-  let targetId = 'isGaq0fvCCI'; // Default Cartoon Music
-  if (game.phase === 11) {
-    targetId = 'yi6qpbUo-w8'; // Pure Piano Instrumental (Moving from default to phase 11)
+  if (!bgmAudio) {
+    bgmAudio = new Audio('bgm.mp3');
+    bgmAudio.loop = true;
+    bgmAudio.volume = 0.5;
   }
-  
-  // Only change if different to avoid restarting music
-  const currentData = ytPlayer.getVideoData ? ytPlayer.getVideoData() : {};
-  if (currentData.video_id !== targetId) {
-    ytPlayer.loadVideoById({
-      videoId: targetId,
-      startSeconds: 0,
-      suggestedQuality: 'small'
-    });
-  } else {
-    ytPlayer.playVideo();
-  }
+  // Os navegadores bloqueiam som desacompanhado de clique.
+  // Nosso botão 'Iniciar' permite que este play() funcione corretamente.
+  bgmAudio.play().catch(e => console.log('Autoplay da música foi prevenido:', e));
 }
 
 function stopBGM() {
-  if (ytPlayer && ytPlayer.pauseVideo) {
-    ytPlayer.pauseVideo();
+  if (bgmAudio) {
+    bgmAudio.pause();
   }
 }
 
@@ -1214,27 +1175,25 @@ function shoot() {
   player.lastShootTime = now;
   
   soundShoot();
-  let currentAmmo = nextAmmo;
-  nextAmmo = (nextAmmo === 'bone') ? 'food' : 'bone';
+  let r = Math.floor(Math.random() * 4); 
+  let f0 = 'food_' + r;
+  let f1 = 'food_' + ((r+1)%4);
+  let f2 = 'food_' + ((r+2)%4);
   
-  bullets.push({ x: player.x + player.width/2 - 10, y: player.y - 12, vx: 600, rot: 0, type: currentAmmo });
+  // Tiro frontal sempre será osso, saindo do bico do tanque azul (nas costas)
+  bullets.push({ x: player.x + 10, y: player.y - 45, vx: 600, rot: 0, type: 'bone' });
   
-  // Shooting logic priority
+  // Tiros Verticais usam os tipos de ração aleatórios gerados acima (food_0 a food_3)
   if (player.tripleShotTimer > 0) {
-    // 3 bullets
-    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -600, vx: 0, rot: 0, type: currentAmmo }); 
-    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -450, vx: -400, rot: 0, type: currentAmmo }); 
-    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -450, vx: 400, rot: 0, type: currentAmmo }); 
+    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -600, vx: 0, rot: 0, type: f0 }); 
+    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -450, vx: -400, rot: 0, type: f1 }); 
+    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -450, vx: 400, rot: 0, type: f2 }); 
   } else if (player.doubleShotTimer > 0) {
-    // 2 tiros para frente E 2 tiros para cima (Desejo do Usuário!)
-    // O primeiro de frente já saiu no início da função (linha 1216)
-    bullets.push({ x: player.x + player.width/2 - 10, y: player.y - 12 - 15, vx: 600, rot: 0, type: currentAmmo });
-    // E agora os dois para cima em "V"
-    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -600, vx: -50, rot: 0, type: currentAmmo });
-    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -600, vx: 50, rot: 0, type: currentAmmo });
+    bullets.push({ x: player.x + 10, y: player.y - 45 - 15, vx: 600, rot: 0, type: 'bone' });
+    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -600, vx: -50, rot: 0, type: f0 });
+    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -600, vx: 50, rot: 0, type: f1 });
   } else {
-    // Modo Normal: 1 tiro para frente (linha 1216) e 1 para cima (abaixo)
-    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -600, vx: 0, rot: 0, type: currentAmmo });
+    upBullets.push({ x: player.x, y: player.y - player.height - 20, vy: -600, vx: 0, rot: 0, type: f0 });
   }
 }
 
@@ -2209,26 +2168,36 @@ function drawBone(ctx, x, y, rot) {
   ctx.restore();
 }
 
-function drawFood(ctx, x, y, rot) {
+function drawFood(ctx, x, y, rot, type) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(rot);
   ctx.shadowColor = 'rgba(255,100,0,0.8)';
   ctx.shadowBlur = 10;
   
-  // Ração (Fish shape / bowl)
-  ctx.fillStyle = '#D2691E'; // orangeish cat food
-  ctx.beginPath();
-  ctx.moveTo(0, -5);
-  ctx.lineTo(5, 5);
-  ctx.lineTo(-5, 5);
-  ctx.fill();
-
-  ctx.fillStyle = '#A0522D';
-  ctx.beginPath();
-  ctx.arc(0, 0, 4, 0, Math.PI*2);
-  ctx.fill();
-
+  if (type === 'food_0') {
+    // Meatball redonda
+    ctx.fillStyle = '#8B4513';
+    ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#A0522D';
+    ctx.beginPath(); ctx.arc(-2, -2, 2, 0, Math.PI*2); ctx.fill();
+  } else if (type === 'food_1') {
+    // Ração quadrada
+    ctx.fillStyle = '#CD853F'; ctx.fillRect(-5, -5, 10, 10);
+    ctx.fillStyle = '#8B4513'; ctx.fillRect(-2, -2, 4, 4);
+  } else if (type === 'food_2') {
+    // Mini-osso dourado
+    ctx.fillStyle = '#F5DEB3'; 
+    ctx.fillRect(-4, -2, 8, 4);
+    ctx.beginPath(); ctx.arc(-4, -2, 3, 0, Math.PI*2); ctx.arc(-4, 2, 3, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(4, -2, 3, 0, Math.PI*2); ctx.arc(4, 2, 3, 0, Math.PI*2); ctx.fill();
+  } else {
+    // Mini carinha de cachorro biscoito
+    ctx.fillStyle = '#D2691E';
+    ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI*2); ctx.fill(); 
+    ctx.beginPath(); ctx.ellipse(-4, -3, 2, 4, -0.5, 0, Math.PI*2); ctx.fill(); 
+    ctx.beginPath(); ctx.ellipse(4, -3, 2, 4, 0.5, 0, Math.PI*2); ctx.fill(); 
+  }
   ctx.restore();
 }
 
@@ -3232,12 +3201,10 @@ function render() {
   }
 
   for(let b of bullets) {
-    if (b.type === 'bone') drawBone(ctx, b.x, b.y, b.rot);
-    else drawFood(ctx, b.x, b.y, b.rot);
+    drawBone(ctx, b.x, b.y, b.rot);
   }
   for(let b of upBullets) {
-    if (b.type === 'bone') drawStone(ctx, b.x, b.y, b.rot); // Stone up is basically bone replacement, wait user said "tudo que atira tem que matar", so standard up bullets
-    else drawFood(ctx, b.x, b.y, b.rot);
+    drawFood(ctx, b.x, b.y, b.rot, b.type);
   }
 
   for(let p of particles) {
