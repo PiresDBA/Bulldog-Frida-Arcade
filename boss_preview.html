@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Pré-visualização dos Chefes Animados (Salsichinha Luna)</title>
+  <style>
+    body { background: #1a1a1a; color: #fff; font-family: sans-serif; text-align: center; }
+    h2 { color: #ff69b4; }
+    .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px; }
+    .boss-card { background: #2a2a2a; border: 2px solid #555; padding: 10px; border-radius: 12px; }
+    canvas { background: transparent; border-bottom: 2px solid #000; }
+    .name { margin-top: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #ccc; }
+  </style>
+</head>
+<body>
+  <h2>Pré-visualização (Laboratório de Chefes Animação)</h2>
+  <p>Aqui estão os 10 chefes redesenhados e animados no Canvas (sem usar bateria extra de recursos!).</p>
+  <div class="grid" id="container"></div>
+
+  <script>
+    // -------------------------------------------------------------
+    // FUNÇÕES COMPARTILHADAS (ECONOMIA DE TOKENS)
+    // -------------------------------------------------------------
+    function drawAngryEyes(ctx, x, y, open = true) {
+      if (!open) return;
+      ctx.fillStyle = '#f00';
+      ctx.beginPath(); ctx.ellipse(x - 12, y, 6, 4, 0.3, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(x + 12, y, 6, 4, -0.3, 0, Math.PI*2); ctx.fill();
+      ctx.lineWidth = 3; ctx.strokeStyle = '#000'; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(x - 20, y - 5); ctx.lineTo(x - 6, y + 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x + 20, y - 5); ctx.lineTo(x + 6, y + 2); ctx.stroke();
+      // Pupilas
+      ctx.fillStyle = '#ffcc00';
+      ctx.beginPath(); ctx.arc(x - 11, y, 2, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x + 11, y, 2, 0, Math.PI*2); ctx.fill();
+    }
+
+    function createBossCard(id, title, drawFunc) {
+      const container = document.getElementById('container');
+      const card = document.createElement('div');
+      card.className = 'boss-card';
+      const canvas = document.createElement('canvas');
+      canvas.width = 150; canvas.height = 150;
+      card.appendChild(canvas);
+      const label = document.createElement('div');
+      label.className = 'name'; label.innerText = title;
+      card.appendChild(label);
+      container.appendChild(card);
+      return { ctx: canvas.getContext('2d'), draw: drawFunc };
+    }
+
+    // -------------------------------------------------------------
+    // DESENHOS ANIMADOS DOS 10 CHEFES
+    // -------------------------------------------------------------
+
+    // 1. Tufão (Wind)
+    function drawWind(ctx, t) {
+      ctx.save(); ctx.translate(75, 120);
+      const drift = Math.sin(t * 8) * 15;
+      
+      ctx.fillStyle = 'rgba(200, 200, 200, 0.8)';
+      for(let i=0; i<6; i++) {
+         let w = 60 - (i*10);
+         let y = -i * 15;
+         let xObs = drift * (1 - (i*0.1));
+         ctx.beginPath();
+         ctx.ellipse(xObs + Math.sin(t*20+i)*5, y, w, 10, 0, 0, Math.PI*2);
+         ctx.fill();
+      }
+      drawAngryEyes(ctx, drift*0.5, -70);
+      ctx.restore();
+    }
+
+    // 2. Trovão (Storm)
+    function drawStorm(ctx, t) {
+      ctx.save(); ctx.translate(75, 75);
+      const floatY = Math.sin(t * 4) * 8;
+      
+      // Nuvem pulsante
+      ctx.translate(0, floatY);
+      const scale = 1 + Math.sin(t * 12) * 0.05;
+      ctx.scale(scale, scale);
+      
+      ctx.fillStyle = '#444';
+      ctx.beginPath();
+      ctx.arc(0, 0, 35, 0, Math.PI*2);
+      ctx.arc(-25, 10, 25, 0, Math.PI*2);
+      ctx.arc(25, 10, 25, 0, Math.PI*2);
+      ctx.arc(-40, 30, 15, 0, Math.PI*2);
+      ctx.arc(40, 30, 20, 0, Math.PI*2);
+      ctx.fill();
+
+      // Raio (pisca aleatoriamente)
+      if (Math.random() > 0.8) {
+        ctx.fillStyle = '#ff0';
+        ctx.beginPath();
+        ctx.moveTo(10, 20); ctx.lineTo(-10, 60); ctx.lineTo(5, 60); ctx.lineTo(-15, 100); ctx.lineTo(25, 50); ctx.lineTo(5, 50);
+        ctx.fill();
+      }
+
+      drawAngryEyes(ctx, 0, 15);
+      ctx.restore();
+    }
+
+    // 3. Aspirador (Vacuum)
+    function drawVacuum(ctx, t) {
+      ctx.save(); ctx.translate(75, 130);
+      const shake = Math.sin(t * 40) * 2;
+      ctx.translate(shake, 0);
+
+      // Corpo
+      ctx.fillStyle = '#cc0000';
+      ctx.beginPath(); ctx.roundRect(-30, -60, 60, 50, 10); ctx.fill();
+      
+      // Rodas
+      ctx.fillStyle = '#111';
+      ctx.beginPath(); ctx.arc(-35, -10, 15, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(35, -10, 15, 0, Math.PI*2); ctx.fill();
+
+      // Mangueira sugadora (tubo que balança)
+      const pipeAngle = Math.sin(t * 8) * 0.5;
+      ctx.translate(0, -60);
+      ctx.rotate(pipeAngle);
+      ctx.fillStyle = '#555';
+      ctx.fillRect(-8, -40, 16, 40);
+      // Bico
+      ctx.fillStyle = '#222';
+      ctx.beginPath(); ctx.moveTo(-20, -50); ctx.lineTo(20, -50); ctx.lineTo(10, -40); ctx.lineTo(-10, -40); ctx.fill();
+
+      // Efeito de sucção (partículas de listras de ar)
+      ctx.strokeStyle = '#fff'; ctx.lineWidth=2;
+      for(let i=0; i<3; i++) {
+         let suckY = -50 - ((t*100 + i*20) % 40);
+         ctx.beginPath(); ctx.moveTo(-15, suckY); ctx.lineTo(15, suckY); ctx.stroke();
+      }
+      
+      drawAngryEyes(ctx, 0, 25);
+      ctx.restore();
+    }
+
+    // 4. Carro (Car)
+    function drawCar(ctx, t) {
+      ctx.save(); ctx.translate(75, 130);
+      const bounce = Math.abs(Math.sin(t * 15)) * 5; // suspensão
+      
+      // Rodas
+      ctx.fillStyle = '#222';
+      ctx.fillRect(-45, -15, 20, 15);
+      ctx.fillRect(25, -15, 20, 15);
+
+      ctx.translate(0, -bounce);
+      
+      // Chassi
+      ctx.fillStyle = '#0055ff'; // Azul
+      ctx.beginPath(); ctx.roundRect(-50, -35, 100, 30, 8); ctx.fill();
+      // Teto
+      ctx.beginPath(); ctx.roundRect(-30, -60, 60, 30, 10); ctx.fill();
+      
+      // Parabrisa (Vidro)
+      ctx.fillStyle = '#88ccff';
+      ctx.fillRect(-25, -55, 50, 20);
+
+      // Faróis
+      ctx.fillStyle = '#ffff00';
+      ctx.beginPath(); ctx.arc(-35, -20, 8, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(35, -20, 8, 0, Math.PI*2); ctx.fill();
+
+      // O carro em si não tem olhos grandes, os faróis são os olhos, 
+      // mas vamos adicionar o angry eyes no parabrisa.
+      drawAngryEyes(ctx, 0, -45);
+      ctx.restore();
+    }
+
+    // 5. Moto (Motorcycle)
+    function drawMoto(ctx, t) {
+      ctx.save(); ctx.translate(75, 120);
+      const lean = Math.sin(t * 5) * 0.2; // inclinando
+      ctx.rotate(lean);
+      
+      // Pneu dianteiro grosso (visto de frente)
+      ctx.fillStyle = '#111';
+      ctx.fillRect(-15, -20, 30, 40);
+      
+      // Carenagem da moto
+      ctx.fillStyle = '#ff6600';
+      ctx.beginPath(); ctx.moveTo(0, -70); ctx.lineTo(-25, -20); ctx.lineTo(25, -20); ctx.fill();
+      
+      // Guidão
+      ctx.strokeStyle = '#888'; ctx.lineWidth = 6;
+      ctx.beginPath(); ctx.moveTo(-35, -50); ctx.lineTo(35, -50); ctx.stroke();
+      // Manoplas
+      ctx.fillStyle = '#000';
+      ctx.fillRect(-45, -55, 15, 10);
+      ctx.fillRect(30, -55, 15, 10);
+
+      drawAngryEyes(ctx, 0, -40);
+      ctx.restore();
+    }
+
+    // 6. Gaivota (Seagull)
+    function drawSeagull(ctx, t) {
+      ctx.save(); ctx.translate(75, 70);
+      const flap = Math.sin(t * 15) * 0.4;
+      
+      ctx.fillStyle = '#f0f0f0';
+      ctx.beginPath(); ctx.ellipse(0, 0, 20, 30, 0, 0, Math.PI*2); ctx.fill(); // Corpo
+      
+      // Asas
+      ctx.fillStyle = '#ddd';
+      ctx.save(); ctx.translate(-15, -10); ctx.rotate(flap);
+      ctx.beginPath(); ctx.ellipse(-20, 0, 30, 10, 0, 0, Math.PI*2); ctx.fill(); ctx.restore();
+      ctx.save(); ctx.translate(15, -10); ctx.rotate(-flap);
+      ctx.beginPath(); ctx.ellipse(20, 0, 30, 10, 0, 0, Math.PI*2); ctx.fill(); ctx.restore();
+
+      // Cabeça e Bico
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.circle = ctx.arc(0, -35, 15, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#ffaa00'; ctx.beginPath(); ctx.moveTo(-5, -35); ctx.lineTo(5, -35); ctx.lineTo(0, -10); ctx.fill();
+      
+      drawAngryEyes(ctx, 0, -40);
+      ctx.restore();
+    }
+
+    // 7. Cachorrão Preto (Ilda)
+    function drawIlda(ctx, t) {
+      ctx.save(); ctx.translate(75, 120);
+      // Aqui a escala e altura seriam justas para que a Luna (salsichinha) consiga pular!
+      // Vamos mantê-la correndo sem preencher toda a tela.
+      const walk1 = Math.sin(t * 20) * 8;
+      const walk2 = Math.cos(t * 20) * 8;
+
+      ctx.fillStyle = '#222';
+      // Pernas traseiras
+      ctx.beginPath(); ctx.ellipse(-20 + walk1, 15, 6, 12, 0, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(10 + walk2, 15, 6, 12, 0, 0, Math.PI*2); ctx.fill();
+      
+      // Corpo Vira-lata
+      ctx.beginPath(); ctx.ellipse(0, 0, 35, 20, 0, 0, Math.PI*2); ctx.fill();
+      
+      // Pernas dianteiras
+      ctx.fillStyle = '#111';
+      ctx.beginPath(); ctx.ellipse(-10 - walk1, 15, 6, 12, 0, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(20 - walk2, 15, 6, 12, 0, 0, Math.PI*2); ctx.fill();
+
+      // Rabo espetado batendo
+      ctx.save(); ctx.translate(30, -5); ctx.rotate(walk1 * 0.05 + 0.5);
+      ctx.beginPath(); ctx.ellipse(15, 0, 18, 4, 0, 0, Math.PI*2); ctx.fill(); ctx.restore();
+
+      // Cabeça
+      ctx.fillStyle = '#222';
+      ctx.beginPath(); ctx.ellipse(-30, -15, 18, 18, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#111'; ctx.beginPath(); ctx.ellipse(-20, -10, 8, 15, -0.5, 0, Math.PI*2); ctx.fill(); // Orelha
+      
+      // Focinho e Dentes
+      ctx.fillStyle = '#333'; ctx.beginPath(); ctx.ellipse(-45, -5, 15, 10, -0.2, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(-55, -8, 4, 0, Math.PI*2); ctx.fill(); // Nariz
+      ctx.fillStyle = '#fff'; // Dentes pontiagudos
+      ctx.beginPath(); ctx.moveTo(-50, 2); ctx.lineTo(-45, 12); ctx.lineTo(-40, 0); ctx.fill();
+
+      drawAngryEyes(ctx, -30, -20);
+      ctx.restore();
+    }
+
+    // 8. Vassoura (Broom)
+    function drawBroom(ctx, t) {
+      ctx.save(); ctx.translate(75, 40);
+      const sweep = Math.sin(t * 8) * 0.4;
+      ctx.rotate(sweep); // Vassoura "varrendo" como um pêndulo
+      
+      // Cabo
+      ctx.fillStyle = '#8B4513';
+      ctx.fillRect(-5, 0, 10, 60);
+
+      // Cerdas (Parte de baixo que varre)
+      ctx.translate(0, 60);
+      const bristleWobble = Math.sin(t * 20) * 0.1; // Cerdas tremendo com a força
+      ctx.rotate(bristleWobble);
+      
+      ctx.fillStyle = '#ffcc00'; // Amarelo palha
+      ctx.beginPath(); ctx.moveTo(-15, 0); ctx.lineTo(15, 0); ctx.lineTo(30, 40); ctx.lineTo(-30, 40); ctx.fill();
+
+      // Costura da vassoura (Barbante)
+      ctx.strokeStyle = '#cda522'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(-20, 15); ctx.lineTo(20, 15); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-25, 25); ctx.lineTo(25, 25); ctx.stroke();
+
+      drawAngryEyes(ctx, 0, 10);
+      ctx.restore();
+    }
+
+    // 9. Fogos (Fireworks)
+    function drawFireworks(ctx, t) {
+      ctx.save(); ctx.translate(75, 80);
+      const shake = (Math.random() - 0.5) * 4;
+      ctx.translate(shake, shake);
+
+      // Foguete (Base)
+      ctx.fillStyle = '#e60000';
+      ctx.fillRect(-15, -20, 30, 50);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(-15, 0, 30, 10); // Faixa branca
+
+      // Cone
+      ctx.fillStyle = '#ff9900';
+      ctx.beginPath(); ctx.moveTo(-15, -20); ctx.lineTo(15, -20); ctx.lineTo(0, -50); ctx.fill();
+
+      // Pavio e faíscas
+      ctx.strokeStyle = '#aaaaaa'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, 30); ctx.quadraticCurveTo(10, 40, 20, 50); ctx.stroke();
+      // Faiscando
+      if (Math.random() > 0.5) {
+         ctx.fillStyle = '#ffff00';
+         ctx.beginPath(); ctx.arc(20 + (Math.random()*10 - 5), 50 + (Math.random()*10 - 5), 3, 0, Math.PI*2); ctx.fill();
+      }
+
+      drawAngryEyes(ctx, 0, -5);
+      ctx.restore();
+    }
+
+    // 10. Mangueira (Hose)
+    function drawHose(ctx, t) {
+      ctx.save(); ctx.translate(75, 40);
+      // Movimento de cobra incontrolável
+      const wormX = Math.sin(t * 10) * 15;
+      const curl = Math.cos(t * 8) * 0.5;
+
+      // Corpo da mangueira
+      ctx.strokeStyle = '#009933'; ctx.lineWidth = 14; ctx.lineCap='round';
+      ctx.beginPath();
+      ctx.moveTo(0, 150);
+      ctx.quadraticCurveTo(wormX * 2, 70, wormX, 0); 
+      ctx.stroke();
+
+      ctx.translate(wormX, 0);
+      ctx.rotate(curl);
+
+      // Bico da mangueira
+      ctx.fillStyle = '#ccaa00'; // Latão
+      ctx.fillRect(-10, -20, 20, 20);
+      ctx.fillStyle = '#777';
+      ctx.fillRect(-14, -5, 28, 5); // Anel de aperto
+
+      // Água jorrando
+      ctx.fillStyle = 'rgba(0, 150, 255, 0.7)';
+      for(let i=0; i<8; i++) {
+         let dropY = -20 - ((t*200 + i*15) % 60);
+         let dropX = (Math.random() - 0.5) * 20;
+         ctx.beginPath(); ctx.ellipse(dropX, dropY, 3, 6, 0, 0, Math.PI*2); ctx.fill();
+      }
+
+      drawAngryEyes(ctx, 0, -10);
+      ctx.restore();
+    }
+
+    // Inicialização da Grade
+    const bosses = [
+      { id: 'wind', name: 'Tufão', draw: drawWind },
+      { id: 'storm', name: 'Tempestade', draw: drawStorm },
+      { id: 'vacuum', name: 'Aspirador', draw: drawVacuum },
+      { id: 'car', name: 'Carro', draw: drawCar },
+      { id: 'moto', name: 'Moto', draw: drawMoto },
+      { id: 'seagull', name: 'Gaivota', draw: drawSeagull },
+      { id: 'ilda', name: 'Ilda (Cachorro)', draw: drawIlda },
+      { id: 'broom', name: 'Vassoura', draw: drawBroom },
+      { id: 'fireworks', name: 'Fogos', draw: drawFireworks },
+      { id: 'hose', name: 'Mangueira', draw: drawHose }
+    ];
+
+    const cards = bosses.map(b => createBossCard(b.id, b.name, b.draw));
+
+    // Loop de Animação Principal
+    function loop() {
+      const t = Date.now() / 1000;
+      cards.forEach(c => {
+        c.ctx.clearRect(0, 0, 150, 150);
+        c.draw(c.ctx, t);
+      });
+      requestAnimationFrame(loop);
+    }
+    loop();
+
+  </script>
+</body>
+</html>

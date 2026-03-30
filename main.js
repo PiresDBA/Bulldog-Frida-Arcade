@@ -454,15 +454,19 @@ function stopUfoSound() {
 function soundPowerDown() {
   if(!audioCtx) return;
   const t = audioCtx.currentTime;
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.type = 'sawtooth';
-  osc.frequency.setValueAtTime(300, t);
-  osc.frequency.exponentialRampToValueAtTime(50, t + 0.6);
-  gain.gain.setValueAtTime(0.5, t);
-  gain.gain.linearRampToValueAtTime(0, t + 0.6);
-  osc.connect(gain); gain.connect(audioCtx.destination);
-  osc.start(t); osc.stop(t + 0.6);
+  const freqs = [659.25, 523.25, 440.00]; // E5, C5, A4 (Plim-Plim-Plim descendente)
+  freqs.forEach((f, i) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine'; // Som fofo e limpo
+    osc.frequency.value = f;
+    gain.gain.setValueAtTime(0, t + i * 0.1);
+    gain.gain.linearRampToValueAtTime(0.3, t + i * 0.1 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + i * 0.1 + 0.1);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(t + i * 0.1);
+    osc.stop(t + i * 0.1 + 0.15);
+  });
 }
 
 function soundPowerUp() {
@@ -2038,35 +2042,63 @@ function drawDog(ctx, x, y, width, height, timer, isJumping, isFalling) {
   ctx.roundRect(width/2 - 10, -height - 30, 30, 25, 12);
   ctx.fill();
 
-  // Hats
-  if (player.outfit === 'sailor') {
-    // Pink Sailor Hat
-    ctx.save();
-    ctx.translate(width/2 + 5, -height - 30);
-    ctx.rotate(-0.1);
-    ctx.shadowColor = 'rgba(0,0,0,0.5)';
-    ctx.shadowBlur = 5;
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(0, 0, 12, Math.PI, 0); 
-    ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = '#ff69b4'; 
-    ctx.fillRect(-15, -2, 30, 4);
-    ctx.fillStyle = '#ff1493';
-    ctx.fillRect(-5, -12, 10, 2);
-    ctx.restore();
-  } else if (player.outfit === 'suit') {
-    // Elegant Black Hat
-    ctx.save();
-    ctx.translate(width/2 + 10, -height - 35);
-    ctx.fillStyle = '#222';
-    ctx.fillRect(-15, 0, 30, 5); // Brim
-    ctx.fillRect(-10, -15, 20, 15); // Top
-    ctx.fillStyle = '#f00'; // Red ribbon
-    ctx.fillRect(-10, -5, 20, 3);
-    ctx.restore();
+  // Hats (Aparece apenas a partir da fase 11)
+  if (game.phase >= 11) {
+    if (player.outfit === 'sailor') {
+      // Pink Sailor Hat
+      ctx.save();
+      ctx.translate(width/2 + 5, -height - 30);
+      ctx.rotate(-0.1);
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 5;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(0, 0, 12, Math.PI, 0); 
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#ff69b4'; 
+      ctx.fillRect(-15, -2, 30, 4);
+      ctx.fillStyle = '#ff1493';
+      ctx.fillRect(-5, -12, 10, 2);
+      ctx.restore();
+    } else if (player.outfit === 'suit') {
+      // Elegant Black Hat
+      ctx.save();
+      ctx.translate(width/2 + 10, -height - 35);
+      ctx.fillStyle = '#222';
+      ctx.fillRect(-15, 0, 30, 5); // Brim
+      ctx.fillRect(-10, -15, 20, 15); // Top
+      ctx.fillStyle = '#f00'; // Red ribbon
+      ctx.fillRect(-10, -5, 20, 3);
+      ctx.restore();
+    }
   }
+
+  // Tanquezinho Escolar / Mochila de Combate (no alto das costas)
+  ctx.save();
+  ctx.translate(-5, -height - 18); // Fica mais em cima (no lombo)
+  
+  // Corpo do Tanquezinho (azul clarinho)
+  ctx.fillStyle = '#00bfff';
+  ctx.beginPath(); ctx.roundRect(-12, -12, 24, 18, 6); ctx.fill();
+  
+  // Visor de vidro no tanque
+  ctx.fillStyle = '#ccffff';
+  ctx.beginPath(); ctx.roundRect(-6, -8, 12, 10, 3); ctx.fill();
+
+  // Tampa rosa forte no topo
+  ctx.fillStyle = '#ff1493';
+  ctx.beginPath(); ctx.roundRect(-5, -16, 10, 5, 2); ctx.fill();
+
+  // Canhão/bico direcionado pra frente
+  ctx.fillStyle = '#aaa'; 
+  ctx.beginPath(); ctx.moveTo(12, -4); ctx.lineTo(20, -2); ctx.lineTo(20, 2); ctx.lineTo(12, 4); ctx.fill();
+  
+  // Cintas da mochila descendo pra barriga
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(-6, 6); ctx.lineTo(-6, 18); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(6, 6); ctx.lineTo(6, 18); ctx.stroke();
+  ctx.restore();
   
   ctx.fillStyle = headGrad;
   ctx.beginPath();
@@ -2376,9 +2408,6 @@ function drawBear(ctx, x, y, kind, timer, state) {
 
   if (state === 'eating' || state === 'jumping_to_eat') {
      // Urso gordo caindo pra tras de ponta cabeça
-     ctx.font = '50px Arial';
-     ctx.fillText('❤️', 0, -60);
-     
      ctx.rotate(Math.PI); // Fica de ponta cabeça!
      ctx.translate(0, 10);
      
@@ -2465,71 +2494,41 @@ function drawBear(ctx, x, y, kind, timer, state) {
   ctx.restore();
 }
 
-function drawHilda(ctx, timer) {
-  ctx.save();
-  ctx.translate(0, -10);
-  ctx.scale(1.8, 1.8); // Hilda é um cachorrão gigante!
+function drawHilda(ctx, t) {
+  ctx.save(); 
+  ctx.translate(0, 15); // Abaixada para a Luna conseguir pular
+  const walk1 = Math.sin(t * 15) * 8;
+  const walk2 = Math.cos(t * 15) * 8;
 
-  // Leg movement
-  const walk1 = Math.sin(timer * 15) * 5;
-  const walk2 = Math.cos(timer * 15) * 5;
+  ctx.fillStyle = '#222';
+  // Pernas traseiras
+  ctx.beginPath(); ctx.ellipse(-20 + walk1, 15, 6, 12, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10 + walk2, 15, 6, 12, 0, 0, Math.PI*2); ctx.fill();
   
-  // Back legs
+  // Corpo (menor para permitir pular sobre)
+  ctx.beginPath(); ctx.ellipse(0, 0, 35, 20, 0, 0, Math.PI*2); ctx.fill();
+  
+  // Pernas dianteiras
   ctx.fillStyle = '#111';
-  ctx.beginPath(); ctx.ellipse(-20 + walk1, 20, 6, 12, 0, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(10 + walk2, 20, 6, 12, 0, 0, Math.PI*2); ctx.fill();
-  
-  // Body (Cachorro de rua preto / Vira-lata agressivo)
-  ctx.fillStyle = '#222';
-  ctx.beginPath(); ctx.ellipse(-5, 0, 35, 18, 0, 0, Math.PI*2); ctx.fill();
-  
-  // Front legs
-  ctx.fillStyle = '#1a1a1a';
-  ctx.beginPath(); ctx.ellipse(-10 - walk1, 22, 6, 12, 0, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(20 - walk2, 22, 6, 12, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(-10 - walk1, 15, 6, 12, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(20 - walk2, 15, 6, 12, 0, 0, Math.PI*2); ctx.fill();
 
-  // Rabo agressivo rápido 
-  ctx.save();
-  ctx.translate(30, -5);
-  ctx.rotate((Math.sin(timer * 25) * 0.4) + 0.3);
-  ctx.fillStyle = '#222';
-  ctx.beginPath(); ctx.ellipse(10, 0, 15, 3, 0, 0, Math.PI*2); ctx.fill();
-  ctx.restore();
-  
-  // Head
-  ctx.translate(-35, -15);
-  ctx.fillStyle = '#222';
-  ctx.beginPath(); ctx.ellipse(0, 0, 18, 15, -0.2, 0, Math.PI*2); ctx.fill();
-  
-  // Orelhas caídas que dão cara de vira-lata
-  ctx.fillStyle = '#111';
-  ctx.beginPath(); ctx.ellipse(5, -12, 5, 10, 0.5, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(-10, -8, 5, 12, -0.8, 0, Math.PI*2); ctx.fill(); 
+  // Rabo agressivo
+  ctx.save(); ctx.translate(30, -5); ctx.rotate(walk1 * 0.05 + 0.5);
+  ctx.beginPath(); ctx.ellipse(15, 0, 18, 4, 0, 0, Math.PI*2); ctx.fill(); ctx.restore();
 
+  // Cabeça
+  ctx.fillStyle = '#222';
+  ctx.beginPath(); ctx.ellipse(-30, -15, 18, 18, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#111'; ctx.beginPath(); ctx.ellipse(-20, -10, 8, 15, -0.5, 0, Math.PI*2); ctx.fill(); 
+  
   // Focinho
-  ctx.fillStyle = '#333';
-  ctx.beginPath(); ctx.ellipse(-12, 5, 12, 8, -0.2, 0, Math.PI*2); ctx.fill();
-  
-  // Nariz Black
-  ctx.fillStyle = '#000';
-  ctx.beginPath(); ctx.arc(-22, 2, 4, 0, Math.PI*2); ctx.fill();
-  
-  // Olho Maligno Vermelho
-  ctx.fillStyle = '#ff0000';
-  ctx.beginPath(); ctx.arc(-4, -3, 5, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#ffcc00'; 
-  ctx.beginPath(); ctx.arc(-4, -3, 2, 0, Math.PI*2); ctx.fill();
-  
-  // Sobrancelha zangada colada no olho
-  ctx.lineWidth = 3; ctx.strokeStyle = '#000';
-  ctx.lineCap = 'round';
-  ctx.beginPath(); ctx.moveTo(2, -8); ctx.lineTo(-10, -5); ctx.stroke();
-
-  // Dentes pontiagudos saindo da boca  
+  ctx.fillStyle = '#333'; ctx.beginPath(); ctx.ellipse(-45, -5, 15, 10, -0.2, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(-55, -8, 4, 0, Math.PI*2); ctx.fill(); 
   ctx.fillStyle = '#fff';
-  ctx.beginPath(); ctx.moveTo(-20, 10); ctx.lineTo(-15, 15); ctx.lineTo(-12, 10); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(-12, 10); ctx.lineTo(-8, 15); ctx.lineTo(-5, 10); ctx.fill();
-  
+  ctx.beginPath(); ctx.moveTo(-50, 2); ctx.lineTo(-45, 12); ctx.lineTo(-40, 0); ctx.fill();
+
+  if (typeof drawAngryEyes === 'function') drawAngryEyes(ctx, -30, -20);
   ctx.restore();
 }
 
@@ -2634,6 +2633,71 @@ function drawUrubu(ctx, flap) {
   ctx.beginPath(); ctx.ellipse(6, 25, 6, 4, 0, 0, Math.PI*2); ctx.fill();
 
   ctx.restore();
+}
+
+function drawAngryEyes(ctx, x, y) {
+  ctx.fillStyle = '#f00'; ctx.beginPath(); ctx.ellipse(x - 12, y, 6, 4, 0.3, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x + 12, y, 6, 4, -0.3, 0, Math.PI*2); ctx.fill();
+  ctx.lineWidth = 3; ctx.strokeStyle = '#000'; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(x - 20, y - 5); ctx.lineTo(x - 6, y + 2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x + 20, y - 5); ctx.lineTo(x + 6, y + 2); ctx.stroke();
+  ctx.fillStyle = '#fc0'; ctx.beginPath(); ctx.arc(x - 11, y, 2, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(x + 11, y, 2, 0, Math.PI*2); ctx.fill();
+}
+function drawWind(ctx, t) {
+  ctx.save(); const d = Math.sin(t*8)*15; ctx.fillStyle = 'rgba(200,200,200,0.8)';
+  for(let i=0;i<5;i++){ ctx.beginPath(); ctx.ellipse(d*(1-i*0.1)+Math.sin(t*20+i)*5, -i*15, 50-i*10, 10, 0, 0, Math.PI*2); ctx.fill(); }
+  drawAngryEyes(ctx, d*0.5, -60); ctx.restore();
+}
+function drawStorm(ctx, t) {
+  ctx.save(); ctx.translate(0, Math.sin(t*4)*8 - 40); const s = 1+Math.sin(t*12)*0.05; ctx.scale(s,s);
+  ctx.fillStyle='#444'; ctx.beginPath(); ctx.arc(0,0,35,0,Math.PI*2); ctx.arc(-25,10,25,0,Math.PI*2); ctx.arc(25,10,25,0,Math.PI*2); ctx.arc(-40,30,15,0,Math.PI*2); ctx.arc(40,30,20,0,Math.PI*2); ctx.fill();
+  if(Math.random()>0.8){ ctx.fillStyle='#ff0'; ctx.beginPath(); ctx.moveTo(10,20); ctx.lineTo(-10,60); ctx.lineTo(5,60); ctx.lineTo(-15,100); ctx.lineTo(25,50); ctx.fill(); }
+  drawAngryEyes(ctx, 0, 15); ctx.restore();
+}
+function drawVacuum(ctx, t) {
+  ctx.save(); ctx.translate(Math.sin(t*40)*2, 0);
+  ctx.fillStyle='#c00'; ctx.beginPath(); ctx.roundRect(-30,-60,60,50,10); ctx.fill();
+  ctx.fillStyle='#111'; ctx.beginPath(); ctx.arc(-35,-10,15,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(35,-10,15,0,Math.PI*2); ctx.fill();
+  ctx.translate(0,-60); ctx.rotate(Math.sin(t*8)*0.5); ctx.fillStyle='#555'; ctx.fillRect(-8,-40,16,40);
+  ctx.fillStyle='#222'; ctx.beginPath(); ctx.moveTo(-20,-50); ctx.lineTo(20,-50); ctx.lineTo(10,-40); ctx.lineTo(-10,-40); ctx.fill();
+  drawAngryEyes(ctx, 0, 25); ctx.restore();
+}
+function drawCar(ctx, t) {
+  ctx.save(); ctx.fillStyle='#222'; ctx.fillRect(-45,-15,20,15); ctx.fillRect(25,-15,20,15); ctx.translate(0,-Math.abs(Math.sin(t*15))*5);
+  ctx.fillStyle='#05f'; ctx.beginPath(); ctx.roundRect(-50,-35,100,30,8); ctx.fill(); ctx.beginPath(); ctx.roundRect(-30,-60,60,30,10); ctx.fill();
+  ctx.fillStyle='#8cf'; ctx.fillRect(-25,-55,50,20);
+  ctx.fillStyle='#ff0'; ctx.beginPath(); ctx.arc(-35,-20,8,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(35,-20,8,0,Math.PI*2); ctx.fill();
+  drawAngryEyes(ctx, 0, -45); ctx.restore();
+}
+function drawMoto(ctx, t) {
+  ctx.save(); ctx.rotate(Math.sin(t*5)*0.2);
+  ctx.fillStyle='#111'; ctx.fillRect(-15,-20,30,40);
+  ctx.fillStyle='#f60'; ctx.beginPath(); ctx.moveTo(0,-70); ctx.lineTo(-25,-20); ctx.lineTo(25,-20); ctx.fill();
+  ctx.strokeStyle='#888'; ctx.lineWidth=6; ctx.beginPath(); ctx.moveTo(-35,-50); ctx.lineTo(35,-50); ctx.stroke();
+  ctx.fillStyle='#000'; ctx.fillRect(-45,-55,15,10); ctx.fillRect(30,-55,15,10);
+  drawAngryEyes(ctx, 0, -40); ctx.restore();
+}
+function drawBroom(ctx, t) {
+  ctx.save(); ctx.translate(0,-80); ctx.rotate(Math.sin(t*8)*0.4);
+  ctx.fillStyle='#8B4513'; ctx.fillRect(-5,0,10,60); ctx.translate(0,60); ctx.rotate(Math.sin(t*20)*0.1);
+  ctx.fillStyle='#fc0'; ctx.beginPath(); ctx.moveTo(-15,0); ctx.lineTo(15,0); ctx.lineTo(30,40); ctx.lineTo(-30,40); ctx.fill();
+  ctx.strokeStyle='#cda522'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(-20,15); ctx.lineTo(20,15); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-25,25); ctx.lineTo(25,25); ctx.stroke();
+  drawAngryEyes(ctx, 0, 10); ctx.restore();
+}
+function drawFireworks(ctx, t) {
+  ctx.save(); ctx.translate(0,-40); const s=(Math.random()-0.5)*4; ctx.translate(s,s);
+  ctx.fillStyle='#e00'; ctx.fillRect(-15,-20,30,50); ctx.fillStyle='#fff'; ctx.fillRect(-15,0,30,10);
+  ctx.fillStyle='#f90'; ctx.beginPath(); ctx.moveTo(-15,-20); ctx.lineTo(15,-20); ctx.lineTo(0,-50); ctx.fill();
+  ctx.strokeStyle='#aaa'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(0,30); ctx.quadraticCurveTo(10,40,20,50); ctx.stroke();
+  drawAngryEyes(ctx, 0, -5); ctx.restore();
+}
+function drawHose(ctx, t) {
+  ctx.save(); ctx.translate(0,-80); const wx=Math.sin(t*10)*15;
+  ctx.strokeStyle='#093'; ctx.lineWidth=14; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(0,150); ctx.quadraticCurveTo(wx*2,70,wx,0); ctx.stroke();
+  ctx.translate(wx,0); ctx.rotate(Math.cos(t*8)*0.5);
+  ctx.fillStyle='#ca0'; ctx.fillRect(-10,-20,20,20); ctx.fillStyle='#777'; ctx.fillRect(-14,-5,28,5);
+  ctx.fillStyle='rgba(0,150,255,0.7)'; for(let i=0;i<6;i++) { ctx.beginPath(); ctx.ellipse((Math.random()-0.5)*20, -20-((t*200+i*20)%50), 3, 6, 0, 0, Math.PI*2); ctx.fill(); }
+  drawAngryEyes(ctx, 0, -10); ctx.restore();
 }
 
 function drawSeagull(ctx, flap, isDiving, angle = 0) {
@@ -2995,83 +3059,51 @@ function render() {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.4)'; 
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    if (boss.type === 'storm' || boss.type === 'wind' || boss.type === 'vacuum') {
-      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      // Draw flying streaks
-      for (let i = 0; i < 30; i++) {
-        const sx = Math.random() * canvas.width;
-        const sy = Math.random() * canvas.height;
-        ctx.moveTo(sx, sy);
-        if (boss.type === 'wind' || boss.type === 'vacuum') {
-           ctx.lineTo(sx - 100, sy); // horizontal wind
-        } else {
-           ctx.lineTo(sx - 20, sy + 80); // diagonal rain
-        }
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    
+    // Todos os bosses ganham um efeito climático no fundo
+    const rainBosses = ['storm', 'hose', 'fireworks'];
+    const isRain = rainBosses.includes(boss.type);
+    
+    for (let i = 0; i < 30; i++) {
+      const sx = Math.random() * canvas.width;
+      const sy = Math.random() * canvas.height;
+      ctx.moveTo(sx, sy);
+      if (isRain) {
+         ctx.lineTo(sx - 20, sy + 80); // diagonal rain
+      } else {
+         ctx.lineTo(sx - 100, sy); // horizontal wind
       }
-      ctx.stroke();
     }
+    ctx.stroke();
   }
 
-  function drawAngryEyes(c, x, y) {
-    c.fillStyle = '#f00';
-    c.beginPath(); c.ellipse(x - 15, y, 6, 4, 0.3, 0, Math.PI*2); c.fill();
-    c.beginPath(); c.ellipse(x + 15, y, 6, 4, -0.3, 0, Math.PI*2); c.fill();
-    c.lineWidth = 4; c.strokeStyle = '#000';
-    c.beginPath(); c.moveTo(x - 24, y - 6); c.lineTo(x - 8, y + 2); c.stroke();
-    c.beginPath(); c.moveTo(x + 24, y - 6); c.lineTo(x + 8, y + 2); c.stroke();
-  }
-
-  // Draw Boss Fears
+  // Draw Boss Fears Animados
   if (boss) {
     ctx.save();
     ctx.translate(boss.x, boss.y);
-    ctx.shadowColor = '#000';
-    ctx.shadowBlur = 10;
     
-    ctx.font = '80px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    
-    if (boss.type === 'wind') {
-        ctx.fillText('🌪️', 0, 0); 
-        drawAngryEyes(ctx, 0, -10);
-    } else if (boss.type === 'storm') {
-        ctx.fillText('🌩️', 0, 0); 
-        drawAngryEyes(ctx, 0, 10);
-    } else if (boss.type === 'vacuum') {
-        ctx.fillText('🧲', 0, 0); // Magnet representing vacuum suction
-        drawAngryEyes(ctx, 0, -10);
-    } else if (boss.type === 'car') {
-        ctx.fillText('🚘', 0, 0); 
-        drawAngryEyes(ctx, 0, 5);
-    } else if (boss.type === 'motorcycle') {
-        ctx.fillText('🏍️', 0, 0); 
-        drawAngryEyes(ctx, 5, -5);
-    } else if (boss.type === 'seagull') {
+    if (boss.type === 'wind') drawWind(ctx, boss.timer);
+    else if (boss.type === 'storm') drawStorm(ctx, boss.timer);
+    else if (boss.type === 'vacuum') drawVacuum(ctx, boss.timer);
+    else if (boss.type === 'car') drawCar(ctx, boss.timer);
+    else if (boss.type === 'motorcycle') drawMoto(ctx, boss.timer);
+    else if (boss.type === 'seagull') {
         const flap = Math.sin(boss.timer * 15) * 0.3;
         let angle = 0;
         if (boss.mode === 'DIVING') {
-           // Como usamos scale(-1, 1) no draw, a gaivota mira para a ESQUERDA.
-           // Precisamos do ângulo calculando o dx invertido para que ela olhe pra baixo 
            let dx = player.x - boss.x;
            let dy = player.y - boss.y;
-           angle = Math.atan2(dy, -dx); // Angulo real positivo
+           angle = Math.atan2(dy, -dx);
         }
         drawSeagull(ctx, flap, boss.mode === 'DIVING', angle);
-    } else if (boss.type === 'bigdog') {
-        drawHilda(ctx, boss.timer);
-    } else if (boss.type === 'broom') {
-        ctx.fillText('🧹', 0, 0); 
-        drawAngryEyes(ctx, 0, -10);
-    } else if (boss.type === 'fireworks') {
-        ctx.fillText('🎇', 0, 0); 
-        drawAngryEyes(ctx, 0, -5);
-    } else if (boss.type === 'hose') {
-        ctx.fillText('🚿', 0, 0); 
-        drawAngryEyes(ctx, 5, -5);
-    }
+    } 
+    else if (boss.type === 'bigdog') drawHilda(ctx, boss.timer);
+    else if (boss.type === 'broom') drawBroom(ctx, boss.timer);
+    else if (boss.type === 'fireworks') drawFireworks(ctx, boss.timer);
+    else if (boss.type === 'hose') drawHose(ctx, boss.timer);
     
     // Boss HP bar
     ctx.fillStyle = '#333';
@@ -3085,6 +3117,8 @@ function render() {
     ctx.fillRect(-50, 50, 100, 20);
     ctx.fillStyle = '#fff';
     ctx.font = '12px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
     
     let fearName = 'MOTO';
     if (boss.type === 'wind') fearName = 'VENTANIA';
