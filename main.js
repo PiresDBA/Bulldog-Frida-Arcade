@@ -759,6 +759,7 @@ let player = {
   animTimer: 0,
   lastShootTime: 0,
   outfit: 'sailor',
+  kind: 'luna',
   tripleShotTimer: 0,
   doubleShotTimer: 0
 };
@@ -1041,6 +1042,13 @@ UI.saveScoreBtn.addEventListener('click', () => {
     renderHighScores();
 });
 
+document.querySelectorAll('.hero-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.hero-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  });
+});
+
 document.querySelectorAll('.diff-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
     document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('selected'));
@@ -1078,6 +1086,12 @@ function startGame() {
   game.continues = 5;               // Dá 5 chances extras
   // Pega a dificuldade que você escolheu nos botões coloridos
   game.difficulty = document.querySelector('.diff-btn.selected')?.dataset.val || 'medium';
+  player.kind = document.querySelector('.hero-btn.selected')?.dataset.val || 'luna';
+  // Ajusta tamanho físico conforme o herói
+  if (player.kind === 'cinder') { player.width = 60; player.height = 25; }
+  else if (player.kind === 'frida') { player.width = 90; player.height = 35; }
+  else if (player.kind === 'bear') { player.width = 90; player.height = 50; }
+  else { player.width = 80; player.height = 30; } // Luna padrão
   resetPhase();                     // Prepara o cenário
   UI.startScreen.classList.add('hidden'); // Esconde o menu inicial
   UI.gameOverScreen.classList.add('hidden'); // Esconde a tela de derrota
@@ -1937,190 +1951,169 @@ function drawMenuDogs(timer) {
  * A gente usa formas geométricas (retângulos arredondados, círculos) 
  * para montar o corpo dela.
  */
-function drawDog(ctx, x, y, width, height, timer, isJumping, isFalling) {
-  if (player.dead) return; // Se a Luna "morrer", a gente para de desenhar ela
+function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFalling, type = 'luna') {
+  if (player.dead) return; 
   
-  // Ajustamos a posição da Luna no chão (Terra firme)
-  const drawY = y + 20; 
+  let bodyColor1, bodyColor2, earColor;
+  let isBear = false;
+  let isCat = false;
+  let isFrida = false;
+  
+  if (type === 'luna') {
+    bodyColor1 = '#B2663E'; bodyColor2 = '#5C2E0A'; earColor = '#5C2E0A';
+  } else if (type === 'frida') {
+    bodyColor1 = '#e6b800'; bodyColor2 = '#997a00'; earColor = '#cc9900';
+    isFrida = true;
+  } else if (type === 'cinder') {
+    bodyColor1 = '#95a5a6'; bodyColor2 = '#34495e'; earColor = '#2c3e50';
+    isCat = true;
+  } else {
+    bodyColor1 = '#9b59b6'; bodyColor2 = '#4a235a'; earColor = '#3e1a4d';
+    if(type === 'brown_bear') { bodyColor1 = '#CD853F'; bodyColor2='#8B4513'; earColor='#5C2E0A'; }
+    else if(type === 'white_bear') { bodyColor1 = '#ecf0f1'; bodyColor2='#bdc3c7'; earColor='#7f8c8d'; }
+    else if(type === 'panda_bear') { bodyColor1 = '#ecf0f1'; bodyColor2='#bdc3c7'; earColor='#2c3e50'; }
+    isBear = true;
+  }
 
-  /**
-   * CONTEXTO (save e restore):
-   * Quando usamos 'ctx.save()', é como se tirássemos uma foto das configurações
-   * atuais do pincel. Depois, podemos girar a tela, mudar a cor, e quando 
-   * damos 'ctx.restore()', o pincel volta ao normal para não bagunçar o resto.
-   */
+  const drawY = y + 20; 
   ctx.save();
   
-  // Se a Luna pegou uma estrela (invencível), ela fica piscando (transparente)
-  if (player.invincible) {
+  if (player.invincible && player.kind === type) { // Pisca pisca só pro hero
     ctx.globalAlpha = (Math.floor(Date.now() / 150) % 2 === 0) ? 0.3 : 0.8;
   }
   
-  // Posicionamos o "pincel" no lugar onde a Luna está
   ctx.translate(x, drawY); 
-  
-  // Se ela estiver pulando ou caindo, a gente inclina o corpinho dela
   ctx.scale(player.scale || 1, player.scale || 1);
-  if (player.isFalling) ctx.rotate(player.rotation || 0);
+  if (isFalling) ctx.rotate(player.rotation || 0);
   else if (isJumping) ctx.rotate(-Math.PI / 12);
   
-  // Sombra para ela não parecer "flutuando" no papel
   ctx.shadowColor = 'rgba(0,0,0,0.6)';
   ctx.shadowBlur = 10;
   ctx.shadowOffsetY = 8;
   
-  // Degradê de cores para o pelo ficar bonito
   const bodyGrad = ctx.createLinearGradient(0, -height - 10, 0, 0);
-  bodyGrad.addColorStop(0, '#B2663E'); // Marrom claro em cima
-  bodyGrad.addColorStop(1, '#5C2E0A'); // Marrom escuro embaixo
+  bodyGrad.addColorStop(0, bodyColor1);
+  bodyGrad.addColorStop(1, bodyColor2);
 
-  // Desenha o corpo (um retângulo com cantos redondos)
   ctx.fillStyle = bodyGrad;
   ctx.beginPath();
-  ctx.roundRect(-width/2, -height - 10, width, height, height/2);
-  ctx.fill();
+  if (isBear) {
+    // Urso é mais gordinho
+    ctx.roundRect(-width/1.8, -height - 15, width*1.1, height+10, (height+10)/2);
+  } else {
+    // Corpo padrão de quadrupede
+    ctx.roundRect(-width/2, -height - 10, width, height, height/2);
+  }
+  if (type === 'panda_bear') {
+    ctx.fill();
+    ctx.fillStyle = '#2c3e50'; 
+    ctx.beginPath(); ctx.roundRect(-width/2+10, -height - 10, 20, height, 5); ctx.fill();
+  } else {
+    ctx.fill();
+  }
 
-  // Removemos a sombra para os olhos e nariz ficarem nítidos
   ctx.shadowBlur = 0; 
   ctx.shadowOffsetY = 0;
 
-  // Tuxedo for 'suit' outfit
-  if (player.outfit === 'suit') {
+  // Outfit suit só na Luna hero por agora, ou pra todos? Vamos colocar pra todos pra ficar bonito!
+  if (player.outfit === 'suit' && player.kind === type) {
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.moveTo(-width/2, -height - 5); ctx.lineTo(0, -5); ctx.lineTo(width/2, -height - 5);
+    ctx.lineTo(width/2, 0); ctx.lineTo(-width/2, 0); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.moveTo(-10, -height - 2); ctx.lineTo(0, -10); ctx.lineTo(10, -height - 2); ctx.fill();
+    ctx.fillStyle = '#f00';
+    ctx.beginPath(); ctx.moveTo(-5, -height + 2); ctx.lineTo(5, -height + 10); ctx.lineTo(-5, -height + 10); ctx.lineTo(5, -height + 2); ctx.fill();
+  }
+
+  const headGrad = ctx.createRadialGradient(width/2 + 5, -height - 17, 0, width/2 + 5, -height - 17, 30);
+  headGrad.addColorStop(0, bodyColor1);
+  headGrad.addColorStop(1, bodyColor2);
+
+  ctx.fillStyle = headGrad;
+  ctx.beginPath();
+  if (isBear) {
+    ctx.roundRect(width/2 - 15, -height - 35, 35, 35, 17.5);
+  } else {
+    ctx.roundRect(width/2 - 10, -height - 30, 30, 25, 12);
+  }
+  ctx.fill();
+
+  if (game.phase >= 11 && player.kind === type) {
+    if (player.outfit === 'sailor') {
+      ctx.save(); ctx.translate(width/2 + 5, -height - 30); ctx.rotate(-0.1);
+      ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 5;
+      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(0, 0, 12, Math.PI, 0); ctx.fill();
+      ctx.shadowBlur = 0; ctx.fillStyle = '#ff69b4'; ctx.fillRect(-15, -2, 30, 4);
+      ctx.fillStyle = '#ff1493'; ctx.fillRect(-5, -12, 10, 2); ctx.restore();
+    } else if (player.outfit === 'suit') {
+      ctx.save(); ctx.translate(width/2 + 10, -height - 35); ctx.fillStyle = '#222';
+      ctx.fillRect(-15, 0, 30, 5); ctx.fillRect(-10, -15, 20, 15);
+      ctx.fillStyle = '#f00'; ctx.fillRect(-10, -5, 20, 3); ctx.restore();
+    }
+  }
+
+  // Tanquezinho Escolar / Mochila (Só o herói deve ter a mochila de tiro!)
+  // Inimigos não devem ter canhão nas costas.
+  if (player.kind === type) {
+    ctx.save();
+    ctx.translate(-5, -height - 18); 
+    ctx.fillStyle = '#00bfff'; ctx.beginPath(); ctx.roundRect(-12, -12, 24, 18, 6); ctx.fill();
+    ctx.fillStyle = '#ccffff'; ctx.beginPath(); ctx.roundRect(-6, -8, 12, 10, 3); ctx.fill();
+    ctx.fillStyle = '#ff1493'; ctx.beginPath(); ctx.roundRect(-5, -16, 10, 5, 2); ctx.fill();
+    ctx.fillStyle = '#aaa'; 
+    ctx.beginPath(); ctx.moveTo(12, -4); ctx.lineTo(20, -2); ctx.lineTo(20, 2); ctx.lineTo(12, 4); ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(-6, 6); ctx.lineTo(-6, 18); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(6, 6); ctx.lineTo(6, 18); ctx.stroke();
+    ctx.restore();
+  }
+
+  // Focinho
+  ctx.fillStyle = headGrad;
+  ctx.beginPath();
+  if (!isBear) ctx.roundRect(width/2 + 10, -height - 20, 25, 15, 8);
+  ctx.fill();
+  
+  // Nariz
+  ctx.fillStyle = '#000';
+  ctx.beginPath();
+  if (isBear) ctx.arc(width/2 + 18, -height - 14, 5, 0, Math.PI*2);
+  else ctx.arc(width/2 + 33, -height - 14, 4, 0, Math.PI*2);
+  ctx.fill();
+
+  // Olhos
+  if (Math.sin(timer * 4) > 0.96) {
+     ctx.fillStyle = headGrad; 
+     ctx.beginPath();
+     if (isBear) ctx.ellipse(width/2 - 2, -height - 25, 5, 5, 0, 0, Math.PI*2);
+     else ctx.ellipse(width/2 + 12, -height - 22, 6, 9, 0, 0, Math.PI*2);
+     ctx.fill();
+     ctx.fillStyle = '#000'; 
+     if (isBear) ctx.fillRect(width/2 - 6, -height - 25, 8, 2);
+     else ctx.fillRect(width/2 + 8, -height - 22, 8, 2);
+  } else {
+    // Normal Eyes
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    if (isBear) ctx.ellipse(width/2 - 2, -height - 25, 4, 4, 0, 0, Math.PI*2);
+    else ctx.ellipse(width/2 + 12, -height - 22, 5, 8, 0, 0, Math.PI*2);
+    ctx.fill();
+
     ctx.fillStyle = '#000';
     ctx.beginPath();
-    ctx.moveTo(-width/2, -height - 5);
-    ctx.lineTo(0, -5);
-    ctx.lineTo(width/2, -height - 5);
-    ctx.lineTo(width/2, 0);
-    ctx.lineTo(-width/2, 0);
+    if (isBear) ctx.arc(width/2, -height - 25, 2.5, 0, Math.PI*2);
+    else ctx.arc(width/2 + 14, -height - 24, 3.5, 0, Math.PI*2);
     ctx.fill();
     
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.moveTo(-10, -height - 2);
-    ctx.lineTo(0, -10);
-    ctx.lineTo(10, -height - 2);
-    ctx.fill();
-    
-    // Bow tie
-    ctx.fillStyle = '#f00';
-    ctx.beginPath();
-    ctx.moveTo(-5, -height + 2);
-    ctx.lineTo(5, -height + 10);
-    ctx.lineTo(-5, -height + 10);
-    ctx.lineTo(5, -height + 2);
+    if (isBear) ctx.arc(width/2, -height - 26, 1.0, 0, Math.PI*2);
+    else ctx.arc(width/2 + 15, -height - 25, 1.5, 0, Math.PI*2);
     ctx.fill();
   }
 
-  const headGrad = ctx.createRadialGradient(width/2 + 5, -height - 17, 0, width/2 + 5, -height - 17, 30);
-  headGrad.addColorStop(0, '#f08954');
-  headGrad.addColorStop(1, '#8B4513');
-
-  ctx.fillStyle = headGrad;
-  ctx.beginPath();
-  ctx.roundRect(width/2 - 10, -height - 30, 30, 25, 12);
-  ctx.fill();
-
-  // Hats (Aparece apenas a partir da fase 11)
-  if (game.phase >= 11) {
-    if (player.outfit === 'sailor') {
-      // Pink Sailor Hat
-      ctx.save();
-      ctx.translate(width/2 + 5, -height - 30);
-      ctx.rotate(-0.1);
-      ctx.shadowColor = 'rgba(0,0,0,0.5)';
-      ctx.shadowBlur = 5;
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(0, 0, 12, Math.PI, 0); 
-      ctx.fill();
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = '#ff69b4'; 
-      ctx.fillRect(-15, -2, 30, 4);
-      ctx.fillStyle = '#ff1493';
-      ctx.fillRect(-5, -12, 10, 2);
-      ctx.restore();
-    } else if (player.outfit === 'suit') {
-      // Elegant Black Hat
-      ctx.save();
-      ctx.translate(width/2 + 10, -height - 35);
-      ctx.fillStyle = '#222';
-      ctx.fillRect(-15, 0, 30, 5); // Brim
-      ctx.fillRect(-10, -15, 20, 15); // Top
-      ctx.fillStyle = '#f00'; // Red ribbon
-      ctx.fillRect(-10, -5, 20, 3);
-      ctx.restore();
-    }
-  }
-
-  // Tanquezinho Escolar / Mochila de Combate (no alto das costas)
-  ctx.save();
-  ctx.translate(-5, -height - 18); // Fica mais em cima (no lombo)
-  
-  // Corpo do Tanquezinho (azul clarinho)
-  ctx.fillStyle = '#00bfff';
-  ctx.beginPath(); ctx.roundRect(-12, -12, 24, 18, 6); ctx.fill();
-  
-  // Visor de vidro no tanque
-  ctx.fillStyle = '#ccffff';
-  ctx.beginPath(); ctx.roundRect(-6, -8, 12, 10, 3); ctx.fill();
-
-  // Tampa rosa forte no topo
-  ctx.fillStyle = '#ff1493';
-  ctx.beginPath(); ctx.roundRect(-5, -16, 10, 5, 2); ctx.fill();
-
-  // Canhão/bico direcionado pra frente
-  ctx.fillStyle = '#aaa'; 
-  ctx.beginPath(); ctx.moveTo(12, -4); ctx.lineTo(20, -2); ctx.lineTo(20, 2); ctx.lineTo(12, 4); ctx.fill();
-  
-  // Cintas da mochila descendo pra barriga
-  ctx.strokeStyle = '#fff'; ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.moveTo(-6, 6); ctx.lineTo(-6, 18); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(6, 6); ctx.lineTo(6, 18); ctx.stroke();
-  ctx.restore();
-  
-  ctx.fillStyle = headGrad;
-  ctx.beginPath();
-  ctx.roundRect(width/2 + 10, -height - 20, 25, 15, 8);
-  ctx.fill();
-  
-  ctx.fillStyle = '#000';
-  ctx.beginPath();
-  ctx.arc(width/2 + 33, -height - 14, 4, 0, Math.PI*2);
-  ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.beginPath();
-  ctx.arc(width/2 + 32, -height - 16, 1, 0, Math.PI*2);
-  ctx.fill();
-  
-  // CUTE UPPER EYES (PIDÃO)
-  ctx.fillStyle = '#fff';
-  ctx.beginPath();
-  ctx.ellipse(width/2 + 12, -height - 22, 5, 8, 0, 0, Math.PI*2);
-  ctx.fill();
-
-  ctx.fillStyle = '#000';
-  ctx.beginPath();
-  // pupil looking up / forward
-  ctx.arc(width/2 + 14, -height - 24, 3.5, 0, Math.PI*2);
-  ctx.fill();
-  
-  // Shiny "Pidão" reflection
-  ctx.fillStyle = '#fff';
-  ctx.beginPath();
-  ctx.arc(width/2 + 15, -height - 25, 1.5, 0, Math.PI*2);
-  ctx.fill();
-
-  // Blinking animation
-  if (Math.sin(timer * 4) > 0.96) {
-     ctx.fillStyle = headGrad; 
-     ctx.beginPath();
-     ctx.ellipse(width/2 + 12, -height - 22, 6, 9, 0, 0, Math.PI*2);
-     ctx.fill();
-     ctx.fillStyle = '#000'; 
-     ctx.fillRect(width/2 + 8, -height - 22, 8, 2);
-  }
-  
+  // Orelhas animadas
   ctx.save();
   ctx.translate(width/2, -height - 25);
   let earFlap = 0;
@@ -2129,22 +2122,40 @@ function drawDog(ctx, x, y, width, height, timer, isJumping, isFalling) {
   else earFlap = -Math.PI/8 + Math.sin(timer * 20) * 0.4;
   ctx.rotate(earFlap);
   
-  ctx.fillStyle = EARS_COLOR;
+  ctx.fillStyle = earColor;
   ctx.beginPath();
-  ctx.ellipse(-2, 12, 6, 15, 0, 0, Math.PI*2);
+  if (isCat) { ctx.moveTo(-5,-2); ctx.lineTo(6,-2); ctx.lineTo(0,-18); }
+  else if (isBear) { ctx.arc(0, -12, 10, 0, Math.PI*2); }
+  else if (isFrida) { ctx.ellipse(2, -8, 6, 12, Math.PI/4, 0, Math.PI*2); }
+  else { ctx.ellipse(-2, 12, 6, 15, 0, 0, Math.PI*2); } // Luna
   ctx.fill();
   ctx.restore();
 
+  // Rabo animado
   ctx.save();
-  ctx.translate(-width/2 + 5, -height - 5);
+  if (isBear) {
+    ctx.translate(-width/2 - 10, -height);
+  } else {
+    ctx.translate(-width/2 + 5, -height - 5);
+  }
   ctx.rotate(Math.sin(timer * 15) * 0.3 - 0.5);
   ctx.fillStyle = bodyGrad;
   ctx.beginPath();
-  ctx.roundRect(-20, -5, 25, 8, 4);
+  if (isCat) {
+      ctx.roundRect(-25, -2, 30, 4, 2); 
+      ctx.roundRect(-25, -10, 4, 10, 2); 
+  } else if (isBear) {
+      ctx.arc(-5, 0, 10, 0, Math.PI*2);
+  } else if (isFrida) {
+      ctx.roundRect(-10, -5, 15, 6, 3);
+  } else { // Luna
+      ctx.roundRect(-20, -5, 25, 8, 4);
+  }
   ctx.fill();
   ctx.restore();
 
-  ctx.fillStyle = EARS_COLOR;
+  // Patas balançantes
+  ctx.fillStyle = earColor;
   const swing = isJumping || isFalling ? 0 : Math.sin(timer * 20) * 10;
   
   ctx.beginPath();
@@ -3279,7 +3290,7 @@ function render() {
   ctx.globalAlpha = 1;
 
   if (player.x > -50) {
-    drawDog(ctx, player.x, player.y, player.width, player.height, player.animTimer, player.isJumping, player.isFalling);
+    drawAnimatedAnimal(ctx, player.x, player.y, player.width, player.height, player.animTimer, player.isJumping, player.isFalling, player.kind);
     
     // Power-up Timer Clock
     if (player.tripleShotTimer > 0 || player.doubleShotTimer > 0) {
