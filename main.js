@@ -76,7 +76,8 @@ const i18n = {
     phaseReadyBear: "Vamos lá! O Urso está pronto!",
     unlockMsg: "Desbloquear por {cost} moedas?",
     notEnoughCoins: "Moedas insuficientes!",
-    locked: "🔒"
+    locked: "🔒",
+    tripleShot: "Tiro Triplo!"
   },
   en: {
     score: "SCORE", phase: "PHASE", selectHero: "SELECT HERO", ctrlShoot: "Shoot",
@@ -97,7 +98,8 @@ const i18n = {
     phaseReadyBear: "Let's go! Fluffy Bear is ready!",
     unlockMsg: "Unlock for {cost} coins?",
     notEnoughCoins: "Not enough coins!",
-    locked: "🔒"
+    locked: "🔒",
+    tripleShot: "Triple Shot!"
   },
   es: {
     score: "PUNTOS", phase: "FASE", selectHero: "ELIGE TU HÉROE", ctrlShoot: "Disparar",
@@ -118,7 +120,30 @@ const i18n = {
     phaseReadyBear: "¡Vamos! ¡El Oso está listo!",
     unlockMsg: "¿Desbloquear por {cost} monedas?",
     notEnoughCoins: "¡Monedas insuficientes!",
-    locked: "🔒"
+    locked: "🔒",
+    tripleShot: "¡Tiro Triple!"
+  },
+  zh: {
+    score: "得分", phase: "阶段", selectHero: "英雄选择", ctrlShoot: "射击",
+    ctrlJump: "跳跃", ctrlMove: "移动", gameMode: "游戏模式", easy: "简单",
+    medium: "中等", hard: "困难", startBtn: "准备好吗？开战吧！",
+    victoryText: "恭喜！我们成功击败了最终的首领！你太棒了！",
+    continueBtn: "继续冒险", continueQ: "继续吗？", yes: "是", no: "否",
+    continuesLeft: "剩余继续次数", finalScore: "最终得分",
+    namePlaceholder: "您的名字", saveScore: "保存记录！",
+    topRecords: "🏆 最高记录", tryAgain: "再试一次",
+    introLuna: "你好！我是香肠狗露娜！请按冒险按钮解救我的小伙伴！",
+    introFrida: "你好！我是胖嘟嘟的弗里达！请按冒险按钮解救我的小伙伴！",
+    introCinder: "你好！我是小猫灰姑娘！请按冒险按钮解救我的小伙伴！",
+    introBear: "你好！我是毛绒绒的熊！请按冒险按钮解救我的小伙伴！",
+    phaseReadyLuna: "走吧！露娜准备好了！",
+    phaseReadyFrida: "走吧！弗里达准备好了！",
+    phaseReadyCinder: "走吧！灰姑娘准备好了！",
+    phaseReadyBear: "走吧！熊准备好了！",
+    unlockMsg: "用 {cost} 金币解锁吗？",
+    notEnoughCoins: "金币不足！",
+    locked: "🔒",
+    tripleShot: "三连发！"
   }
 };
 
@@ -507,8 +532,18 @@ function soundMarioWin() {
   playNote(770, 0.75, 0.2);
 }
 
-function speak(text) {
-  const utterance = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=pt-BR&client=tw-ob`);
+function speak(key) {
+  let text = "Tiro Triplo!";
+  let tl = "pt-BR";
+  
+  if (i18n && currentLang && i18n[currentLang]) {
+    text = i18n[currentLang][key] || key;
+    if (currentLang === 'en') tl = 'en-US';
+    else if (currentLang === 'es') tl = 'es-ES';
+    else if (currentLang === 'zh') tl = 'zh-CN';
+  }
+  
+  const utterance = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${tl}&client=tw-ob`);
   utterance.volume = 1.0;
   utterance.play().catch(e => console.log("TTS blocked:", e));
 }
@@ -2049,7 +2084,7 @@ function update(dt) {
     if (h.hp <= 0) {
       createExplosion(h.x, h.y, '#ffea00', 60);
       soundMarioWin();
-      speak("Tiro Triplo!");
+      speak('tripleShot');
       player.tripleShotTimer = 12000; // 12 seconds
       helicopters.splice(i, 1);
       updateHeliSound(); // stop sound immediately
