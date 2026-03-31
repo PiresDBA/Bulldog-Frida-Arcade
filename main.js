@@ -496,6 +496,25 @@ function soundDogBark() {
   });
 }
 
+// Latido de dachshund (mais agudo e rápido que o bulldog)
+function soundDachshundBark() {
+  if(!audioCtx) return;
+  const playYip = (t, freq) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(freq, t);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.6, t + 0.1);
+    gain.gain.setValueAtTime(0.5, t); 
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t + 0.1);
+  };
+  playYip(audioCtx.currentTime, 450);
+  playYip(audioCtx.currentTime + 0.12, 550);
+  playYip(audioCtx.currentTime + 0.24, 500);
+}
+
 let currentBgNoise = null;
 let thunderInterval = null;
 let currentEngineOscs = [];
@@ -1415,6 +1434,7 @@ function update(dt) {
       bulldogs.push({ x: canvas.width, y: GROUND_Y, width: w, height: h, state: 'idle', animTimer: 0, kind: t }); 
       if (t === 'cinder') soundMeow(); 
       else if (t.includes('bear')) soundBear(); 
+      else if (t === 'luna') soundDachshundBark();
       else soundDogBark();
     }
   }
@@ -3213,21 +3233,37 @@ function render() {
     if (b.kind === 'frida') drawBulldog(ctx, b.x, b.y, b.width, b.height, b.animTimer, b.state);
     else if (b.kind === 'cinder') drawCat(ctx, b.x, b.y, b.width, b.height, b.animTimer, b.state);
     else if (b.kind === 'luna') {
-      // Placa de nome LUNA
+      // Placa de nome LUNA (só quando andando)
+      if (b.state !== 'eating') {
+        ctx.save();
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        ctx.fillRect(b.x - 20, b.y + 20 - 30 - 35, 40, 15);
+        ctx.fillStyle = '#B2663E';
+        ctx.font = '10px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('LUNA', b.x, b.y + 20 - 30 - 27);
+        ctx.restore();
+      }
+      
       ctx.save();
-      ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.fillRect(b.x - 20, b.y + 20 - 30 - 35, 40, 15);
-      ctx.fillStyle = '#B2663E';
-      ctx.font = '10px Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('LUNA', b.x, b.y + 20 - 30 - 27);
-      ctx.restore();
-      // Luna espelhada pra esquerda (como inimigo)
-      ctx.save();
-      ctx.translate(b.x, 0);
-      ctx.scale(-1, 1);
-      ctx.translate(-b.x, 0);
+      if (b.state === 'eating') {
+        // Barriga pra cima! Rotaciona 180° no eixo do corpo
+        ctx.translate(b.x, b.y + 20);
+        ctx.rotate(Math.PI);
+        ctx.translate(-b.x, -(b.y + 20));
+        // Ossinho girando
+        ctx.save();
+        ctx.translate(b.x + 30, b.y + 30);
+        ctx.rotate(b.animTimer * 15);
+        drawBone(ctx, 0, 0, 0);
+        ctx.restore();
+      } else {
+        // Normal: espelha pra esquerda
+        ctx.translate(b.x, 0);
+        ctx.scale(-1, 1);
+        ctx.translate(-b.x, 0);
+      }
       drawAnimatedAnimal(ctx, b.x, b.y, b.width, b.height || 30, b.animTimer, false, false, 'luna');
       ctx.restore();
     }
