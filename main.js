@@ -1061,12 +1061,46 @@ UI.btnNoContinue.addEventListener('click', rejectContinue);
 UI.saveScoreBtn.addEventListener('click', () => {
     updateHighScores(game.score, UI.playerNameInput.value);
     renderHighScores();
+    // Esconde o input pra não salvar de novo
+    UI.recordInputContainer.style.display = 'none';
+    UI.saveScoreBtn.disabled = true;
+    // Volta ao menu principal após 1.5s
+    setTimeout(() => {
+      UI.gameOverScreen.classList.add('hidden');
+      UI.startScreen.classList.remove('hidden');
+      UI.saveScoreBtn.disabled = false;
+    }, 1500);
 });
+
+// Mapa de imagens por herói
+const heroImageMap = {
+  luna: './luna-icon.png',
+  frida: './frida-game.png',
+  cinder: './Cinder-game.png',
+  bear: './urso-sem-fundo.png'
+};
+const heroNameMap = { luna: 'Luna', frida: 'Frida', cinder: 'Cinder', bear: 'Urso' };
+
+function updateHeroImages(kind) {
+  const img = heroImageMap[kind] || heroImageMap.luna;
+  const name = heroNameMap[kind] || 'Luna';
+  const menuImg = document.getElementById('menu-dog-img');
+  const victoryImg = document.getElementById('victory-dog-img');
+  const phaseImg = document.getElementById('phase-dog-img');
+  if (menuImg) menuImg.src = img;
+  if (victoryImg) victoryImg.src = img;
+  if (phaseImg) phaseImg.src = img;
+  menuDogImg.src = img;
+  // Texto das telas
+  const phaseBubble = document.getElementById('phase-bubble');
+  if (phaseBubble) phaseBubble.textContent = 'Vamos lá! ' + (name === 'Luna' ? 'A Luna' : (name === 'Urso' ? 'O Urso' : 'A ' + name)) + ' está pronta!';
+}
 
 document.querySelectorAll('.hero-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.hero-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
+    updateHeroImages(btn.dataset.val);
   });
 });
 
@@ -1108,6 +1142,7 @@ function startGame() {
   // Pega a dificuldade que você escolheu nos botões coloridos
   game.difficulty = document.querySelector('.diff-btn.selected')?.dataset.val || 'medium';
   player.kind = document.querySelector('.hero-btn.selected')?.dataset.val || 'luna';
+  updateHeroImages(player.kind);  // Troca imagens e textos para o herói selecionado
   // Ajusta tamanho físico conforme o herói (mesmos tamanhos dos sprites originais do jogo)
   if (player.kind === 'cinder') { player.width = 60; player.height = 35; }
   else if (player.kind === 'frida') { player.width = 110; player.height = 50; }
