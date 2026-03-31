@@ -824,20 +824,22 @@ function initMountains() {
 let boss = null;
 let nextAmmo = 'bone'; 
 
-function drawCat(ctx, x, y, width, height, timer, state) {
+function drawCat(ctx, x, y, width, height, timer, state, isHero) {
   const drawY = y + 20; 
 
-  // Name Tag (Drawn First)
-  ctx.save();
-  ctx.translate(x, drawY);
-  ctx.fillStyle = 'rgba(0,0,0,0.5)';
-  ctx.fillRect(-width/2 - 10, -height - 40, 45, 15);
-  ctx.fillStyle = '#FFB6C1';
-  ctx.font = '10px Arial';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('CINDER', -width/2 + 12, -height - 32);
-  ctx.restore();
+  // Name Tag (esconde quando é herói)
+  if (!isHero) {
+    ctx.save();
+    ctx.translate(x, drawY);
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(-width/2 - 10, -height - 40, 45, 15);
+    ctx.fillStyle = '#FFB6C1';
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('CINDER', -width/2 + 12, -height - 32);
+    ctx.restore();
+  }
 
   ctx.save();
   ctx.translate(x, drawY);
@@ -2240,21 +2242,22 @@ function drawFood(ctx, x, y, rot, type) {
   ctx.restore();
 }
 
-function drawBulldog(ctx, x, y, width, height, timer, state) {
-  const drawY = y + 20; // Anchor on dirt
+function drawBulldog(ctx, x, y, width, height, timer, state, isHero) {
+  const drawY = y + 20;
 
-  // Floating Name Tag (RPG style) - Drawn FIRST, so it doesn't rotate!
-  ctx.save();
-  ctx.translate(x, drawY);
-  ctx.fillStyle = 'rgba(0,0,0,0.5)';
-  ctx.fillRect(-width/2 - 10, -height - 35, 40, 15);
-  ctx.fillStyle = '#FFD700';
-  ctx.font = '12px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText('FRIDA', -width/2 + 10, -height - 24);
-  ctx.restore();
+  // Placa de nome (esconde quando é herói pra não espelhar)
+  if (!isHero) {
+    ctx.save();
+    ctx.translate(x, drawY);
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(-width/2 - 10, -height - 35, 40, 15);
+    ctx.fillStyle = '#FFD700';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('FRIDA', -width/2 + 10, -height - 24);
+    ctx.restore();
+  }
 
-  // Draw Bulldog Body
   ctx.save();
   ctx.translate(x, drawY); 
   
@@ -2274,111 +2277,115 @@ function drawBulldog(ctx, x, y, width, height, timer, state) {
   const bBody = ctx.createLinearGradient(0, -height, 0, 0);
   bBody.addColorStop(0, '#ffdf99');
   bBody.addColorStop(1, '#a6722d');
-  
+
+  // Rabo curto animado
+  ctx.save();
+  ctx.translate(width/2 - 5, -height/2);
+  const tailWag = Math.sin(timer * (state === 'jumping_to_eat' ? 30 : 15)) * (state === 'jumping_to_eat' ? 0.8 : 0.4);
+  ctx.rotate(tailWag - 0.3);
+  ctx.fillStyle = '#a6722d';
+  ctx.beginPath(); ctx.roundRect(0, -4, 18, 8, 4); ctx.fill();
+  ctx.restore();
+
+  // 4 PATAS animadas
+  let swing = state === 'eating' ? Math.sin(timer * 10) * 8 : Math.sin(timer * 10) * 5;
+  if (state === 'jumping_to_eat') swing = Math.sin(timer * 25) * 3; // Patas mexem no ar
+
+  // Patas traseiras
+  ctx.fillStyle = '#8a5c1a';
+  ctx.beginPath(); ctx.roundRect(width/2 - 25 - swing, -12, 12, 18, 4); ctx.fill();
+  ctx.beginPath(); ctx.roundRect(width/2 - 10 + swing, -12, 12, 18, 4); ctx.fill();
+  ctx.fillStyle = '#fff'; 
+  ctx.beginPath(); ctx.roundRect(width/2 - 25 - swing, 0, 12, 6, 2); ctx.fill();
+  ctx.beginPath(); ctx.roundRect(width/2 - 10 + swing, 0, 12, 6, 2); ctx.fill();
+
+  // Corpo gordo
   ctx.fillStyle = bBody;
   ctx.beginPath();
   ctx.roundRect(-width/2, -height, width, height, height/2);
   ctx.fill();
-  
-  ctx.shadowBlur = 0;
-  ctx.shadowOffsetY = 0;
+  ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
 
+  // Barriga branca
   ctx.fillStyle = '#ffffff';
   ctx.beginPath();
   ctx.ellipse(0, -height/2 + 5, width/2 - 15, height/2 - 5, 0, 0, Math.PI*2);
   ctx.fill();
-  
+
+  // Patas dianteiras
+  ctx.fillStyle = bBody;
+  ctx.beginPath(); ctx.roundRect(-width/2 + 5 + swing, -12, 12, 18, 4); ctx.fill();
+  ctx.beginPath(); ctx.roundRect(-width/2 + 20 - swing, -12, 12, 18, 4); ctx.fill();
+  ctx.fillStyle = '#fff'; 
+  ctx.beginPath(); ctx.roundRect(-width/2 + 5 + swing, 0, 12, 6, 2); ctx.fill();
+  ctx.beginPath(); ctx.roundRect(-width/2 + 20 - swing, 0, 12, 6, 2); ctx.fill();
+
+  // Cabeça
   const bHead = ctx.createRadialGradient(-width/2 + 5, -height/2 + 5, 0, -width/2 + 5, -height/2 + 5, 45);
   bHead.addColorStop(0, '#ffdf99');
   bHead.addColorStop(1, '#a6722d');
-
   ctx.fillStyle = bHead;
-  ctx.beginPath();
-  ctx.arc(-width/2, -height/2, 25, 0, Math.PI*2); 
-  ctx.fill();
+  ctx.beginPath(); ctx.arc(-width/2, -height/2, 25, 0, Math.PI*2); ctx.fill();
   
+  // Focinho branco
   ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.ellipse(-width/2 - 10, -height/2 + 8, 18, 12, 0, 0, Math.PI*2); 
-  ctx.fill();
+  ctx.beginPath(); ctx.ellipse(-width/2 - 10, -height/2 + 8, 18, 12, 0, 0, Math.PI*2); ctx.fill();
   
+  // Nariz preto
   ctx.fillStyle = '#000';
-  ctx.beginPath();
-  ctx.arc(-width/2 - 15, -height/2 + 2, 6, 0, Math.PI*2); 
-  ctx.fill();
+  ctx.beginPath(); ctx.arc(-width/2 - 15, -height/2 + 2, 6, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle = '#fff';
-  ctx.beginPath();
-  ctx.arc(-width/2 - 17, -height/2, 2, 0, Math.PI*2);
-  ctx.fill();
+  ctx.beginPath(); ctx.arc(-width/2 - 17, -height/2, 2, 0, Math.PI*2); ctx.fill();
 
+  // Boca/Língua
   if (state === 'idle' || state === 'jumping_to_eat') {
-    ctx.fillStyle = '#6b0000'; 
-    ctx.beginPath();
-    ctx.arc(-width/2 - 12, -height/2 + 15, 12, 0, Math.PI); 
-    ctx.fill();
-    ctx.fillStyle = '#ff6666'; 
-    ctx.beginPath();
-    ctx.ellipse(-width/2 - 12, -height/2 + 18, 8, 5, 0, 0, Math.PI*2);
-    ctx.fill();
+    ctx.fillStyle = '#4a0000'; 
+    ctx.beginPath(); ctx.arc(-width/2 - 12, -height/2 + 14, 10, 0, Math.PI); ctx.fill();
+    ctx.fillStyle = '#ff9999'; 
+    ctx.beginPath(); ctx.ellipse(-width/2 - 12, -height/2 + 16, 6, 3 + Math.sin(timer*5)*1.5, 0, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = '#fff';
-    ctx.fillRect(-width/2 - 20, -height/2 + 10, 4, 6);
-    ctx.fillRect(-width/2 - 6, -height/2 + 10, 4, 6);
+    ctx.fillRect(-width/2 - 19, -height/2 + 10, 3, 4);
+    ctx.fillRect(-width/2 - 7, -height/2 + 10, 3, 4);
   } else { 
-    ctx.fillStyle = '#ff6666'; 
-    ctx.beginPath();
-    ctx.roundRect(-width/2 - 15, -height/2 + 15, 10, 10, 4);
-    ctx.fill();
+    ctx.strokeStyle = '#8B4513'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(-width/2 - 12, -height/2 + 15, 6, 0, Math.PI); ctx.stroke();
   }
 
-  ctx.fillStyle = '#fff';
-  ctx.beginPath();
-  ctx.arc(-width/2 - 5, -height/2 - 10, 7, 0, Math.PI*2);
-  ctx.fill();
-  ctx.fillStyle = '#000';
-  ctx.beginPath();
-  if (state === 'idle') {
-    ctx.arc(-width/2 - 7, -height/2 - 10, 3, 0, Math.PI*2); 
-    ctx.fillStyle = '#333';
-    ctx.fillRect(-width/2 - 10, -height/2 - 18, 12, 4);
-  } else if (state === 'jumping_to_eat') {
-    ctx.arc(-width/2 - 5, -height/2 - 10, 4, 0, Math.PI*2); 
-    ctx.fillStyle = '#333';
-    ctx.beginPath();
-    ctx.arc(-width/2 - 5, -height/2 - 18, 8, Math.PI, 0); 
-    ctx.stroke();
+  // 2 OLHOS grandes com brilho e piscar
+  if (Math.sin(timer * 4) > 0.95) {
+    ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(-width/2 - 10, -height/2 - 8); ctx.lineTo(-width/2 - 2, -height/2 - 8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-width/2 + 2, -height/2 - 10); ctx.lineTo(-width/2 + 10, -height/2 - 10); ctx.stroke();
   } else {
-    ctx.fillRect(-width/2 - 9, -height/2 - 10, 8, 3);
+    // Olho esquerdo
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.ellipse(-width/2 - 5, -height/2 - 8, 5, 7, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#333';
+    ctx.beginPath(); ctx.arc(-width/2 - 6, -height/2 - 8, 3, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(-width/2 - 7, -height/2 - 10, 1.2, 0, Math.PI*2); ctx.fill();
+    // Olho direito
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.ellipse(-width/2 + 5, -height/2 - 10, 5, 7, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#333';
+    ctx.beginPath(); ctx.arc(-width/2 + 4, -height/2 - 10, 3, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(-width/2 + 3, -height/2 - 12, 1.2, 0, Math.PI*2); ctx.fill();
   }
 
-  ctx.fillStyle = '#8a5c1a'; 
-  ctx.beginPath();
-  ctx.ellipse(-width/2 + 15, -height/2 - 10, 8, 15, -0.5, 0, Math.PI*2);
-  ctx.fill();
-
-  let swing = state === 'eating' ? Math.sin(timer * 10) * 8 : Math.sin(timer * 10) * 4;
-  if(state === 'jumping_to_eat') swing = 0;
-  
-  ctx.fillStyle = bBody;
-  ctx.beginPath();
-  ctx.roundRect(width/2 - 20 - swing, -10, 12, 15, 4);
-  ctx.fill();
-  ctx.fillStyle = '#ffffff'; 
-  ctx.beginPath();
-  ctx.roundRect(width/2 - 20 - swing, 0, 12, 5, 2);
-  ctx.fill();
-
-  ctx.fillStyle = bBody;
-  ctx.beginPath();
-  ctx.roundRect(-width/2 + 10 + swing, -10, 12, 15, 4);
-  ctx.fill();
-  ctx.fillStyle = '#ffffff'; 
-  ctx.beginPath();
-  ctx.roundRect(-width/2 + 10 + swing, 0, 12, 5, 2);
-  ctx.fill();
-  
+  // Orelha caída animada (vento quando pula!)
+  ctx.save();
+  ctx.translate(-width/2 + 15, -height/2 - 10);
+  let earFlap = -0.5 + Math.sin(timer * 3) * 0.1;
+  if (state === 'jumping_to_eat') earFlap = -Math.PI/3 + Math.sin(timer * 40) * 0.6;
+  ctx.rotate(earFlap);
+  ctx.fillStyle = '#8a5c1a';
+  ctx.beginPath(); ctx.ellipse(0, 12, 8, 15, -0.5, 0, Math.PI*2); ctx.fill();
   ctx.restore();
 
-  if(state === 'eating' || state === 'jumping_to_eat') {
+  ctx.restore();
+
+  if (state === 'eating' || state === 'jumping_to_eat') {
     ctx.save();
     ctx.translate(x - width/2 - 10, drawY + (state === 'eating' ? 10 : -15));
     ctx.rotate(timer * 15); 
@@ -2387,20 +2394,22 @@ function drawBulldog(ctx, x, y, width, height, timer, state) {
   }
 }
 
-function drawBear(ctx, x, y, kind, timer, state) {
+function drawBear(ctx, x, y, kind, timer, state, isHero) {
   ctx.save();
   
-  // Placa de nome
-  ctx.fillStyle = 'rgba(0,0,0,0.5)';
-  ctx.fillRect(x - 25, y - 70, 50, 15);
-  ctx.fillStyle = '#fff';
-  ctx.font = '10px Arial';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  let name = "URSO";
-  if(kind === 'white_bear') name = "POLAR";
-  if(kind === 'panda_bear') name = "PANDA";
-  ctx.fillText(name, x, y - 62);
+  // Placa de nome (esconde quando é herói)
+  if (!isHero) {
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(x - 25, y - 70, 50, 15);
+    ctx.fillStyle = '#fff';
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    let name = "URSO";
+    if(kind === 'white_bear') name = "POLAR";
+    if(kind === 'panda_bear') name = "PANDA";
+    ctx.fillText(name, x, y - 62);
+  }
   
   let baseColor1 = '#8B4513'; 
   let baseColor2 = '#A0522D';
@@ -2415,17 +2424,14 @@ function drawBear(ctx, x, y, kind, timer, state) {
   ctx.translate(x, drawY);
 
   if (state === 'eating' || state === 'jumping_to_eat') {
-     // Urso gordo caindo pra tras de ponta cabeça
-     ctx.rotate(Math.PI); // Fica de ponta cabeça!
+     ctx.rotate(Math.PI);
      ctx.translate(0, 10);
      
-     // Corpo gordinho de ponta cabeca
      ctx.fillStyle = baseColor1;
      ctx.beginPath(); ctx.ellipse(0, 0, 25, 30, 0, 0, Math.PI*2); ctx.fill();
      ctx.fillStyle = bellyColor;
      ctx.beginPath(); ctx.ellipse(0, -5, 18, 22, 0, 0, Math.PI*2); ctx.fill();
      
-     // Patinhas batendo loucamente de alegria
      const wag = Math.sin(timer * 20) * 8;
      ctx.fillStyle = baseColor2;
      ctx.beginPath(); ctx.ellipse(-15, -25 + wag, 8, 12, -0.5, 0, Math.PI*2); ctx.fill(); 
@@ -2433,28 +2439,35 @@ function drawBear(ctx, x, y, kind, timer, state) {
      ctx.beginPath(); ctx.ellipse(-20, 10 + wag, 8, 12, -0.8, 0, Math.PI*2); ctx.fill(); 
      ctx.beginPath(); ctx.ellipse(20, 10 - wag, 8, 12, 0.8, 0, Math.PI*2); ctx.fill(); 
      
-     // Cabeça super feliz
      ctx.fillStyle = (kind === 'panda_bear') ? '#fff' : baseColor1;
      ctx.beginPath(); ctx.ellipse(0, 25, 20, 15, 0, 0, Math.PI*2); ctx.fill();
      
-     // Orelhinhas
      ctx.fillStyle = baseColor1;
      ctx.beginPath(); ctx.arc(-15, 35, 7, 0, Math.PI*2); ctx.fill();
      ctx.beginPath(); ctx.arc(15, 35, 7, 0, Math.PI*2); ctx.fill();
      
-     // Olho em formato de U feliz (como a frida \_/)
      ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
      ctx.beginPath(); ctx.arc(-8, 22, 4, 0, Math.PI); ctx.stroke();
      ctx.beginPath(); ctx.arc(8, 22, 4, 0, Math.PI); ctx.stroke();
 
   } else {
-     // Urso caminhando
      const walk1 = Math.sin(timer * 10) * 6;
      const walk2 = Math.cos(timer * 10) * 6;
-     // Piernas traseiras/dianteriras
+     
+     // Rabo pompom animado
+     ctx.save();
+     ctx.translate(25, -15);
+     ctx.rotate(Math.sin(timer * 15) * 0.4);
      ctx.fillStyle = baseColor2;
-     ctx.beginPath(); ctx.ellipse(-12 + walk1, 5, 8, 15, 0, 0, Math.PI*2); ctx.fill(); 
-     ctx.beginPath(); ctx.ellipse(12 + walk2, 5, 8, 15, 0, 0, Math.PI*2); ctx.fill(); 
+     ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI*2); ctx.fill();
+     ctx.restore();
+
+     // 4 PATAS
+     ctx.fillStyle = baseColor2;
+     ctx.beginPath(); ctx.ellipse(-15 + walk1, 5, 8, 15, 0, 0, Math.PI*2); ctx.fill(); 
+     ctx.beginPath(); ctx.ellipse(15 + walk2, 5, 8, 15, 0, 0, Math.PI*2); ctx.fill(); 
+     ctx.beginPath(); ctx.ellipse(-5 - walk1, 8, 7, 12, 0, 0, Math.PI*2); ctx.fill(); 
+     ctx.beginPath(); ctx.ellipse(5 - walk2, 8, 7, 12, 0, 0, Math.PI*2); ctx.fill(); 
 
      // Corpo Gordinho
      ctx.fillStyle = baseColor1;
@@ -2467,37 +2480,61 @@ function drawBear(ctx, x, y, kind, timer, state) {
      ctx.fillStyle = (kind === 'panda_bear') ? '#fff' : baseColor1;
      ctx.beginPath(); ctx.ellipse(0, 0, 18, 16, 0, 0, Math.PI*2); ctx.fill();
      
-     // Orelhas Redondas
+     // Orelhas animadas
+     ctx.save();
+     let earAngle = Math.sin(timer * 3) * 0.1;
+     if (state === 'jumping_to_eat') earAngle = Math.sin(timer * 30) * 0.4;
      ctx.fillStyle = baseColor2;
      if(kind === 'panda_bear') ctx.fillStyle = '#111';
-     ctx.beginPath(); ctx.arc(5, -12, 7, 0, Math.PI*2); ctx.fill();
-     ctx.beginPath(); ctx.arc(-5, -12, 7, 0, Math.PI*2); ctx.fill();
+     ctx.save(); ctx.translate(5, -12); ctx.rotate(earAngle);
+     ctx.beginPath(); ctx.arc(0, 0, 7, 0, Math.PI*2); ctx.fill();
+     ctx.restore();
+     ctx.save(); ctx.translate(-5, -12); ctx.rotate(-earAngle);
+     ctx.beginPath(); ctx.arc(0, 0, 7, 0, Math.PI*2); ctx.fill();
+     ctx.restore();
+     ctx.restore();
 
-     // Manchas do Panda (Olhos)
+     // Manchas do Panda
      if (kind === 'panda_bear') {
          ctx.fillStyle = '#111';
          ctx.beginPath(); ctx.ellipse(-5, -2, 6, 8, -0.3, 0, Math.PI*2); ctx.fill();
          ctx.beginPath(); ctx.ellipse(8, -2, 6, 8, 0.3, 0, Math.PI*2); ctx.fill();
      }
 
-     // Olhos maus
-     ctx.fillStyle = '#fff';
-     ctx.beginPath(); ctx.arc(-5, -2, 3, 0, Math.PI*2); ctx.fill();
-     ctx.beginPath(); ctx.arc(8, -2, 3, 0, Math.PI*2); ctx.fill();
-     ctx.fillStyle = '#000';
-     ctx.beginPath(); ctx.arc(-6, -2, 1.5, 0, Math.PI*2); ctx.fill();
-     ctx.beginPath(); ctx.arc(7, -2, 1.5, 0, Math.PI*2); ctx.fill();
+     // Olhos com piscar
+     if (Math.sin(timer * 4) > 0.95) {
+       ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
+       ctx.beginPath(); ctx.moveTo(-8, -2); ctx.lineTo(-2, -2); ctx.stroke();
+       ctx.beginPath(); ctx.moveTo(5, -2); ctx.lineTo(11, -2); ctx.stroke();
+     } else {
+       ctx.fillStyle = '#fff';
+       ctx.beginPath(); ctx.arc(-5, -2, 4, 0, Math.PI*2); ctx.fill();
+       ctx.beginPath(); ctx.arc(8, -2, 4, 0, Math.PI*2); ctx.fill();
+       ctx.fillStyle = '#000';
+       ctx.beginPath(); ctx.arc(-6, -2, 2, 0, Math.PI*2); ctx.fill();
+       ctx.beginPath(); ctx.arc(7, -2, 2, 0, Math.PI*2); ctx.fill();
+       ctx.fillStyle = '#fff';
+       ctx.beginPath(); ctx.arc(-7, -3, 1, 0, Math.PI*2); ctx.fill();
+       ctx.beginPath(); ctx.arc(6, -3, 1, 0, Math.PI*2); ctx.fill();
+     }
      
-     // Sobrancelha malvada cruzada
-     ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
-     ctx.beginPath(); ctx.moveTo(-8, -6); ctx.lineTo(-2, -4); ctx.stroke();
-     ctx.beginPath(); ctx.moveTo(11, -6); ctx.lineTo(5, -4); ctx.stroke();
+     // Sobrancelha malvada (só inimigo)
+     if (!isHero) {
+       ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
+       ctx.beginPath(); ctx.moveTo(-8, -6); ctx.lineTo(-2, -4); ctx.stroke();
+       ctx.beginPath(); ctx.moveTo(11, -6); ctx.lineTo(5, -4); ctx.stroke();
+     }
 
      // Focinho
      ctx.fillStyle = bellyColor;
      ctx.beginPath(); ctx.ellipse(-10, 8, 10, 6, -0.2, 0, Math.PI*2); ctx.fill();
      ctx.fillStyle = '#000';
      ctx.beginPath(); ctx.arc(-14, 6, 3, 0, Math.PI*2); ctx.fill();
+     
+     if (isHero) {
+       ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5;
+       ctx.beginPath(); ctx.arc(-12, 10, 4, 0, Math.PI); ctx.stroke();
+     }
   }
   ctx.restore();
 }
@@ -3176,8 +3213,23 @@ function render() {
     if (b.kind === 'frida') drawBulldog(ctx, b.x, b.y, b.width, b.height, b.animTimer, b.state);
     else if (b.kind === 'cinder') drawCat(ctx, b.x, b.y, b.width, b.height, b.animTimer, b.state);
     else if (b.kind === 'luna') {
-      // Luna como obstáculo: desenha a salsichinha virada pra esquerda (como inimigo)
+      // Placa de nome LUNA
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.fillRect(b.x - 20, b.y + 20 - 30 - 35, 40, 15);
+      ctx.fillStyle = '#B2663E';
+      ctx.font = '10px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('LUNA', b.x, b.y + 20 - 30 - 27);
+      ctx.restore();
+      // Luna espelhada pra esquerda (como inimigo)
+      ctx.save();
+      ctx.translate(b.x, 0);
+      ctx.scale(-1, 1);
+      ctx.translate(-b.x, 0);
       drawAnimatedAnimal(ctx, b.x, b.y, b.width, b.height || 30, b.animTimer, false, false, 'luna');
+      ctx.restore();
     }
     else drawBear(ctx, b.x, b.y, b.kind, b.animTimer, b.state);
   }
@@ -3329,11 +3381,11 @@ function render() {
       
       let st = player.isJumping ? 'jumping_to_eat' : 'idle';
       if (player.kind === 'cinder') {
-        drawCat(ctx, player.x, player.y, player.width, player.height, player.animTimer, st);
+        drawCat(ctx, player.x, player.y, player.width, player.height, player.animTimer, st, true);
       } else if (player.kind === 'frida') {
-        drawBulldog(ctx, player.x, player.y, player.width, player.height, player.animTimer, st);
+        drawBulldog(ctx, player.x, player.y, player.width, player.height, player.animTimer, st, true);
       } else if (player.kind === 'bear') {
-        drawBear(ctx, player.x, player.y, 'brown_bear', player.animTimer, st);
+        drawBear(ctx, player.x, player.y, 'brown_bear', player.animTimer, st, true);
       }
     }
     ctx.restore();
