@@ -496,23 +496,12 @@ function soundDogBark() {
   });
 }
 
-// Latido de dachshund (mais agudo e rápido que o bulldog)
+// Latido de dachshund (arquivo real)
+const lunaLateAudio = new Audio('luna-latindo.mp3');
+lunaLateAudio.volume = 0.6;
 function soundDachshundBark() {
-  if(!audioCtx) return;
-  const playYip = (t, freq) => {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(freq, t);
-    osc.frequency.exponentialRampToValueAtTime(freq * 0.6, t + 0.1);
-    gain.gain.setValueAtTime(0.5, t); 
-    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start(t); osc.stop(t + 0.1);
-  };
-  playYip(audioCtx.currentTime, 450);
-  playYip(audioCtx.currentTime + 0.12, 550);
-  playYip(audioCtx.currentTime + 0.24, 500);
+  lunaLateAudio.currentTime = 0;
+  lunaLateAudio.play().catch(() => {});
 }
 
 let currentBgNoise = null;
@@ -1080,10 +1069,12 @@ const heroImageMap = {
   bear: './urso-sem-fundo.png'
 };
 const heroNameMap = { luna: 'Luna', frida: 'Frida', cinder: 'Cinder', bear: 'Urso' };
+const heroNicknameMap = { luna: 'Luna Salsicha', frida: 'Frida Gorducha', cinder: 'Cinder Gatinha', bear: 'Urso Fofo' };
 
 function updateHeroImages(kind) {
   const img = heroImageMap[kind] || heroImageMap.luna;
   const name = heroNameMap[kind] || 'Luna';
+  const nickname = heroNicknameMap[kind] || 'Luna Salsicha';
   const menuImg = document.getElementById('menu-dog-img');
   const victoryImg = document.getElementById('victory-dog-img');
   const phaseImg = document.getElementById('phase-dog-img');
@@ -1091,9 +1082,13 @@ function updateHeroImages(kind) {
   if (victoryImg) victoryImg.src = img;
   if (phaseImg) phaseImg.src = img;
   menuDogImg.src = img;
-  // Texto das telas
+  // Texto do balão do menu
+  if (bubbleEl) {
+    bubbleEl.innerHTML = 'Oi! Sou ' + (kind === 'bear' ? 'o ' : 'a ') + nickname + '! Aperte o botão da aventura para resgatarmos meus amiguinhos!';
+  }
+  // Texto da transição de fase
   const phaseBubble = document.getElementById('phase-bubble');
-  if (phaseBubble) phaseBubble.textContent = 'Vamos lá! ' + (name === 'Luna' ? 'A Luna' : (name === 'Urso' ? 'O Urso' : 'A ' + name)) + ' está pronta!';
+  if (phaseBubble) phaseBubble.textContent = 'Vamos lá! ' + (name === 'Urso' ? 'O Urso' : 'A ' + name) + ' está pronta!';
 }
 
 document.querySelectorAll('.hero-btn').forEach(btn => {
