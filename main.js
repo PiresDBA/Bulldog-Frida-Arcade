@@ -867,37 +867,7 @@ let lastTime = 0;
 let gameState = 'START';
 let keys = {};
 
-let introText = "";
-const bubbleEl = document.getElementById('luna-speech-bubble');
-const ttsVoice = new Audio('https://translate.google.com/translate_tts?ie=UTF-8&q=Oi!+Eu+sou+a+Luna+Salsicha!+Bem+vindo+a+minha+aventura!+Vem+jogar+comigo!&tl=pt-BR&client=tw-ob');
-let introIndex = 0;
-let voiced = false;
-
-function typeWriter() {
-  if (gameState !== 'START') return;
-  
-  if (!introText) {
-    if (i18n && currentLang && i18n[currentLang]) {
-      const type = player.kind || 'luna';
-      let key = 'introLuna';
-      if(type==='frida') key='introFrida';
-      if(type==='cinder') key='introCinder';
-      if(type==='bear') key='introBear';
-      introText = i18n[currentLang][key] || "";
-    }
-  }
-
-  if (!voiced) {
-     ttsVoice.volume = 1.0;
-     ttsVoice.play().catch(e => console.log("Audio block: ", e));
-     voiced = true;
-  }
-  if (introText && introIndex < introText.length) {
-    if(bubbleEl) bubbleEl.innerHTML = introText.substring(0, introIndex + 1);
-    introIndex++;
-    setTimeout(typeWriter, 35);
-  }
-}
+// O balão animado de início foi removido a pedido.
 
 let game = {
   score: 0,
@@ -911,8 +881,7 @@ let game = {
   phaseDuration: 45000,
 };
 
-// Inicia o texto animado DEPOIS de gameState e game estarem prontos
-setTimeout(typeWriter, 500);
+
 
 let player = {
   x: 200,
@@ -1261,15 +1230,10 @@ function updateHeroImages(kind) {
       }
     });
 
-    let k = 'introLuna', p = 'phaseReadyLuna';
-    if(kind==='frida') { k='introFrida'; p='phaseReadyFrida'; }
-    if(kind==='cinder') { k='introCinder'; p='phaseReadyCinder'; }
-    if(kind==='bear') { k='introBear'; p='phaseReadyBear'; }
-    
-    introText = dict[k] || "";
-    introIndex = 0;
-    if(bubbleEl) bubbleEl.innerHTML = "";
-    if (gameState === 'START') typeWriter();
+    let p = 'phaseReadyLuna';
+    if(kind==='frida') { p = 'phaseReadyFrida'; }
+    if(kind==='cinder') { p = 'phaseReadyCinder'; }
+    if(kind==='bear') { p = 'phaseReadyBear'; }
 
     const phaseBubble = document.getElementById('phase-bubble');
     if (phaseBubble) phaseBubble.textContent = dict[p] || "";
