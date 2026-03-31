@@ -9,10 +9,15 @@
   <meta name="apple-mobile-web-app-title" content="Luna Arcade" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#3366ff" />
-  <title>Salsichinha Luna Arcade</title>
+  <title>Bulldog Frida Arcade</title>
   <link rel="stylesheet" href="./style.css">
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="./icon-192.png">
+
+  <!-- Otimizações de Performance: Preload de Assets Essenciais -->
+  <link rel="preload" href="cartoon_bgm.mp3" as="audio">
+  <link rel="preload" href="luna-latindo.mp3" as="audio">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Righteous&family=Press+Start+2P&display=swap" as="style">
 </head>
   <body>
     <div id="yt-player-container" style="position: absolute; opacity: 0; pointer-events: none; overflow: hidden; z-index: -100;">
@@ -32,17 +37,24 @@
     <canvas id="gameCanvas" width="800" height="600"></canvas>
     <div id="ui-layer">
       <div class="hud">
-        <div id="score-display">PONTOS: <span id="score">0</span></div>
-        <div id="phase-display">FASE: <span id="phase">1</span></div>
+        <div id="score-display"><span data-i18n="score">SCORE</span>: <span id="score">0</span></div>
+        <div id="phase-display"><span data-i18n="phase">PHASE</span>: <span id="phase">1</span></div>
         <div id="lives-display">❤️ <span id="lives">3</span></div>
+        <div id="coins-display">🪙 <span id="coins">0</span></div>
       </div>
     </div>
 
     <div id="start-screen" class="screen">
+      <div id="lang-selector" style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
+        <button class="lang-btn" data-lang="pt" style="background:none; border:none; font-size:24px; cursor:pointer;" title="Português">🇧🇷</button>
+        <button class="lang-btn" data-lang="en" style="background:none; border:none; font-size:24px; cursor:pointer;" title="English">🇺🇸</button>
+        <button class="lang-btn" data-lang="es" style="background:none; border:none; font-size:24px; cursor:pointer;" title="Español">🇪🇸</button>
+      </div>
+      
       <h1 class="title-3d">MULTI ANIMAL ARCADE</h1>
 
       <div id="hero-selector" style="text-align: center; margin-bottom: 12px; display: inline-block;">
-        <div style="font-size:11px; color:#ffcc00; margin-bottom:4px; font-family:'Righteous', cursive; letter-spacing: 1px;">SELECIONE SEU HERÓI</div>
+        <div data-i18n="selectHero" style="font-size:11px; color:#ffcc00; margin-bottom:4px; font-family:'Righteous', cursive; letter-spacing: 1px;">SELECT HERO</div>
         <div style="display: flex; gap: 4px; border-radius: 12px; background: rgba(0,0,0,0.4); padding: 4px; border: 1px solid rgba(255,255,255,0.1);">
           <button class="hero-btn selected" data-val="luna" style="background:#B2663E; flex: 1; padding: 5px; color: white;">🌭 Luna</button>
           <button class="hero-btn" data-val="frida" style="background:#a6722d; flex: 1; padding: 5px; color: white;">🐕 Frida</button>
@@ -57,19 +69,19 @@
       </div>
 
       <div class="controls" style="text-align: center; margin-bottom: 5px; font-size: 11px; color: #ccc;">
-        <span class="key">Z</span>/<span class="key">J</span>: Atirar &nbsp;|&nbsp; <span class="key">↑</span>/<span class="key">Espaço</span>: Pular &nbsp;|&nbsp; <span class="key">←</span>/<span class="key">→</span>: Mover
+        <span class="key">Z</span>/<span class="key">J</span>: <span data-i18n="ctrlShoot">Shoot</span> &nbsp;|&nbsp; <span class="key">↑</span>/<span class="key">Espaço</span>: <span data-i18n="ctrlJump">Jump</span> &nbsp;|&nbsp; <span class="key">←</span>/<span class="key">→</span>: <span data-i18n="ctrlMove">Move</span>
       </div>
 
       <div id="difficulty-selector" style="text-align: center; margin-bottom: 12px; display: inline-block;">
-        <div style="font-size:11px; color:#ffcc00; margin-bottom:4px; font-family:'Righteous', cursive; letter-spacing: 1px;">MODO DE JOGO</div>
+        <div data-i18n="gameMode" style="font-size:11px; color:#ffcc00; margin-bottom:4px; font-family:'Righteous', cursive; letter-spacing: 1px;">GAME MODE</div>
         <div style="display: flex; gap: 4px; border-radius: 12px; background: rgba(0,0,0,0.4); padding: 4px; border: 1px solid rgba(255,255,255,0.1);">
-          <button class="diff-btn" data-val="easy" style="background:#2ecc71; flex: 1; min-width: 60px;">Fácil</button>
-          <button class="diff-btn selected" data-val="medium" style="background:#f1c40f; flex: 1; min-width: 60px;">Médio</button>
-          <button class="diff-btn" data-val="hard" style="background:#e74c3c; flex: 1; min-width: 60px;">Hard</button>
+          <button class="diff-btn" data-val="easy" style="background:#2ecc71; flex: 1; min-width: 60px;" data-i18n="easy">Easy</button>
+          <button class="diff-btn selected" data-val="medium" style="background:#f1c40f; flex: 1; min-width: 60px;" data-i18n="medium">Normal</button>
+          <button class="diff-btn" data-val="hard" style="background:#e74c3c; flex: 1; min-width: 60px;" data-i18n="hard">Hard</button>
         </div>
       </div>
 
-      <button id="start-btn" class="btn">Topa Começar? Vamos Nessa!</button>
+      <button id="start-btn" class="btn" data-i18n="startBtn">Play Now!</button>
 
       <!-- Banner de instalação -->
       <div id="install-banner" style="display:none; margin-top:10px; text-align:center;">
@@ -87,50 +99,49 @@
     <div id="phase-complete-screen" class="screen hidden"
       style="background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);">
       <div class="luna-dialog" style="margin-bottom: 20px;">
-        <div class="bubble" id="victory-bubble">"Parabéns! Nós vencemos o chefão da fase com sucesso! Você é demais!"</div>
-        <img id="victory-dog-img" src="./luna-icon.png" class="menu-dog-anim" alt="Herói">
+        <div class="bubble" id="victory-bubble" data-i18n="victoryText">Congratulations! Boss defeated!</div>
+        <img id="victory-dog-img" src="./luna-icon.png" class="menu-dog-anim" alt="Hero">
       </div>
-      <button id="continue-btn" class="btn">Continuar Aventura</button>
+      <button id="continue-btn" class="btn" data-i18n="continueBtn">Continue Adventure</button>
     </div>
 
     <div id="continue-screen" class="screen hidden" style="background: rgba(0,0,0,0.9); backdrop-filter: blur(5px);">
-      <h1 class="title-3d" style="color:#ffcc00; font-size: 60px;">CONTINUAR?</h1>
+      <h1 class="title-3d" style="color:#ffcc00; font-size: 60px;" data-i18n="continueQ">CONTINUE?</h1>
       <p style="font-size: 40px; margin-top: 0; color: #fff;" id="continue-timer">10</p>
       <div style="display: flex; gap: 20px;">
         <button id="btn-yes-continue" class="btn"
-          style="background: linear-gradient(135deg, #4CAF50, #2E7D32); min-width: 120px;">SIM</button>
+          style="background: linear-gradient(135deg, #4CAF50, #2E7D32); min-width: 120px;" data-i18n="yes">YES</button>
         <button id="btn-no-continue" class="btn"
-          style="background: linear-gradient(135deg, #f44336, #c62828); min-width: 120px;">NÃO</button>
+          style="background: linear-gradient(135deg, #f44336, #c62828); min-width: 120px;" data-i18n="no">NO</button>
       </div>
-      <p style="margin-top: 20px; color: #fff;">Continues restantes: <span id="continues-left">5</span></p>
+      <p style="margin-top: 20px; color: #fff;"><span data-i18n="continuesLeft">Continues remaining</span>: <span id="continues-left">5</span></p>
     </div>
 
     <div id="game-over-screen" class="screen hidden">
       <h1 class="title-3d" style="color:#ff3333;text-shadow:0 0 20px #f00;">GAME OVER</h1>
-      <p style="font-size:24px;">Score Final: <span id="final-score">0</span></p>
+      <p style="font-size:24px;"><span data-i18n="finalScore">Final Score</span>: <span id="final-score">0</span></p>
 
       <div id="record-input-container" style="margin-top: 15px;">
-        <input type="text" id="player-name" placeholder="Seu Nome (10 letras)" maxlength="10"
+        <input type="text" id="player-name" placeholder="Name" maxlength="10" data-i18n-placeholder="namePlaceholder"
           style="padding: 10px; border-radius: 5px; border: none; font-family: inherit; text-align: center; width: 220px;">
         <button id="save-score-btn" class="btn"
-          style="padding: 10px 20px; font-size: 14px; margin-top: 10px; background: #ffcc00; color: #000;">Salvar
-          Recorde!</button>
+          style="padding: 10px 20px; font-size: 14px; margin-top: 10px; background: #ffcc00; color: #000;" data-i18n="saveScore">
+          Save Score!</button>
       </div>
 
       <div id="high-scores-container"
         style="margin: 20px 0; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; width: 300px; border: 1px solid rgba(255,255,255,0.2);">
-        <h2 style="color: #ffcc00; font-size: 14px; text-shadow: 1px 1px #000; margin-bottom: 15px;">🏆 OS MELHORES
-          RECORDES</h2>
+        <h2 style="color: #ffcc00; font-size: 14px; text-shadow: 1px 1px #000; margin-bottom: 15px;" data-i18n="topRecords">🏆 TOP SCORES</h2>
         <div id="high-scores-list" style="font-size: 16px; color: #fff; text-align: left; line-height: 1.6;">
           <!-- preenchido via JS -->
         </div>
       </div>
 
-      <button id="restart-btn" class="btn">Tentar Novamente</button>
+      <button id="restart-btn" class="btn" data-i18n="tryAgain">Try Again</button>
     </div>
 
     <div id="phase-transition" class="screen hidden">
-      <h1 class="phase-text">Fase <span id="next-phase">2</span>!</h1>
+      <h1 class="phase-text"><span data-i18n="phase">Phase</span> <span id="next-phase">2</span>!</h1>
       <div class="luna-dialog" style="margin-top: 20px;">
         <div class="bubble" id="phase-bubble" style="font-size:16px;">Vamos lá! A Luna está pronta!</div>
         <img id="phase-dog-img" src="./luna-icon.png" class="menu-dog-anim" style="width:120px;height:120px;" alt="Herói">

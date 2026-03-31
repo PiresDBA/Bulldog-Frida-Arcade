@@ -51,8 +51,153 @@ const UI = {
   highScoresList: document.getElementById('high-scores-list'),   // Lista dos Recordes salvos
   playerNameInput: document.getElementById('player-name'),       // Caixinha pra você digitar seu nome
   saveScoreBtn: document.getElementById('save-score-btn'),       // Botão pra salvar seu Recorde
-  recordInputContainer: document.getElementById('record-input-container') // Onde fica a caixinha do nome
+  recordInputContainer: document.getElementById('record-input-container'),
+  coinsDisplay: document.getElementById('coins')
 };
+
+// --- i18n (Internacionalização) ---
+const i18n = {
+  pt: {
+    score: "PONTOS", phase: "FASE", selectHero: "SELECIONE SEU HERÓI", ctrlShoot: "Atirar",
+    ctrlJump: "Pular", ctrlMove: "Mover", gameMode: "MODO DE JOGO", easy: "Fácil",
+    medium: "Médio", hard: "Difícil", startBtn: "Topa Começar? Vamos Nessa!",
+    victoryText: "Parabéns! Nós vencemos o chefão da fase com sucesso! Você é demais!",
+    continueBtn: "Continuar Aventura", continueQ: "CONTINUAR?", yes: "SIM", no: "NÃO",
+    continuesLeft: "Continues restantes", finalScore: "Score Final",
+    namePlaceholder: "Seu Nome (10 letras)", saveScore: "Salvar Recorde!",
+    topRecords: "🏆 OS MELHORES RECORDES", tryAgain: "Tentar Novamente",
+    introLuna: "Oi! Sou a Luna Salsicha! Aperte o botão da aventura para resgatarmos meus amiguinhos!",
+    introFrida: "Oi! Sou a Frida Gorducha! Aperte o botão da aventura para resgatarmos meus amiguinhos!",
+    introCinder: "Oi! Sou a Cinder Gatinha! Aperte o botão da aventura para resgatarmos meus amiguinhos!",
+    introBear: "Oi! Sou o Urso Fofo! Aperte o botão da aventura para resgatarmos meus amiguinhos!",
+    phaseReadyLuna: "Vamos lá! A Luna está pronta!",
+    phaseReadyFrida: "Vamos lá! A Frida está pronta!",
+    phaseReadyCinder: "Vamos lá! A Cinder está pronta!",
+    phaseReadyBear: "Vamos lá! O Urso está pronto!",
+    unlockMsg: "Desbloquear por {cost} moedas?",
+    notEnoughCoins: "Moedas insuficientes!",
+    locked: "🔒"
+  },
+  en: {
+    score: "SCORE", phase: "PHASE", selectHero: "SELECT HERO", ctrlShoot: "Shoot",
+    ctrlJump: "Jump", ctrlMove: "Move", gameMode: "GAME MODE", easy: "Easy",
+    medium: "Normal", hard: "Hard", startBtn: "Ready? Let's Go!",
+    victoryText: "Congratulations! We defeated the boss! You rock!",
+    continueBtn: "Continue Adventure", continueQ: "CONTINUE?", yes: "YES", no: "NO",
+    continuesLeft: "Continues left", finalScore: "Final Score",
+    namePlaceholder: "Your Name", saveScore: "Save Score!",
+    topRecords: "🏆 TOP SCORES", tryAgain: "Try Again",
+    introLuna: "Hi! I'm Luna Sausage! Press the adventure button to rescue my friends!",
+    introFrida: "Hi! I'm Chubby Frida! Press the adventure button to rescue my friends!",
+    introCinder: "Hi! I'm Cinder Kitty! Press the adventure button to rescue my friends!",
+    introBear: "Hi! I'm Fluffy Bear! Press the adventure button to rescue my friends!",
+    phaseReadyLuna: "Let's go! Luna is ready!",
+    phaseReadyFrida: "Let's go! Frida is ready!",
+    phaseReadyCinder: "Let's go! Cinder is ready!",
+    phaseReadyBear: "Let's go! Fluffy Bear is ready!",
+    unlockMsg: "Unlock for {cost} coins?",
+    notEnoughCoins: "Not enough coins!",
+    locked: "🔒"
+  },
+  es: {
+    score: "PUNTOS", phase: "FASE", selectHero: "ELIGE TU HÉROE", ctrlShoot: "Disparar",
+    ctrlJump: "Saltar", ctrlMove: "Mover", gameMode: "MODO DE JUEGO", easy: "Fácil",
+    medium: "Medio", hard: "Difícil", startBtn: "¿Empezamos? ¡Vamos!",
+    victoryText: "¡Felicidades! ¡Vencimos al jefe final con éxito! ¡Eres genial!",
+    continueBtn: "Continuar Aventura", continueQ: "¿CONTINUAR?", yes: "SÍ", no: "NO",
+    continuesLeft: "Continues restantes", finalScore: "Puntaje Final",
+    namePlaceholder: "Tu Nombre", saveScore: "¡Guardar!",
+    topRecords: "🏆 LOS MEJORES RÉCORDS", tryAgain: "Intentar de nuevo",
+    introLuna: "¡Hola! ¡Soy Luna Salchicha! ¡Presiona el botón de aventura para rescatar a mis amiguitos!",
+    introFrida: "¡Hola! ¡Soy Frida Gordita! ¡Presiona el botón de aventura para rescatar a mis amiguitos!",
+    introCinder: "¡Hola! ¡Soy Cinder Gatita! ¡Presiona el botón de aventura para rescatar a mis amiguitos!",
+    introBear: "¡Hola! ¡Soy el Oso Tierno! ¡Presiona el botón de aventura para rescatar a mis amiguitos!",
+    phaseReadyLuna: "¡Vamos! ¡Luna está lista!",
+    phaseReadyFrida: "¡Vamos! ¡Frida está lista!",
+    phaseReadyCinder: "¡Vamos! ¡Cinder está lista!",
+    phaseReadyBear: "¡Vamos! ¡El Oso está listo!",
+    unlockMsg: "¿Desbloquear por {cost} monedas?",
+    notEnoughCoins: "¡Monedas insuficientes!",
+    locked: "🔒"
+  }
+};
+
+let currentLang = localStorage.getItem('luna_arcade_lang') || navigator.language.substring(0, 2) || 'en';
+if (!i18n[currentLang]) currentLang = 'en';
+
+function translateUI() {
+  const dict = i18n[currentLang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key]) el.innerText = dict[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (dict[key]) el.placeholder = dict[key];
+  });
+  localStorage.setItem('luna_arcade_lang', currentLang);
+  updateHeroImages(player.kind); // re-translates hero bubbles
+}
+
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentLang = btn.getAttribute('data-lang');
+    translateUI();
+  });
+});
+
+// Executa a inicialização de UI
+window.addEventListener('DOMContentLoaded', () => {
+  translateUI();
+  updateCoinsDisplay();
+});
+
+// --- GLOBAL GAME ECONOMY ---
+let globalCoins = parseInt(localStorage.getItem('luna_arcade_coins') || '0');
+let unlockedHeroes = JSON.parse(localStorage.getItem('luna_arcade_unlocked') || '["luna", "frida"]');
+
+const HERO_PRICES = {
+  cinder: 1500,
+  bear: 3000
+};
+
+// Updates visual coin count
+function updateCoinsDisplay() {
+  if (UI.coinsDisplay) UI.coinsDisplay.innerText = globalCoins;
+  localStorage.setItem('luna_arcade_coins', globalCoins);
+}
+
+// --- ADS SDK PLACEHOLDERS ---
+function showRewardedAd(onRewardGranted) {
+  console.log("%c[ADS SDK] showRewardedAd() called", "color: #ff9900; font-weight: bold;");
+  // Pause game state
+  const prevGameState = gameState;
+  gameState = 'PAUSED_AD';
+  stopBGM();
+  
+  // Fake ad timer (simulate 3 seconds ad)
+  setTimeout(() => {
+    console.log("%c[ADS SDK] Reward Granted!", "color: #00ff00; font-weight: bold;");
+    if(onRewardGranted) onRewardGranted();
+    gameState = prevGameState;
+    startBGM();
+  }, 3000);
+}
+
+function showInterstitialAd(onAdClosed) {
+  console.log("%c[ADS SDK] showInterstitialAd() called", "color: #ff9900; font-weight: bold;");
+  const prevGameState = gameState;
+  gameState = 'PAUSED_AD';
+  stopBGM();
+  
+  // Fake ad timer
+  setTimeout(() => {
+    console.log("%c[ADS SDK] Interstitial Closed!", "color: #00ff00; font-weight: bold;");
+    if(onAdClosed) onAdClosed();
+    gameState = prevGameState;
+    startBGM();
+  }, 2000);
+}
 
 // --- IMAGE ASSETS ---
 const menuDogImg = new Image();
@@ -63,14 +208,16 @@ let continueInterval = null;
 
 // Avião removido conforme pedido do usuário!
 function showContinueScreen() {
-  if (game.continues <= 0) {
-    triggerGameOver();
-    return;
-  }
-  
   gameState = 'CONTINUE';
   UI.continueScreen.classList.remove('hidden');
-  UI.continuesLeftText.innerText = game.continues;
+  
+  if (game.continues > 0) {
+    UI.continuesLeftText.parentElement.innerHTML = `<span data-i18n="continuesLeft">Continues remaining</span>: <span id="continues-left">${game.continues}</span>`;
+  } else {
+    UI.continuesLeftText.parentElement.innerHTML = `<span style="color:#f1c40f; cursor:pointer;">🎥 Watch Ad to Continue!</span>`;
+  }
+  if (typeof translateUI === 'function') translateUI();
+  
   stopBGM();
   
   let count = 10;
@@ -88,13 +235,24 @@ function showContinueScreen() {
 
 function acceptContinue() {
   if (continueInterval) clearInterval(continueInterval);
-  game.continues--;
-  game.lives = 5;
   UI.continueScreen.classList.add('hidden');
-  resetPhase();
-  gameState = 'PLAYING';
-  startBGM();
-  saveGame();
+  
+  const finishContinue = () => {
+    game.lives = 5;
+    resetPhase();
+    gameState = 'PLAYING';
+    startBGM();
+    saveGame();
+  };
+
+  if (game.continues > 0) {
+    game.continues--;
+    finishContinue();
+  } else {
+    showRewardedAd(() => {
+      finishContinue();
+    });
+  }
 }
 
 function rejectContinue() {
@@ -108,11 +266,14 @@ function triggerGameOver() {
   UI.finalScore.innerText = game.score;
   UI.recordInputContainer.style.display = 'block'; // mostra pra digitar o nome
   renderHighScores();
-  setTimeout(() => {
-    UI.gameOverScreen.classList.remove('hidden');
-  }, 1000);
   stopBGM();
   saveGame();
+  
+  showInterstitialAd(() => {
+    setTimeout(() => {
+      UI.gameOverScreen.classList.remove('hidden');
+    }, 500);
+  });
 }
 
 function updateHighScores(newScore, playerName) {
@@ -179,16 +340,7 @@ function loadGame() {
   }
 }
 
-/**
- * ATUALIZAÇÃO DA TELA (updateUI):
- * Essa função serve para pegar os números das nossas gavetas (variáveis)
- * e escrever eles lá no nosso arquivo de texto (HTML) para o jogador ver.
- */
-function updateUI() {
-  if (UI.score) UI.score.innerText = Math.floor(game.score);
-  if (UI.phase) UI.phase.innerText = game.phase;
-  if (UI.lives) UI.lives.innerText = game.lives;
-}
+
 
 /**
  * SISTEMA DE ÁUDIO (Web Audio API):
@@ -715,7 +867,7 @@ let lastTime = 0;
 let gameState = 'START';
 let keys = {};
 
-const introText = "Oi! Sou a Luna Salsicha! Aperte o botão da aventura para resgatarmos meus amiguinhos!";
+let introText = "";
 const bubbleEl = document.getElementById('luna-speech-bubble');
 const ttsVoice = new Audio('https://translate.google.com/translate_tts?ie=UTF-8&q=Oi!+Eu+sou+a+Luna+Salsicha!+Bem+vindo+a+minha+aventura!+Vem+jogar+comigo!&tl=pt-BR&client=tw-ob');
 let introIndex = 0;
@@ -723,13 +875,25 @@ let voiced = false;
 
 function typeWriter() {
   if (gameState !== 'START') return;
+  
+  if (!introText) {
+    if (i18n && currentLang && i18n[currentLang]) {
+      const type = player.kind || 'luna';
+      let key = 'introLuna';
+      if(type==='frida') key='introFrida';
+      if(type==='cinder') key='introCinder';
+      if(type==='bear') key='introBear';
+      introText = i18n[currentLang][key] || "";
+    }
+  }
+
   if (!voiced) {
      ttsVoice.volume = 1.0;
      ttsVoice.play().catch(e => console.log("Audio block: ", e));
      voiced = true;
   }
-  if (introIndex < introText.length) {
-    if(bubbleEl) bubbleEl.innerHTML += introText.charAt(introIndex);
+  if (introText && introIndex < introText.length) {
+    if(bubbleEl) bubbleEl.innerHTML = introText.substring(0, introIndex + 1);
     introIndex++;
     setTimeout(typeWriter, 35);
   }
@@ -1073,8 +1237,6 @@ const heroNicknameMap = { luna: 'Luna Salsicha', frida: 'Frida Gorducha', cinder
 
 function updateHeroImages(kind) {
   const img = heroImageMap[kind] || heroImageMap.luna;
-  const name = heroNameMap[kind] || 'Luna';
-  const nickname = heroNicknameMap[kind] || 'Luna Salsicha';
   const menuImg = document.getElementById('menu-dog-img');
   const victoryImg = document.getElementById('victory-dog-img');
   const phaseImg = document.getElementById('phase-dog-img');
@@ -1082,20 +1244,65 @@ function updateHeroImages(kind) {
   if (victoryImg) victoryImg.src = img;
   if (phaseImg) phaseImg.src = img;
   menuDogImg.src = img;
-  // Texto do balão do menu
-  if (bubbleEl) {
-    bubbleEl.innerHTML = 'Oi! Sou ' + (kind === 'bear' ? 'o ' : 'a ') + nickname + '! Aperte o botão da aventura para resgatarmos meus amiguinhos!';
+  
+  if (i18n && currentLang && i18n[currentLang]) {
+    const dict = i18n[currentLang];
+    
+    // Updates UI Lock states
+    document.querySelectorAll('.hero-btn').forEach(btn => {
+      const val = btn.dataset.val;
+      if (!unlockedHeroes.includes(val)) {
+        btn.innerHTML = dict.locked + " " + (heroNameMap[val] || val);
+        btn.style.opacity = '0.7';
+      } else {
+        const icon = val==='luna'?'🌭':val==='frida'?'🐕':val==='cinder'?'🐱':'🐻';
+        btn.innerHTML = icon + " " + (heroNameMap[val] || val);
+        btn.style.opacity = '1';
+      }
+    });
+
+    let k = 'introLuna', p = 'phaseReadyLuna';
+    if(kind==='frida') { k='introFrida'; p='phaseReadyFrida'; }
+    if(kind==='cinder') { k='introCinder'; p='phaseReadyCinder'; }
+    if(kind==='bear') { k='introBear'; p='phaseReadyBear'; }
+    
+    introText = dict[k] || "";
+    introIndex = 0;
+    if(bubbleEl) bubbleEl.innerHTML = "";
+    if (gameState === 'START') typeWriter();
+
+    const phaseBubble = document.getElementById('phase-bubble');
+    if (phaseBubble) phaseBubble.textContent = dict[p] || "";
   }
-  // Texto da transição de fase
-  const phaseBubble = document.getElementById('phase-bubble');
-  if (phaseBubble) phaseBubble.textContent = 'Vamos lá! ' + (name === 'Urso' ? 'O Urso' : 'A ' + name) + ' está pronta!';
 }
 
 document.querySelectorAll('.hero-btn').forEach(btn => {
   btn.addEventListener('click', () => {
+    const val = btn.dataset.val;
+    const dict = i18n[currentLang];
+    
+    if (!unlockedHeroes.includes(val)) {
+      const cost = HERO_PRICES[val];
+      const msg = dict.unlockMsg.replace('{cost}', cost);
+      if (confirm(msg)) {
+        if (globalCoins >= cost) {
+          globalCoins -= cost;
+          updateCoinsDisplay();
+          unlockedHeroes.push(val);
+          localStorage.setItem('luna_arcade_unlocked', JSON.stringify(unlockedHeroes));
+        } else {
+          alert(dict.notEnoughCoins);
+          return;
+        }
+      } else {
+        return; // declined
+      }
+    }
+    
     document.querySelectorAll('.hero-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
-    updateHeroImages(btn.dataset.val);
+    player.kind = val;
+    updateHeroImages(val);
   });
 });
 
@@ -1509,7 +1716,7 @@ function update(dt) {
          b.animTimer = 0;
          soundHappy();             // Som de cachorro feliz
          createExplosion(b.x, b.y - 30, '#ffb6c1', 20); // Coraçõezinhos!
-         game.score += 20;         // Você ganha pontos por alimentar ele
+         game.score += 20; globalCoins += 20; updateCoinsDisplay(); // Você ganha moedas por alimentar ele
          updateUI();
       }
     } 
@@ -1541,7 +1748,7 @@ function update(dt) {
           b.animTimer = 0;
           soundHappy();
           createExplosion(b.x, b.y - 30, '#ffb6c1', 20);
-          game.score += 20;
+          game.score += 20; globalCoins += 20; updateCoinsDisplay();
           player.vy = player.jumpPower * 0.8; // Quica
           updateUI();
         } else {
@@ -1638,7 +1845,7 @@ function update(dt) {
       if (boss.hp <= 0 && !boss.dead) {
          boss.dead = true;
          stopBgNoise();
-         game.score += 500;
+         game.score += 500; globalCoins += 500; updateCoinsDisplay();
          updateUI();
          
          // PAUSE AND SHOW VICTORY OVERLAY WITH EXPLOSIONS!
@@ -1705,7 +1912,7 @@ function update(dt) {
         if (Math.abs(bullets[i].x - bombs[k].x) < 35 && Math.abs(bullets[i].y - bombs[k].y) < 35) {
           soundTink();
           createStarsExplosion(bombs[k].x, bombs[k].y, 25);
-          game.score += 15;
+          game.score += 15; globalCoins += 15; updateCoinsDisplay();
           updateUI();
           bombs.splice(k, 1);
           hit = true;
@@ -1750,7 +1957,7 @@ function update(dt) {
         soundFreeAnimal();
         savedAnimals.push({ x: enemies[j].x, y: enemies[j].y + 10, type: enemies[j].type, vy: -50 });
         enemies.splice(j, 1);
-        game.score += 50;
+        game.score += 50; globalCoins += 50; updateCoinsDisplay();
         updateUI();
         hit = true;
         break;
@@ -1762,7 +1969,7 @@ function update(dt) {
         if (Math.abs(upBullets[i].x - bombs[k].x) < 35 && Math.abs(upBullets[i].y - bombs[k].y) < 35) {
           soundTink();
           createStarsExplosion(bombs[k].x, bombs[k].y, 25);
-          game.score += 15;
+          game.score += 15; globalCoins += 15; updateCoinsDisplay();
           updateUI();
           bombs.splice(k, 1);
           hit = true;
