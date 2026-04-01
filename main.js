@@ -2280,13 +2280,13 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   ctx.beginPath();
   if (isIris) {
     // UNICORN HORSE BODY
-    // Corpo mais curto e alto que um cachorro
-    ctx.roundRect(-width/2, -height - 10, width, height, 10);
+    // Corpo mais curto, alto e arredondado para visual mais feminino
+    ctx.roundRect(-width/2, -height - 10, width, height, 15);
     ctx.fill();
     
     // PESCOÇO (Neck) - Na Direita
     ctx.beginPath();
-    ctx.roundRect(width/2 - 15, -height - 40, 20, 40, 10);
+    ctx.roundRect(width/2 - 12, -height - 35, 18, 35, 10);
     ctx.fill();
   } else {
     ctx.roundRect(-width/2, -height - 10, width, height, height/2);
@@ -2316,9 +2316,13 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
         ctx.fillStyle = colors[i];
         ctx.beginPath(); ctx.ellipse(-5 - i*2, 5 + i*2, 10, 5, 0.5, 0, Math.PI*2); ctx.fill();
     }
-    // Horn
+    // Horn - Inclinado para frente (Mais místico)
     ctx.fillStyle = '#fffabb';
-    ctx.beginPath(); ctx.moveTo(15, -15); ctx.lineTo(10, -45); ctx.lineTo(25, -15); ctx.fill();
+    ctx.save();
+    ctx.translate(18, -15);
+    ctx.rotate(0.3); // Leve inclinação para frente
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-5, -30); ctx.lineTo(10, 0); ctx.fill();
+    ctx.restore();
     ctx.restore();
   }
 
@@ -2330,7 +2334,7 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   ctx.beginPath();
   if (isIris) {
     // CABEÇA Unicórnio (no topo do pescoço)
-    ctx.roundRect(width/2 - 5, -height - 50, 35, 25, 12);
+    ctx.roundRect(width/2 - 8, -height - 45, 32, 22, 10);
   } else {
     ctx.roundRect(width/2 - 10, -height - 30, 30, 25, 12);
   }
@@ -2369,7 +2373,7 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   // Focinho
   ctx.fillStyle = headGrad;
   ctx.beginPath();
-  if (isIris) ctx.roundRect(width/2 + 20, -height - 45, 20, 15, 8);
+  if (isIris) ctx.roundRect(width/2 + 15, -height - 40, 18, 12, 6);
   else ctx.roundRect(width/2 + 10, -height - 20, 25, 15, 8);
   ctx.fill();
   
@@ -2412,7 +2416,7 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   // Orelhas animadas
   ctx.save();
   if (isIris) {
-    ctx.translate(width/2 + 10, -height - 50);
+    ctx.translate(width/2 + 5, -height - 45); // Orelhas menores para cavalo
   } else {
     ctx.translate(width/2, -height - 25);
   }
@@ -2424,14 +2428,21 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   
   ctx.fillStyle = earColor;
   ctx.beginPath();
-  if (isIris) { ctx.ellipse(0, 0, 6, 12, 0, 0, Math.PI*2); }
+  if (isIris) { 
+      // Pequenos triângulos místico/feminino
+      ctx.moveTo(-4, 0); ctx.lineTo(4, 0); ctx.lineTo(0, -10); 
+  }
   else { ctx.ellipse(-2, 12, 6, 15, 0, 0, Math.PI*2); } // Luna
   ctx.fill();
   ctx.restore();
 
   // Rabo animado
   ctx.save();
-  ctx.translate(-width/2 + 5, -height - 5);
+  if (isIris) {
+      ctx.translate(-width/2 + 5, -height - 15); // Cauda mais alta, sem arrastar
+  } else {
+      ctx.translate(-width/2 + 5, -height - 5);
+  }
   ctx.rotate(Math.sin(timer * 15) * 0.3 - 0.5);
   ctx.fillStyle = bodyGrad;
   ctx.beginPath();
@@ -2440,7 +2451,7 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
       const rColors = ['#f00', '#f90', '#ff0', '#0f0', '#0ff', '#00f', '#90f'];
       for(let i=0; i<7; i++) {
           ctx.fillStyle = rColors[i];
-          ctx.beginPath(); ctx.ellipse(-15 - i*2, 10 + i*2, 15, 5, 0.5, 0, Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.ellipse(-12 - i*2, -5 + i*2, 12, 4, 0.5, 0, Math.PI*2); ctx.fill();
       }
   } else { // Luna
       ctx.roundRect(-20, -5, 25, 8, 4);
@@ -3384,8 +3395,8 @@ function render() {
     ctx.stroke();
   }
 
-  // Draw Boss Fears Animados
-  if (boss && boss.active) {
+  // 4. DRAW BOSS
+  if (typeof boss !== 'undefined' && boss && boss.active) {
     ctx.save();
     ctx.translate(boss.x, boss.y);
     
@@ -3627,7 +3638,11 @@ function render() {
     if (player.kind === 'luna') {
       drawAnimatedAnimal(ctx, player.x, player.y, player.width, player.height, player.animTimer, player.isJumping, player.isFalling, 'luna');
     } else if (player.kind === 'iris') {
-       drawAnimatedAnimal(ctx, player.x, player.y, player.width, player.height, player.animTimer, player.isJumping, player.isFalling, 'iris');
+       // ESCALA 80% para a Íris como pedido
+       ctx.save();
+       ctx.scale(0.8, 0.8);
+       drawAnimatedAnimal(ctx, player.x / 0.8, player.y / 0.8, player.width, player.height, player.animTimer, player.isJumping, player.isFalling, 'iris');
+       ctx.restore();
     } else {
       // Others face LEFT by default, MUST FLIP for player.
       ctx.save();

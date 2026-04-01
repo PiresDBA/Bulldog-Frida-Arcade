@@ -402,6 +402,19 @@ p {
     height: 110px;
     font-size: 16px;
   }
+
+  /* HUD MOBILE OPTIMIZATION */
+  .hud {
+    top: 5px;
+    padding: 0 10px;
+  }
+  .hud div {
+    font-size: 12px !important;
+  }
+  .hud span {
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
 }
 
 /* Layout landscape para celular */
