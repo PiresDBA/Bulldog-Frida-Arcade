@@ -2249,14 +2249,14 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   if (type === 'luna') {
     bodyColor1 = '#B2663E'; bodyColor2 = '#5C2E0A'; earColor = '#5C2E0A';
   } else if (isIris) {
-    bodyColor1 = '#ffccff'; bodyColor2 = '#ff99ff'; earColor = '#ff66ff';
+    bodyColor1 = '#fff0f5'; bodyColor2 = '#ffccff'; earColor = '#ff66ff';
   } else {
     bodyColor1 = '#ffccff'; bodyColor2 = '#ff99ff'; earColor = '#ff66ff';
   }
 
   // Se for Íris, reduzimos levemente o tamanho do corpo para elegância
-  const bW = isIris ? width - 5 : width;
-  const bH = isIris ? height - 5 : height;
+  const bW = isIris ? width : width;
+  const bH = isIris ? height : height;
 
   const drawY = y + 20; 
   ctx.save();
@@ -2270,7 +2270,7 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   if (isFalling) ctx.rotate(player.rotation || 0);
   else if (isJumping) ctx.rotate(-Math.PI / 12);
   
-  ctx.shadowColor = 'rgba(0,0,0,0.6)';
+  ctx.shadowColor = 'rgba(0,0,0,0.4)';
   ctx.shadowBlur = 10;
   ctx.shadowOffsetY = 8;
   
@@ -2281,66 +2281,72 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   ctx.fillStyle = bodyGrad;
   ctx.beginPath();
   if (isIris) {
-    // CORPO Unicórnio (Menor e Arredondado)
-    ctx.roundRect(-bW/2, -bH - 10, bW, bH, 15);
+    // CORPO Unicórnio (Fofinho e Redondo)
+    ctx.roundRect(-bW/2, -bH - 10, bW, bH, 20);
     ctx.fill();
     
-    // CRINA COMO PESCOÇO (MUITO MAIS CURTO - v1.8)
-    const mColors = ['#f00', '#f90', '#ff0', '#0f0']; // Apenas 4 bolinhas
+    // CRINA VOLUMOSA (Esconde o pescoço - v1.9)
+    const mColors = ['#ff007f', '#ff00ff', '#8a2be2', '#4b0082', '#ff1493']; 
     ctx.save();
-    ctx.translate(bW/2 - 20, -bH - 10); 
-    for(let i=0; i<mColors.length; i++) {
-        ctx.fillStyle = mColors[i];
+    ctx.translate(bW/2 - 15, -bH - 5); 
+    for(let i=0; i<6; i++) {
+        ctx.fillStyle = mColors[i % mColors.length];
         ctx.beginPath();
-        // i*2.5 (indo para a direita/frente), i*(-4) (subindo pouco)
-        ctx.arc(i*3.5, -i*5, 12, 0, Math.PI*2);
+        // Círculos grandes que dão volume atrás da cabeça
+        ctx.arc(-i*4, -i*2, 18, 0, Math.PI*2);
         ctx.fill();
     }
-    
-    // REDESENHANDO A CABEÇA (Formato Cavalo/Triangular)
     ctx.restore();
+    
+    // CABEÇA KAWAII (Redonda e Grande)
     ctx.save();
-    ctx.translate(bW/2 - 10, -bH - 35); // Posição colada no pescoço curto
+    ctx.translate(bW/2 + 5, -bH - 25);
     
     ctx.fillStyle = bodyGrad;
     ctx.beginPath();
-    // Crânio alongado
-    ctx.moveTo(0, 0);
-    ctx.lineTo(45, 10);  // Focinho ponto 1
-    ctx.lineTo(45, 30);  // Focinho ponto 2
-    ctx.lineTo(0, 30);   // Base da cabeça
-    ctx.closePath();
+    ctx.ellipse(0, 0, 28, 25, 0, 0, Math.PI*2); // Elipse fofa
     ctx.fill();
 
-    // CHIFRE NA TESTA (Mais para a frente)
+    // FOCINHO MINÚSCULO
+    ctx.beginPath();
+    ctx.ellipse(15, 8, 15, 12, 0, 0, Math.PI*2);
+    ctx.fill();
+    
+    // CHIFRE NA TESTA (Inclinado)
     const hornGrad = ctx.createLinearGradient(0, -35, 0, 0);
-    hornGrad.addColorStop(0, '#f00'); hornGrad.addColorStop(0.5, '#ffff00'); hornGrad.addColorStop(1, '#00ffff');
+    hornGrad.addColorStop(0, '#ffd700'); hornGrad.addColorStop(0.5, '#ffea00'); hornGrad.addColorStop(1, '#fffacd');
     ctx.fillStyle = hornGrad;
     ctx.beginPath();
-    ctx.moveTo(10, 5); 
-    ctx.lineTo(15, -35); // Ponta do chifre
-    ctx.lineTo(25, 8);
+    ctx.moveTo(-5, -15); 
+    ctx.lineTo(5, -50); // Ponta do chifre
+    ctx.lineTo(15, -10);
     ctx.fill();
 
-    // OLHO
-    ctx.fillStyle = Math.sin(timer * 4) > 0.96 ? '#000' : '#fff';
-    ctx.beginPath();
-    if (Math.sin(timer * 4) > 0.96) ctx.fillRect(15, 12, 8, 2);
-    else {
-        ctx.ellipse(18, 14, 5, 7, 0, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(20, 12, 3, 0, Math.PI*2); ctx.fill();
+    // OLHO GIGANTE (Kawai/Anime)
+    let blink = Math.sin(timer * 4) > 0.96;
+    if (blink) {
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(10, 5, 20, 0); ctx.stroke();
+    } else {
+        // Globo ocular
+        ctx.fillStyle = '#000';
+        ctx.beginPath(); ctx.ellipse(10, -2, 10, 14, 0, 0, Math.PI*2); ctx.fill();
+        // Brilhos (Highlights) - ESSENCIAL PARA O STYLE
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.arc(14, -8, 4.5, 0, Math.PI*2); ctx.fill(); // Brilho maior
+        ctx.beginPath(); ctx.arc(6, 4, 2, 0, Math.PI*2); ctx.fill(); // Brilho menor embaixo
     }
 
-    // NARIZ
-    ctx.fillStyle = '#000';
-    ctx.beginPath(); ctx.arc(40, 22, 3, 0, Math.PI*2); ctx.fill();
+    // NARIZINHO
+    ctx.fillStyle = '#ff99aa';
+    ctx.beginPath(); ctx.arc(22, 10, 2, 0, Math.PI*2); ctx.fill();
 
     // ORELHA
     ctx.save();
-    ctx.translate(10, 5);
-    ctx.rotate(-Math.PI/8 + Math.sin(timer * 20) * 0.4);
-    ctx.fillStyle = earColor;
-    ctx.beginPath(); ctx.moveTo(-4,0); ctx.lineTo(4,0); ctx.lineTo(0,-18); ctx.fill();
+    ctx.translate(-10, -15);
+    ctx.rotate(-0.3 + Math.sin(timer * 20) * 0.1);
+    ctx.fillStyle = bodyColor1;
+    ctx.beginPath(); ctx.moveTo(-6,0); ctx.lineTo(6,0); ctx.lineTo(0,-18); ctx.fill();
     ctx.restore();
 
     ctx.restore();
@@ -2398,20 +2404,20 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     ctx.restore();
   }
 
-  // RABO (In Íris, positioned HIGHER up the back)
+  // RABO (Kawaii Rainbow)
   ctx.save();
   if (isIris) {
-      ctx.translate(-bW/2 + 5, -bH - 5); // Subiu para o topo do traseiro
+      ctx.translate(-bW/2 + 5, -bH - 5); 
   } else {
       ctx.translate(-width/2 + 5, -height - 5);
   }
   ctx.rotate(Math.sin(timer * 15) * 0.3 - 0.5);
   
   if (isIris) {
-      const rColors = ['#f00', '#f90', '#ff0', '#0f0', '#0ff', '#00f', '#90f'];
+      const rColors = ['#ff0000', '#ffa500', '#ffff00', '#008000', '#0000ff', '#4b0082', '#ee82ee'];
       for(let i=0; i<7; i++) {
           ctx.fillStyle = rColors[i];
-          ctx.beginPath(); ctx.ellipse(-12 - i*2, -2 + i*2, 12, 4, 0.5, 0, Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.ellipse(-12 - i*2, -2 + i*2, 14, 6, 0.5, 0, Math.PI*2); ctx.fill();
       }
   } else {
       ctx.fillStyle = bodyGrad;
@@ -3630,7 +3636,8 @@ function render() {
     // Tanquezinho (Canhão) nas costas de todos exceto Luna
     if (player.kind !== 'luna') {
       ctx.save();
-      ctx.translate(player.x - 5, player.y + 20 - player.height - 18);
+      // Ajustado: x - 15 (mais para trás) e y - 8 (colado no corpo)
+      ctx.translate(player.x - 15, player.y + 20 - player.height - 8);
       ctx.fillStyle = '#00bfff'; ctx.beginPath(); ctx.roundRect(-12, -12, 24, 18, 6); ctx.fill();
       ctx.fillStyle = '#ccffff'; ctx.beginPath(); ctx.roundRect(-6, -8, 12, 10, 3); ctx.fill();
       ctx.fillStyle = '#ff1493'; ctx.beginPath(); ctx.roundRect(-5, -16, 10, 5, 2); ctx.fill();
