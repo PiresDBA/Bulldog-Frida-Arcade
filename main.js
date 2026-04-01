@@ -3455,9 +3455,7 @@ function render() {
   }
 
   for(let b of bulldogs) {
-    if (b.kind === 'frida') drawBulldog(ctx, b.x, b.y, b.width, b.height, b.animTimer, b.state);
-    else if (b.kind === 'cinder') drawCat(ctx, b.x, b.y, b.width, b.height, b.animTimer, b.state);
-    else if (b.kind === 'luna') {
+    if (b.kind === 'luna') {
       // Placa de nome LUNA (só quando andando)
       if (b.state !== 'eating') {
         ctx.save();
@@ -3525,8 +3523,15 @@ function render() {
         drawAnimatedAnimal(ctx, b.x, b.y, b.width, b.height || 30, b.animTimer, false, false, 'luna');
       }
       ctx.restore();
+    } else {
+      // TODOS os outros agora usam drawAnimatedAnimal para garantir que Íris e Barbie apareçam!
+      ctx.save();
+      ctx.translate(b.x, 0);
+      ctx.scale(-1, 1);
+      ctx.translate(-b.x, 0);
+      drawAnimatedAnimal(ctx, b.x, b.y, b.width, b.height, b.animTimer, false, false, b.kind);
+      ctx.restore();
     }
-    else drawBear(ctx, b.x, b.y, b.kind, b.animTimer, b.state);
   }
 
   for(let e of enemies) {
@@ -3649,15 +3654,12 @@ function render() {
   ctx.globalAlpha = 1;
 
   if (player.x > -50) {
-    // drawHero: Desenha o herói selecionado virado pra frente, com tanquezinho e efeitos
     ctx.save();
     
-    // Invencibilidade = pisca
     if (player.invincible) {
       ctx.globalAlpha = (Math.floor(Date.now() / 150) % 2 === 0) ? 0.3 : 0.8;
     }
     
-    // Escala de queda no buraco
     if (player.isFalling) {
       ctx.translate(player.x, player.y + 20);
       ctx.scale(player.scale || 1, player.scale || 1);
@@ -3665,27 +3667,21 @@ function render() {
       ctx.translate(-player.x, -(player.y + 20));
     }
     
+    // Todos os heróis usam drawAnimatedAnimal para garantir visibilidade (Íris, Barbie, etc)
+    // Luna olha naturalmente pra direita, os outros espelhamos
     if (player.kind === 'luna') {
-      // Luna já olha pra direita naturalmente
       drawAnimatedAnimal(ctx, player.x, player.y, player.width, player.height, player.animTimer, player.isJumping, player.isFalling, 'luna');
     } else {
-      // Espelha horizontalmente (os sprites de inimigos olham pra esquerda)
+      ctx.save();
       ctx.translate(player.x, 0);
       ctx.scale(-1, 1);
       ctx.translate(-player.x, 0);
-      
-      let st = player.isJumping ? 'jumping_to_eat' : 'idle';
-      if (player.kind === 'cinder') {
-        drawCat(ctx, player.x, player.y, player.width, player.height, player.animTimer, st, true);
-      } else if (player.kind === 'frida') {
-        drawBulldog(ctx, player.x, player.y, player.width, player.height, player.animTimer, st, true);
-      } else if (player.kind === 'bear') {
-        drawBear(ctx, player.x, player.y, 'brown_bear', player.animTimer, st, true);
-      }
+      drawAnimatedAnimal(ctx, player.x, player.y, player.width, player.height, player.animTimer, player.isJumping, player.isFalling, player.kind);
+      ctx.restore();
     }
-    ctx.restore();
     
-    // Tanquezinho nas costas de TODOS os heróis (sempre virado pra direita)
+    // Tanquezinho (Canhão) nas costas de todos exceto Luna
+    // Tanquezinho (Canhão) nas costas de todos exceto Luna
     if (player.kind !== 'luna') {
       ctx.save();
       ctx.translate(player.x - 5, player.y + 20 - player.height - 18);
@@ -3694,28 +3690,21 @@ function render() {
       ctx.fillStyle = '#ff1493'; ctx.beginPath(); ctx.roundRect(-5, -16, 10, 5, 2); ctx.fill();
       ctx.fillStyle = '#aaa'; 
       ctx.beginPath(); ctx.moveTo(12, -4); ctx.lineTo(20, -2); ctx.lineTo(20, 2); ctx.lineTo(12, 4); ctx.fill();
-      ctx.strokeStyle = '#fff'; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.moveTo(-6, 6); ctx.lineTo(-6, 18); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(6, 6); ctx.lineTo(6, 18); ctx.stroke();
       ctx.restore();
     }
     
-    // Power-up Timer Clock
+    // Timer de Power-up
     if (player.tripleShotTimer > 0 || player.doubleShotTimer > 0) {
       let remaining = player.tripleShotTimer > 0 ? player.tripleShotTimer : player.doubleShotTimer;
       let secs = Math.ceil(remaining / 1000);
-      
-      ctx.fillStyle = '#fff';
-      if (secs <= 2 && Math.floor(Date.now() / 150) % 2 === 0) {
-         ctx.fillStyle = '#f00'; // Pisca vermelho quando vai acabar
-      }
+      ctx.fillStyle = (secs <= 2 && Math.floor(Date.now() / 150) % 2 === 0) ? '#f00' : '#fff';
       ctx.font = 'bold 20px Arial';
       ctx.textAlign = 'center';
-      
-      // Ícone baseado no poder
       let icon = player.tripleShotTimer > 0 ? '🚁 ' : '🛸 ';
       ctx.fillText(icon + secs + 's', player.x, player.y - player.height - 30);
     }
+    
+    ctx.restore();
   }
 
   // Desfaz o tilt da camera
