@@ -2240,13 +2240,12 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   if (player.dead) return; 
   
   let bodyColor1, bodyColor2, earColor;
-  let isIris = false;
+  let isIris = (type === 'iris');
   
   if (type === 'luna') {
     bodyColor1 = '#B2663E'; bodyColor2 = '#5C2E0A'; earColor = '#5C2E0A';
-  } else if (type === 'iris') {
+  } else if (isIris) {
     bodyColor1 = '#ffccff'; bodyColor2 = '#ff99ff'; earColor = '#ff66ff';
-    isIris = true;
   } else {
     bodyColor1 = '#ffccff'; bodyColor2 = '#ff99ff'; earColor = '#ff66ff';
   }
@@ -2279,33 +2278,39 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     ctx.fill();
     
     // CRINA COMO PESCOÇO (Mane as Neck)
-    const colors = ['#f00', '#f90', '#ff0', '#0f0', '#0ff', '#00f', '#90f'];
+    const mColors = ['#f00', '#f90', '#ff0', '#0f0', '#0ff', '#00f', '#90f'];
     ctx.save();
-    ctx.translate(width/2 - 10, -height - 5);
-    for(let i=0; i<colors.length; i++) {
-        ctx.fillStyle = colors[i];
+    ctx.translate(width/2 - 5, -height - 15); 
+    for(let i=0; i<mColors.length; i++) {
+        ctx.fillStyle = mColors[i];
         ctx.beginPath();
-        // Círculos em cascata para formar o pescoço místico
-        ctx.arc(-i*2, -i*6, 12, 0, Math.PI*2);
+        // Círculos em cascata. O topo será coberto pela cabeça.
+        ctx.arc(-i*1, -i*5, 12, 0, Math.PI*2);
         ctx.fill();
     }
-    // Horn (Chifre) no topo
-    ctx.fillStyle = '#fffabb';
+    
+    // CHIFRE ARCO-ÍRIS (Rainbow Horn)
+    const hornGrad = ctx.createLinearGradient(0, -35, 0, 0);
+    hornGrad.addColorStop(0, '#f00');
+    hornGrad.addColorStop(0.5, '#ffff00');
+    hornGrad.addColorStop(1, '#00ffff');
+    ctx.fillStyle = hornGrad;
     ctx.save();
-    ctx.translate(-5, -55);
-    ctx.rotate(0.4);
+    ctx.translate(0, -55);
+    ctx.rotate(0.35);
     ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-6, -35); ctx.lineTo(10, 0); ctx.fill();
     ctx.restore();
     ctx.restore();
 
   } else {
+    // CORPO NORMAL (Luna/Outros)
     ctx.roundRect(-width/2, -height - 10, width, height, height/2);
     ctx.fill();
   }
 
   ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
 
-  // Roupas
+  // Outfit/Roupas
   if (player.outfit === 'suit' && player.kind === type) {
     ctx.fillStyle = '#000';
     ctx.beginPath(); ctx.moveTo(-width/2, -height - 5); ctx.lineTo(0, -5); ctx.lineTo(width/2, -height - 5);
@@ -2323,74 +2328,98 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   ctx.fillStyle = headGrad;
   ctx.beginPath();
   if (isIris) {
-    // CABEÇA Unicórnio (no topo da crina-pescoço)
-    ctx.roundRect(width/2 - 15, -height - 65, 35, 25, 12);
+    // CABEÇA Unicórnio (No topo, cobrindo o rastro da crina)
+    ctx.roundRect(width/2 - 12, -height - 70, 35, 25, 12);
   } else {
     ctx.roundRect(width/2 - 10, -height - 30, 30, 25, 12);
   }
   ctx.fill();
 
-  // Focinho
+  // FOCINHO (Snout)
   ctx.fillStyle = headGrad;
   ctx.beginPath();
-  if (isIris) ctx.roundRect(width/2 + 5, -height - 55, 20, 15, 8);
-  else ctx.roundRect(width/2 + 10, -height - 20, 25, 15, 8);
+  if (isIris) {
+      // Cavalo Snout (Mais reto/triangular)
+      ctx.moveTo(width/2 + 8, -height - 60);
+      ctx.lineTo(width/2 + 25, -height - 58);
+      ctx.lineTo(width/2 + 25, -height - 45);
+      ctx.lineTo(width/2 + 8, -height - 42);
+  } else {
+      ctx.roundRect(width/2 + 10, -height - 20, 25, 15, 8);
+  }
   ctx.fill();
   
-  // Nariz
+  // NARIZ
   ctx.fillStyle = '#000';
   ctx.beginPath();
-  if (isIris) ctx.arc(width/2 + 23, -height - 48, 4, 0, Math.PI*2);
+  if (isIris) ctx.arc(width/2 + 22, -height - 52, 4, 0, Math.PI*2);
   else ctx.arc(width/2 + 33, -height - 14, 4, 0, Math.PI*2);
   ctx.fill();
 
-  // Olhos
-  let eyeX = isIris ? width/2 : width/2 + 12;
-  let eyeY = isIris ? -height - 55 : -height - 22;
+  // OLHOS E PISCADA (Animation Restored)
+  let eyeX = isIris ? width/2 + 2 : width/2 + 12;
+  let eyeY = isIris? -height - 60 : -height - 22;
 
-  ctx.fillStyle = '#fff';
-  ctx.beginPath();
-  ctx.ellipse(eyeX, eyeY, 5, 8, 0, 0, Math.PI*2);
-  ctx.fill();
-  ctx.fillStyle = '#000';
-  ctx.beginPath();
-  ctx.arc(eyeX + 2, eyeY - 2, 3.5, 0, Math.PI*2);
-  ctx.fill();
+  if (Math.sin(timer * 4) > 0.96) {
+     // Blinking
+     ctx.fillStyle = '#000'; 
+     ctx.fillRect(eyeX - 4, eyeY - 1, 8, 2);
+  } else {
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.ellipse(eyeX, eyeY, 5, 8, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(eyeX + 2, eyeY - 2, 3.5, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(eyeX + 3, eyeY - 3, 1.5, 0, Math.PI*2); ctx.fill();
+  }
 
-  // Orelhas
+  // ORELHAS (Animation Restored)
   ctx.save();
   if (isIris) {
-    // Atrás do olho (mais para a esquerda)
     ctx.translate(eyeX - 8, eyeY - 8);
-    ctx.rotate(-0.2);
-    ctx.fillStyle = earColor;
-    ctx.beginPath(); ctx.moveTo(-5, 0); ctx.lineTo(5, 0); ctx.lineTo(0, -12); ctx.fill();
   } else {
     ctx.translate(width/2, -height - 25);
-    ctx.rotate(-Math.PI/8 + Math.sin(timer * 20) * 0.4);
-    ctx.fillStyle = earColor;
-    ctx.beginPath(); ctx.ellipse(-2, 12, 6, 15, 0, 0, Math.PI*2); ctx.fill();
   }
+  
+  let earFlap = 0;
+  if (isFalling) earFlap = -Math.PI/2 + Math.sin(timer * 30) * 0.3;
+  else if (isJumping) earFlap = -Math.PI/3 + Math.sin(timer * 40) * 0.6; 
+  else earFlap = -Math.PI/8 + Math.sin(timer * 20) * 0.4;
+  ctx.rotate(earFlap);
+  
+  ctx.fillStyle = earColor;
+  ctx.beginPath();
+  if (isIris) { 
+      // Cavalo/Unicórnio Delicado
+      ctx.moveTo(-4, 0); ctx.lineTo(4, 0); ctx.lineTo(0, -12); 
+  } else {
+      ctx.ellipse(-2, 12, 6, 15, 0, 0, Math.PI*2);
+  }
+  ctx.fill();
   ctx.restore();
 
-  // Rabo
+  // RABO (Animation & Connection Fixed)
   ctx.save();
   if (isIris) {
-      ctx.translate(-width/2 + 5, -height - 15);
+      ctx.translate(-width/2 + 2, -height - 12); // Puxado para colar no corpo
+  } else {
+      ctx.translate(-width/2 + 5, -height - 5);
+  }
+  ctx.rotate(Math.sin(timer * 15) * 0.3 - 0.5);
+  
+  if (isIris) {
       const rColors = ['#f00', '#f90', '#ff0', '#0f0', '#0ff', '#00f', '#90f'];
       for(let i=0; i<7; i++) {
           ctx.fillStyle = rColors[i];
-          ctx.beginPath(); ctx.ellipse(-12 - i*2, -5 + i*2, 12, 4, 0.5, 0, Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.ellipse(-12 - i*2, -2 + i*2, 12, 4, 0.5, 0, Math.PI*2); ctx.fill();
       }
   } else {
-      ctx.translate(-width/2 + 5, -height - 5);
-      ctx.rotate(Math.sin(timer * 15) * 0.3 - 0.5);
       ctx.fillStyle = bodyGrad;
       ctx.beginPath(); ctx.roundRect(-20, -5, 25, 8, 4); ctx.fill();
   }
   ctx.restore();
 
-  // Patas
+  // PATAS (Geral)
   ctx.fillStyle = earColor;
   const swing = isJumping || isFalling ? 0 : Math.sin(timer * 20) * 10;
   const pHeight = isIris ? 30 : 15;

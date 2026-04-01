@@ -1,26 +1,25 @@
-const CACHE_NAME = 'frida-arcade-v1.2';
+const CACHE_NAME = 'frida-arcade-v1.5';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/main.js',
-  '/style.css',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
-  '/luna-menu-transparent.png',
-  '/luna-icon.png',
-  '/frida-game.png',
-  '/Cinder-game.png',
-  '/unicorn-game.png',
-  '/barbie-game.png',
-  '/urso-sem-fundo.png',
-  '/luna-latindo.mp3',
-  '/bgm.mp3',
-  '/cartoon_bgm.mp3',
-  '/bear1.mp3',
-  '/bear2.mp3',
-  '/bear3.mp3',
-  '/crow.mp3'
+  './',
+  'index.html',
+  'main.js',
+  'style.css',
+  'manifest.json',
+  'frida-icon.png',
+  'luna-menu-transparent.png',
+  'luna-icon.png',
+  'frida-game.png',
+  'Cinder-game.png',
+  'unicorn-game.png',
+  'barbie-game.png',
+  'urso-sem-fundo.png',
+  'luna-latindo.mp3',
+  'bgm.mp3',
+  'cartoon_bgm.mp3',
+  'bear1.mp3',
+  'bear2.mp3',
+  'bear3.mp3',
+  'crow.mp3'
 ];
 
 self.addEventListener('install', event => {
