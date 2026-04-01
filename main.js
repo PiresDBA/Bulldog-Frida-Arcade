@@ -2273,37 +2273,37 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   ctx.fillStyle = bodyGrad;
   ctx.beginPath();
   if (isIris) {
-    // CORPO Unicórnio (Arredondado e Feminino)
+    // CORPO Unicórnio (Arredondado - Horse Shape)
     ctx.roundRect(-width/2, -height - 10, width, height, 15);
     ctx.fill();
     
-    // CRINA COMO PESCOÇO (Mane as Neck)
+    // CRINA COMO PESCOÇO (Inverted Slant for Horse Posture)
     const mColors = ['#f00', '#f90', '#ff0', '#0f0', '#0ff', '#00f', '#90f'];
     ctx.save();
-    ctx.translate(width/2 - 5, -height - 15); 
+    // Começa mais para a esquerda/trás e sobe para a direita/frente
+    ctx.translate(width/2 - 25, -height - 15); 
     for(let i=0; i<mColors.length; i++) {
         ctx.fillStyle = mColors[i];
         ctx.beginPath();
-        // Círculos em cascata. O topo será coberto pela cabeça.
-        ctx.arc(-i*1, -i*5, 12, 0, Math.PI*2);
+        // i*2.2 (indo para a direita), -i*6 (indo para cima)
+        ctx.arc(i*2.2, -i*6, 12, 0, Math.PI*2);
         ctx.fill();
     }
     
-    // CHIFRE ARCO-ÍRIS (Rainbow Horn)
+    // CHIFRE ARCO-ÍRIS
     const hornGrad = ctx.createLinearGradient(0, -35, 0, 0);
     hornGrad.addColorStop(0, '#f00');
     hornGrad.addColorStop(0.5, '#ffff00');
     hornGrad.addColorStop(1, '#00ffff');
     ctx.fillStyle = hornGrad;
     ctx.save();
-    ctx.translate(0, -55);
-    ctx.rotate(0.35);
+    ctx.translate(15, -60); // Ajustado para o slant frontal
+    ctx.rotate(0.3);
     ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-6, -35); ctx.lineTo(10, 0); ctx.fill();
     ctx.restore();
     ctx.restore();
 
   } else {
-    // CORPO NORMAL (Luna/Outros)
     ctx.roundRect(-width/2, -height - 10, width, height, height/2);
     ctx.fill();
   }
@@ -2328,22 +2328,22 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   ctx.fillStyle = headGrad;
   ctx.beginPath();
   if (isIris) {
-    // CABEÇA Unicórnio (No topo, cobrindo o rastro da crina)
-    ctx.roundRect(width/2 - 12, -height - 70, 35, 25, 12);
+    // CABEÇA Unicórnio (Posicionada para COBRIR a crina)
+    ctx.roundRect(width/2 - 10, -height - 75, 40, 30, 15);
   } else {
     ctx.roundRect(width/2 - 10, -height - 30, 30, 25, 12);
   }
   ctx.fill();
 
-  // FOCINHO (Snout)
+  // FOCINHO
   ctx.fillStyle = headGrad;
   ctx.beginPath();
   if (isIris) {
       // Cavalo Snout (Mais reto/triangular)
-      ctx.moveTo(width/2 + 8, -height - 60);
-      ctx.lineTo(width/2 + 25, -height - 58);
-      ctx.lineTo(width/2 + 25, -height - 45);
-      ctx.lineTo(width/2 + 8, -height - 42);
+      ctx.moveTo(width/2 + 15, -height - 65);
+      ctx.lineTo(width/2 + 35, -height - 62);
+      ctx.lineTo(width/2 + 35, -height - 48);
+      ctx.lineTo(width/2 + 15, -height - 45);
   } else {
       ctx.roundRect(width/2 + 10, -height - 20, 25, 15, 8);
   }
@@ -2352,16 +2352,15 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   // NARIZ
   ctx.fillStyle = '#000';
   ctx.beginPath();
-  if (isIris) ctx.arc(width/2 + 22, -height - 52, 4, 0, Math.PI*2);
+  if (isIris) ctx.arc(width/2 + 32, -height - 55, 4, 0, Math.PI*2);
   else ctx.arc(width/2 + 33, -height - 14, 4, 0, Math.PI*2);
   ctx.fill();
 
-  // OLHOS E PISCADA (Animation Restored)
-  let eyeX = isIris ? width/2 + 2 : width/2 + 12;
-  let eyeY = isIris? -height - 60 : -height - 22;
+  // OLHOS E PISCADA
+  let eyeX = isIris ? width/2 + 8 : width/2 + 12;
+  let eyeY = isIris ? -height - 65 : -height - 22;
 
   if (Math.sin(timer * 4) > 0.96) {
-     // Blinking
      ctx.fillStyle = '#000'; 
      ctx.fillRect(eyeX - 4, eyeY - 1, 8, 2);
   } else {
@@ -2373,10 +2372,10 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     ctx.beginPath(); ctx.arc(eyeX + 3, eyeY - 3, 1.5, 0, Math.PI*2); ctx.fill();
   }
 
-  // ORELHAS (Animation Restored)
+  // ORELHAS
   ctx.save();
   if (isIris) {
-    ctx.translate(eyeX - 8, eyeY - 8);
+    ctx.translate(eyeX - 8, eyeY - 10);
   } else {
     ctx.translate(width/2, -height - 25);
   }
@@ -2390,18 +2389,17 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   ctx.fillStyle = earColor;
   ctx.beginPath();
   if (isIris) { 
-      // Cavalo/Unicórnio Delicado
-      ctx.moveTo(-4, 0); ctx.lineTo(4, 0); ctx.lineTo(0, -12); 
+      ctx.moveTo(-4, 0); ctx.lineTo(4, 0); ctx.lineTo(0, -15); 
   } else {
       ctx.ellipse(-2, 12, 6, 15, 0, 0, Math.PI*2);
   }
   ctx.fill();
   ctx.restore();
 
-  // RABO (Animation & Connection Fixed)
+  // RABO (Conectado ao corpo)
   ctx.save();
   if (isIris) {
-      ctx.translate(-width/2 + 2, -height - 12); // Puxado para colar no corpo
+      ctx.translate(-width/2 + 5, -height - 2); // Baixado para sair de "dentro" do corpo
   } else {
       ctx.translate(-width/2 + 5, -height - 5);
   }
@@ -2419,7 +2417,7 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   }
   ctx.restore();
 
-  // PATAS (Geral)
+  // PATAS
   ctx.fillStyle = earColor;
   const swing = isJumping || isFalling ? 0 : Math.sin(timer * 20) * 10;
   const pHeight = isIris ? 30 : 15;
