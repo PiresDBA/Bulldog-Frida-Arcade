@@ -70,10 +70,12 @@ const i18n = {
     introFrida: "Oi! Sou a Frida Gorducha! Aperte o botão da aventura para resgatarmos meus amiguinhos!",
     introCinder: "Oi! Sou a Cinder Gatinha! Aperte o botão da aventura para resgatarmos meus amiguinhos!",
     introBear: "Oi! Sou o Urso Fofo! Aperte o botão da aventura para resgatarmos meus amiguinhos!",
+    introUnicorn: "Oi! Sou o Unicórnio Mágico! Vamos espalhar cores e resgatar todos!",
     phaseReadyLuna: "Vamos lá! A Luna está pronta!",
     phaseReadyFrida: "Vamos lá! A Frida está pronta!",
     phaseReadyCinder: "Vamos lá! A Cinder está pronta!",
     phaseReadyBear: "Vamos lá! O Urso está pronto!",
+    phaseReadyUnicorn: "Vamos lá! O Unicórnio está pronto!",
     unlockMsg: "Desbloquear por {cost} moedas?",
     notEnoughCoins: "Moedas insuficientes!",
     locked: "🔒",
@@ -92,10 +94,12 @@ const i18n = {
     introFrida: "Hi! I'm Chubby Frida! Press the adventure button to rescue my friends!",
     introCinder: "Hi! I'm Cinder Kitty! Press the adventure button to rescue my friends!",
     introBear: "Hi! I'm Fluffy Bear! Press the adventure button to rescue my friends!",
+    introUnicorn: "Hi! I'm Magic Unicorn! Let's spread colors and rescue everyone!",
     phaseReadyLuna: "Let's go! Luna is ready!",
     phaseReadyFrida: "Let's go! Frida is ready!",
     phaseReadyCinder: "Let's go! Cinder is ready!",
     phaseReadyBear: "Let's go! Fluffy Bear is ready!",
+    phaseReadyUnicorn: "Let's go! Unicorn is ready!",
     unlockMsg: "Unlock for {cost} coins?",
     notEnoughCoins: "Not enough coins!",
     locked: "🔒",
@@ -114,10 +118,12 @@ const i18n = {
     introFrida: "¡Hola! ¡Soy Frida Gordita! ¡Presiona el botón de aventura para rescatar a mis amiguitos!",
     introCinder: "¡Hola! ¡Soy Cinder Gatita! ¡Presiona el botón de aventura para rescatar a mis amiguitos!",
     introBear: "¡Hola! ¡Soy el Oso Tierno! ¡Presiona el botón de aventura para rescatar a mis amiguitos!",
+    introUnicorn: "¡Hola! ¡Soy el Unicornio Mágico! ¡Vamos a rescatar a todos!",
     phaseReadyLuna: "¡Vamos! ¡Luna está lista!",
     phaseReadyFrida: "¡Vamos! ¡Frida está lista!",
     phaseReadyCinder: "¡Vamos! ¡Cinder está lista!",
     phaseReadyBear: "¡Vamos! ¡El Oso está listo!",
+    phaseReadyUnicorn: "¡Vamos! ¡El Unicornio está listo!",
     unlockMsg: "¿Desbloquear por {cost} monedas?",
     notEnoughCoins: "¡Monedas insuficientes!",
     locked: "🔒",
@@ -136,10 +142,12 @@ const i18n = {
     introFrida: "你好！我是胖嘟嘟的弗里达！请按冒险按钮解救我的小伙伴！",
     introCinder: "你好！我是小猫灰姑娘！请按冒险按钮解救我的小伙伴！",
     introBear: "你好！我是毛绒绒的熊！请按冒险按钮解救我的小伙伴！",
+    introUnicorn: "你好！我是彩虹独角兽！让我们出发去解救大家吧！",
     phaseReadyLuna: "走吧！露娜准备好了！",
     phaseReadyFrida: "走吧！弗里达准备好了！",
     phaseReadyCinder: "走吧！灰姑娘准备好了！",
     phaseReadyBear: "走吧！熊准备好了！",
+    phaseReadyUnicorn: "走吧！独角兽准备好了！",
     unlockMsg: "用 {cost} 金币解锁吗？",
     notEnoughCoins: "金币不足！",
     locked: "🔒",
@@ -183,7 +191,8 @@ let unlockedHeroes = JSON.parse(localStorage.getItem('luna_arcade_unlocked') || 
 
 const HERO_PRICES = {
   cinder: 1500,
-  bear: 3000
+  unicorn: 3000,
+  bear: 5000
 };
 
 // Updates visual coin count
@@ -882,6 +891,14 @@ const bearAudioPool = [
   'bear3.mp3'
 ].map(src => new Audio(src));
 
+function soundWhinny() {
+  if (typeof playNote === 'function') {
+    playNote(440, 0, 0.1);
+    playNote(554, 0.1, 0.1);
+    playNote(659, 0.2, 0.3);
+  }
+}
+
 function soundBear() {
   const audio = bearAudioPool[Math.floor(Math.random() * bearAudioPool.length)];
   const clone = audio.cloneNode(true);
@@ -1234,10 +1251,11 @@ const heroImageMap = {
   luna: './luna-icon.png',
   frida: './frida-game.png',
   cinder: './Cinder-game.png',
+  unicorn: './unicorn-game.png',
   bear: './urso-sem-fundo.png'
 };
-const heroNameMap = { luna: 'Luna', frida: 'Frida', cinder: 'Cinder', bear: 'Urso' };
-const heroNicknameMap = { luna: 'Luna Salsicha', frida: 'Frida Gorducha', cinder: 'Cinder Gatinha', bear: 'Urso Fofo' };
+const heroNameMap = { luna: 'Luna', frida: 'Frida', cinder: 'Cinder', unicorn: 'Uni', bear: 'Urso' };
+const heroNicknameMap = { luna: 'Luna Salsicha', frida: 'Frida Gorducha', cinder: 'Cinder Gatinha', unicorn: 'Unicórnio Mágico', bear: 'Urso Fofo' };
 
 function updateHeroImages(kind) {
   const img = heroImageMap[kind] || heroImageMap.luna;
@@ -1259,7 +1277,13 @@ function updateHeroImages(kind) {
         btn.innerHTML = dict.locked + " " + (heroNameMap[val] || val);
         btn.style.opacity = '0.7';
       } else {
-        const icon = val==='luna'?'🌭':val==='frida'?'🐕':val==='cinder'?'🐱':'🐻';
+        let icon = '❓';
+        if(val==='luna') icon='🌭';
+        else if(val==='frida') icon='🐕';
+        else if(val==='cinder') icon='🐱';
+        else if(val==='unicorn') icon='🦄';
+        else if(val==='bear') icon='🐻';
+        
         btn.innerHTML = icon + " " + (heroNameMap[val] || val);
         btn.style.opacity = '1';
       }
@@ -1268,6 +1292,7 @@ function updateHeroImages(kind) {
     let p = 'phaseReadyLuna';
     if(kind==='frida') { p = 'phaseReadyFrida'; }
     if(kind==='cinder') { p = 'phaseReadyCinder'; }
+    if(kind==='unicorn') { p = 'phaseReadyUnicorn'; }
     if(kind==='bear') { p = 'phaseReadyBear'; }
 
     const phaseBubble = document.getElementById('phase-bubble');
@@ -1655,20 +1680,27 @@ function update(dt) {
       if (Math.abs(h.x - canvas.width) < h.width * 2 + 100) valid = false;
     }
     if (valid && bulldogs.length < 2) { 
-      // Pool de obstáculos: todos MENOS o herói selecionado. Se não é Luna, Luna vira obstáculo!
-      let kinds = ['cinder', 'frida', 'white_bear', 'brown_bear', 'panda_bear'];
+      // Pool de obstáculos: todos MENOS o herói selecionado
+      let kinds = ['cinder', 'frida', 'unicorn', 'white_bear', 'brown_bear', 'panda_bear'];
       if (player.kind !== 'luna') kinds.push('luna');
+      
       // Remove o herói atual e variantes dele
       if (player.kind === 'cinder') kinds = kinds.filter(k => k !== 'cinder');
       else if (player.kind === 'frida') kinds = kinds.filter(k => k !== 'frida');
+      else if (player.kind === 'unicorn') kinds = kinds.filter(k => k !== 'unicorn');
       else if (player.kind === 'bear') kinds = kinds.filter(k => !k.includes('bear'));
       
       const t = kinds[Math.floor(Math.random() * kinds.length)];
-      let w = t === 'cinder' ? 60 : (t === 'frida' || t === 'luna' ? 110 : 90); 
-      let h = t === 'cinder' ? 35 : (t === 'frida' || t === 'luna' ? 50 : 60);
-      if (t === 'luna') { w = 80; h = 40; }
+      let w = 80, h = 50; 
+      if (t === 'cinder') { w = 60; h = 35; }
+      else if (t === 'frida') { w = 110; h = 50; }
+      else if (t === 'luna') { w = 80; h = 40; }
+      else if (t === 'unicorn') { w = 90; h = 65; }
+      else if (t.includes('bear')) { w = 90; h = 60; }
+      
       bulldogs.push({ x: canvas.width, y: GROUND_Y, width: w, height: h, state: 'idle', animTimer: 0, kind: t }); 
       if (t === 'cinder') soundMeow(); 
+      else if (t === 'unicorn') soundWhinny(); // Placeholder or actual sound
       else if (t.includes('bear')) soundBear(); 
       else if (t === 'luna') soundDachshundBark();
       else soundDogBark();
