@@ -2249,13 +2249,12 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   if (type === 'luna') {
     bodyColor1 = '#B2663E'; bodyColor2 = '#5C2E0A'; earColor = '#5C2E0A';
   } else if (isIris) {
-    bodyColor1 = '#fff0f5'; bodyColor2 = '#ffccff'; earColor = '#ff66ff';
+    bodyColor1 = '#fff5fd'; bodyColor2 = '#ffd1f0'; earColor = '#ff66ff';
   } else {
     bodyColor1 = '#ffccff'; bodyColor2 = '#ff99ff'; earColor = '#ff66ff';
   }
 
-  // Se for Íris, reduzimos levemente o tamanho do corpo para elegância
-  const bW = isIris ? width : width;
+  const bW = isIris ? width + 5 : width;
   const bH = isIris ? height : height;
 
   const drawY = y + 20; 
@@ -2270,7 +2269,7 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   if (isFalling) ctx.rotate(player.rotation || 0);
   else if (isJumping) ctx.rotate(-Math.PI / 12);
   
-  ctx.shadowColor = 'rgba(0,0,0,0.4)';
+  ctx.shadowColor = 'rgba(0,0,0,0.3)';
   ctx.shadowBlur = 10;
   ctx.shadowOffsetY = 8;
   
@@ -2281,73 +2280,77 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   ctx.fillStyle = bodyGrad;
   ctx.beginPath();
   if (isIris) {
-    // CORPO Unicórnio (Fofinho e Redondo)
-    ctx.roundRect(-bW/2, -bH - 10, bW, bH, 20);
+    // CORPO Unicórnio (Elegante)
+    ctx.roundRect(-bW/2, -bH - 10, bW, bH, 15);
     ctx.fill();
     
-    // CRINA VOLUMOSA (Esconde o pescoço - v1.9)
-    const mColors = ['#ff007f', '#ff00ff', '#8a2be2', '#4b0082', '#ff1493']; 
+    // CRINA EM MECHAS (Efeito v1.10 - Cabelo fluindo)
+    const mColors = ['#ff69b4', '#da70d6', '#9370db', '#87ceeb', '#98fb98', '#ffffed'];
     ctx.save();
-    ctx.translate(bW/2 - 15, -bH - 5); 
-    for(let i=0; i<6; i++) {
-        ctx.fillStyle = mColors[i % mColors.length];
+    ctx.translate(bW/2 - 22, -bH - 10);
+    for(let i=0; i<mColors.length; i++) {
+        ctx.fillStyle = mColors[i];
+        ctx.save();
+        ctx.rotate(-0.2 + i * 0.1);
         ctx.beginPath();
-        // Círculos grandes que dão volume atrás da cabeça
-        ctx.arc(-i*4, -i*2, 18, 0, Math.PI*2);
+        // Elipses alongadas para parecer cabelo
+        ctx.ellipse(-i*5, -i*3, 15, 25, 0, 0, Math.PI*2);
         ctx.fill();
+        ctx.restore();
     }
     ctx.restore();
     
-    // CABEÇA KAWAII (Redonda e Grande)
+    // CABEÇA MESTRE (Trapezoidal com cantos ovais - Estilo Cavalo Oficial)
     ctx.save();
-    ctx.translate(bW/2 + 5, -bH - 25);
+    ctx.translate(bW/2 - 5, -bH - 35);
     
     ctx.fillStyle = bodyGrad;
     ctx.beginPath();
-    ctx.ellipse(0, 0, 28, 25, 0, 0, Math.PI*2); // Elipse fofa
+    // Crânio (Base larga na bochecha)
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(-15, -10, -15, -35, 10, -45); // Topo da cabeça
+    ctx.bezierCurveTo(25, -50, 45, -40, 55, -20); // Nariz/Focinho superior
+    ctx.bezierCurveTo(60, -5, 55, 5, 45, 10); // Ponta do focinho
+    ctx.bezierCurveTo(35, 15, 15, 15, 5, 10);  // Base do queixo
+    ctx.closePath();
     ctx.fill();
 
-    // FOCINHO MINÚSCULO
-    ctx.beginPath();
-    ctx.ellipse(15, 8, 15, 12, 0, 0, Math.PI*2);
-    ctx.fill();
-    
-    // CHIFRE NA TESTA (Inclinado)
-    const hornGrad = ctx.createLinearGradient(0, -35, 0, 0);
-    hornGrad.addColorStop(0, '#ffd700'); hornGrad.addColorStop(0.5, '#ffea00'); hornGrad.addColorStop(1, '#fffacd');
+    // CHIFRE (Com detalhes de anéis)
+    const hornGrad = ctx.createLinearGradient(0, -60, 0, -10);
+    hornGrad.addColorStop(0, '#ffd700'); hornGrad.addColorStop(0.5, '#fff700'); hornGrad.addColorStop(1, '#ffaa00');
     ctx.fillStyle = hornGrad;
     ctx.beginPath();
-    ctx.moveTo(-5, -15); 
-    ctx.lineTo(5, -50); // Ponta do chifre
-    ctx.lineTo(15, -10);
-    ctx.fill();
-
-    // OLHO GIGANTE (Kawai/Anime)
-    let blink = Math.sin(timer * 4) > 0.96;
-    if (blink) {
-        ctx.strokeStyle = '#000'; ctx.lineWidth = 4; ctx.lineCap = 'round';
-        ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(10, 5, 20, 0); ctx.stroke();
-    } else {
-        // Globo ocular
-        ctx.fillStyle = '#000';
-        ctx.beginPath(); ctx.ellipse(10, -2, 10, 14, 0, 0, Math.PI*2); ctx.fill();
-        // Brilhos (Highlights) - ESSENCIAL PARA O STYLE
-        ctx.fillStyle = '#fff';
-        ctx.beginPath(); ctx.arc(14, -8, 4.5, 0, Math.PI*2); ctx.fill(); // Brilho maior
-        ctx.beginPath(); ctx.arc(6, 4, 2, 0, Math.PI*2); ctx.fill(); // Brilho menor embaixo
+    ctx.moveTo(15, -45); ctx.lineTo(25, -85); ctx.lineTo(35, -40); ctx.fill();
+    // Linhas do chifre (espiral)
+    ctx.strokeStyle = 'rgba(0,0,0,0.2)'; ctx.lineWidth = 2;
+    for(let j=1; j<4; j++) {
+        ctx.beginPath(); ctx.moveTo(20, -45 - j*10); ctx.lineTo(30, -55 - j*10); ctx.stroke();
     }
 
-    // NARIZINHO
-    ctx.fillStyle = '#ff99aa';
-    ctx.beginPath(); ctx.arc(22, 10, 2, 0, Math.PI*2); ctx.fill();
-
-    // ORELHA
+    // ORELHA LATERAL (Atrás do chifre)
     ctx.save();
-    ctx.translate(-10, -15);
-    ctx.rotate(-0.3 + Math.sin(timer * 20) * 0.1);
+    ctx.translate(5, -35);
+    ctx.rotate(-0.5);
     ctx.fillStyle = bodyColor1;
-    ctx.beginPath(); ctx.moveTo(-6,0); ctx.lineTo(6,0); ctx.lineTo(0,-18); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-6,0); ctx.lineTo(6,0); ctx.lineTo(0,-22); ctx.fill();
+    ctx.fillStyle = '#ffb6c1'; // Interior da orelha (rosinha)
+    ctx.beginPath(); ctx.moveTo(-3,0); ctx.lineTo(3,0); ctx.lineTo(0,-15); ctx.fill();
     ctx.restore();
+
+    // OLHO EQUILIBRADO (Expressivo)
+    let blink = Math.sin(timer * 4) > 0.96;
+    if (blink) {
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(25, -20); ctx.quadraticCurveTo(35, -15, 45, -20); ctx.stroke();
+    } else {
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(35, -22, 10, 13, 0.1, 0, Math.PI*2); ctx.fill(); // Esclera
+        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(38, -20, 6, 0, Math.PI*2); ctx.fill(); // Pupila
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(41, -24, 3, 0, Math.PI*2); ctx.fill(); // Brilho 1
+        ctx.beginPath(); ctx.arc(35, -16, 1.5, 0, Math.PI*2); ctx.fill(); // Brilho 2
+    }
+
+    // NARINA
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath(); ctx.arc(52, -5, 3, 0, Math.PI*2); ctx.fill();
 
     ctx.restore();
 
@@ -2404,7 +2407,7 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     ctx.restore();
   }
 
-  // RABO (Kawaii Rainbow)
+  // RABO (Rainbow Layers)
   ctx.save();
   if (isIris) {
       ctx.translate(-bW/2 + 5, -bH - 5); 
@@ -2417,7 +2420,7 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
       const rColors = ['#ff0000', '#ffa500', '#ffff00', '#008000', '#0000ff', '#4b0082', '#ee82ee'];
       for(let i=0; i<7; i++) {
           ctx.fillStyle = rColors[i];
-          ctx.beginPath(); ctx.ellipse(-12 - i*2, -2 + i*2, 14, 6, 0.5, 0, Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.ellipse(-12 - i*2, -2 + i*2, 16, 6, 0.5, 0, Math.PI*2); ctx.fill();
       }
   } else {
       ctx.fillStyle = bodyGrad;
@@ -2426,15 +2429,15 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   ctx.restore();
 
   // PATAS
-  ctx.fillStyle = earColor;
+  ctx.fillStyle = isIris ? '#daa520' : earColor; // Cascos dourados para Íris
   const swing = isJumping || isFalling ? 0 : Math.sin(timer * 20) * 10;
-  const pHeight = isIris ? 30 : 15;
+  const pHeight = isIris ? 32 : 15;
   ctx.beginPath();
   if (isIris) {
-    ctx.roundRect(-bW/2 + 10 + swing, -pHeight, 8, pHeight, 4);
-    ctx.roundRect(bW/2 - 20 - swing, -pHeight, 8, pHeight, 4);
-    ctx.roundRect(-bW/2 + 20 - swing, -pHeight, 8, pHeight, 4);
-    ctx.roundRect(bW/2 - 10 + swing, -pHeight, 8, pHeight, 4);
+    ctx.roundRect(-bW/2 + 10 + swing, -pHeight, 8, pHeight, 3);
+    ctx.roundRect(bW/2 - 20 - swing, -pHeight, 8, pHeight, 3);
+    ctx.roundRect(-bW/2 + 22 - swing, -pHeight, 8, pHeight, 3);
+    ctx.roundRect(bW/2 - 12 + swing, -pHeight, 8, pHeight, 3);
   } else {
     ctx.roundRect(-width/2 + 10 + swing, -pHeight, 8, pHeight, 4);
     ctx.roundRect(width/2 - 20 - swing, -pHeight, 8, pHeight, 4);
