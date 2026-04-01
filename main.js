@@ -146,8 +146,8 @@ const i18n = {
     phaseReadyLuna: "走吧！露娜准备好了！",
     phaseReadyFrida: "走吧！弗里达准备好了！",
     phaseReadyCinder: "走吧！灰姑娘准备好了！",
-    phaseReadyBear: "走吧！熊准备好了！",
-    phaseReadyUnicorn: "走吧！独角兽准备好了！",
+    phaseReadyBarbie: "走吧！芭比准备好了！",
+    phaseReadyIris: "走吧！艾丽丝准备好了！",
     unlockMsg: "用 {cost} 金币解锁吗？",
     notEnoughCoins: "金币不足！",
     locked: "🔒",
@@ -155,7 +155,7 @@ const i18n = {
   }
 };
 
-let currentLang = localStorage.getItem('luna_arcade_lang') || navigator.language.substring(0, 2) || 'en';
+let currentLang = localStorage.getItem('fridaArcade_lang') || navigator.language.substring(0, 2) || 'en';
 if (!i18n[currentLang]) currentLang = 'en';
 
 function translateUI() {
@@ -168,7 +168,7 @@ function translateUI() {
     const key = el.getAttribute('data-i18n-placeholder');
     if (dict[key]) el.placeholder = dict[key];
   });
-  localStorage.setItem('luna_arcade_lang', currentLang);
+  localStorage.setItem('fridaArcade_lang', currentLang);
   updateHeroImages(player.kind); // re-translates hero bubbles
 }
 
@@ -186,19 +186,19 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // --- GLOBAL GAME ECONOMY ---
-let globalCoins = parseInt(localStorage.getItem('luna_arcade_coins') || '0');
-let unlockedHeroes = JSON.parse(localStorage.getItem('luna_arcade_unlocked') || '["luna", "frida"]');
+let globalCoins = parseInt(localStorage.getItem('fridaArcade_coins') || '2000');
+let unlockedHeroes = JSON.parse(localStorage.getItem('fridaArcade_unlocked') || '["luna", "frida"]');
 
 const HERO_PRICES = {
-  cinder: 1500,
-  iris: 3000,
-  barbie: 5000
+  cinder: 500,
+  iris: 1000,
+  barbie: 1500
 };
 
 // Updates visual coin count
 function updateCoinsDisplay() {
   if (UI.coinsDisplay) UI.coinsDisplay.innerText = globalCoins;
-  localStorage.setItem('luna_arcade_coins', globalCoins);
+  localStorage.setItem('fridaArcade_coins', globalCoins);
 }
 
 // --- ADS SDK PLACEHOLDERS ---
@@ -311,16 +311,16 @@ function triggerGameOver() {
 }
 
 function updateHighScores(newScore, playerName) {
-    let scores = JSON.parse(localStorage.getItem('luna_high_scores')) || [];
+    let scores = JSON.parse(localStorage.getItem('fridaArcade_high_scores')) || [];
     const pName = playerName ? playerName.trim().substring(0, 10) : "ANÔNIMO";
     scores.push({ name: pName, score: newScore, date: new Date().toLocaleDateString('pt-BR') });
     scores.sort((a, b) => b.score - a.score);
     scores = scores.slice(0, 5); // top 5
-    localStorage.setItem('luna_high_scores', JSON.stringify(scores));
+    localStorage.setItem('fridaArcade_high_scores', JSON.stringify(scores));
 }
 
 function renderHighScores() {
-    const scores = JSON.parse(localStorage.getItem('luna_high_scores')) || [];
+    const scores = JSON.parse(localStorage.getItem('fridaArcade_high_scores')) || [];
     if (UI.highScoresList) {
         UI.highScoresList.innerHTML = scores.map((s, i) => `
             <div style="display: flex; justify-content: space-between; border-bottom: 1px dotted rgba(255,255,255,0.3); padding: 5px 0;">
@@ -355,12 +355,12 @@ function saveGame() {
     outfit: player.outfit   // A roupinha que a Luna está usando
   };
   // Salva no caderninho sob o nome 'luna_arcade_save'
-  localStorage.setItem('luna_arcade_save', JSON.stringify(data));
+  localStorage.setItem('fridaArcade_save', JSON.stringify(data));
 }
 
 // Essa função lê o caderninho quando você abre o jogo
 function loadGame() {
-  const saved = localStorage.getItem('luna_arcade_save');
+  const saved = localStorage.getItem('fridaArcade_save');
   if (saved) {
     try {
       const data = JSON.parse(saved);
@@ -1299,7 +1299,7 @@ document.querySelectorAll('.hero-btn').forEach(btn => {
           globalCoins -= cost;
           updateCoinsDisplay();
           unlockedHeroes.push(val);
-          localStorage.setItem('luna_arcade_unlocked', JSON.stringify(unlockedHeroes));
+          localStorage.setItem('fridaArcade_unlocked', JSON.stringify(unlockedHeroes));
         } else {
           alert(dict.notEnoughCoins);
           return;
@@ -1667,7 +1667,8 @@ function update(dt) {
     }
     if (valid && bulldogs.length < 2) { 
       // Pool de obstáculos: todos MENOS o herói selecionado
-      let kinds = ['cinder', 'frida', 'iris', 'white_barbie', 'brown_barbie', 'panda_barbie'];
+      // Aumentamos a presença da Íris na lista para que ela apareça com mais frequência!
+      let kinds = ['cinder', 'frida', 'iris', 'iris', 'iris', 'white_barbie', 'brown_barbie', 'panda_barbie'];
       if (player.kind !== 'luna') kinds.push('luna');
       
       // Remove o herói atual e variantes dele
