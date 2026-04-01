@@ -69,12 +69,12 @@ const i18n = {
     introLuna: "Oi! Sou a Luna Salsicha! Aperte o botão da aventura para resgatarmos meus amiguinhos!",
     introFrida: "Oi! Sou a Frida Gorducha! Aperte o botão da aventura para resgatarmos meus amiguinhos!",
     introCinder: "Oi! Sou a Cinder Gatinha! Aperte o botão da aventura para resgatarmos meus amiguinhos!",
-    introBarbie: "Oi! Sou a Barbie Ursinha! Sou rosa e adoro aventuras!",
+    introBaby: "Oi! Sou a Baby Ursinha! Sou rosa e adoro aventuras!",
     introIris: "Oi! Sou a Íris Unicórnio! Vamos espalhar cores e resgatar todos!",
     phaseReadyLuna: "Vamos lá! A Luna está pronta!",
     phaseReadyFrida: "Vamos lá! A Frida está pronta!",
     phaseReadyCinder: "Vamos lá! A Cinder está pronta!",
-    phaseReadyBarbie: "Vamos lá! A Barbie está pronta!",
+    phaseReadyBaby: "Vamos lá! A Baby está pronta!",
     phaseReadyIris: "Vamos lá! A Íris está pronta!",
     unlockMsg: "Desbloquear por {cost} moedas?",
     notEnoughCoins: "Moedas insuficientes!",
@@ -94,12 +94,12 @@ const i18n = {
     introLuna: "Hi! I'm Luna Sausage! Press the adventure button to rescue my friends!",
     introFrida: "Hi! I'm Chubby Frida! Press the adventure button to rescue my friends!",
     introCinder: "Hi! I'm Cinder Kitty! Press the adventure button to rescue my friends!",
-    introBarbie: "Hi! I'm Barbie Bear! I'm pink and love adventures!",
+    introBaby: "Hi! I'm Baby Bear! I'm pink and love adventures!",
     introIris: "Hi! I'm Iris Unicorn! Let's spread colors and rescue everyone!",
     phaseReadyLuna: "Let's go! Luna is ready!",
     phaseReadyFrida: "Let's go! Frida is ready!",
     phaseReadyCinder: "Let's go! Cinder is ready!",
-    phaseReadyBarbie: "Let's go! Barbie is ready!",
+    phaseReadyBaby: "Let's go! Baby is ready!",
     phaseReadyIris: "Let's go! Iris is ready!",
     unlockMsg: "Unlock for {cost} coins?",
     notEnoughCoins: "Not enough coins!",
@@ -119,12 +119,12 @@ const i18n = {
     introLuna: "¡Hola! ¡Soy Luna Salchicha! ¡Presiona el botón de aventura para rescatar a mis amiguitos!",
     introFrida: "¡Hola! ¡Soy Frida Gordita! ¡Presiona el botón de aventura para rescatar a mis amiguitos!",
     introCinder: "¡Hola! ¡Soy Cinder Gatita! ¡Presiona el botón de aventura para rescatar a mis amiguitos!",
-    introBarbie: "¡Hola! ¡Soy Barbie Osita! ¡Soy rosa y divertida!",
+    introBaby: "¡Hola! ¡Soy Baby Osita! ¡Soy rosa y divertida!",
     introIris: "¡Hola! ¡Soy Íris Unicornio! ¡Vamos a rescatar a todos!",
     phaseReadyLuna: "¡Vamos! ¡Luna está lista!",
     phaseReadyFrida: "¡Vamos! ¡Frida está lista!",
     phaseReadyCinder: "¡Vamos! ¡Cinder está lista!",
-    phaseReadyBarbie: "¡Vamos! ¡Barbie está lista!",
+    phaseReadyBaby: "¡Vamos! ¡Baby está lista!",
     phaseReadyIris: "¡Vamos! ¡Íris está lista!",
     unlockMsg: "¿Desbloquear por {cost} monedas?",
     notEnoughCoins: "¡Monedas insuficientes!",
@@ -144,12 +144,12 @@ const i18n = {
     introLuna: "你好！我是香肠狗露娜！请按冒险按钮解救我的小伙伴！",
     introFrida: "你好！我是胖嘟嘟的弗里达！请按冒险按钮解救我的小伙伴！",
     introCinder: "你好！我是小猫灰姑娘！请按冒险按钮解救我的小伙伴！",
-    introBarbie: "你好！我是芭比熊！我是粉红色的，喜欢挑战！",
+    introBaby: "你好！我是香肠狗露娜！请按冒险按钮解救我的小伙伴！",
     introIris: "你好！我是艾丽丝独角兽！让我们出发去解救大家吧！",
     phaseReadyLuna: "走吧！露娜准备好了！",
     phaseReadyFrida: "走吧！弗里达准备好了！",
     phaseReadyCinder: "走吧！灰姑娘准备好了！",
-    phaseReadyBarbie: "走吧！芭比准备好了！",
+    phaseReadyBaby: "走吧！Baby准备好了！",
     phaseReadyIris: "走吧！艾丽丝准备好了！",
     unlockMsg: "用 {cost} 金币解锁吗？",
     notEnoughCoins: "金币不足！",
@@ -196,7 +196,7 @@ let unlockedHeroes = JSON.parse(localStorage.getItem('fridaArcade_unlocked') || 
 const HERO_PRICES = {
   cinder: 500,
   iris: 1000,
-  barbie: 1500
+  baby: 1500
 };
 
 // Updates visual coin count
@@ -1021,7 +1021,7 @@ function initMountains() {
 let boss = null;
 let nextAmmo = 'bone'; 
 
-function drawCat(ctx, x, y, width, height, timer, state, isHero) {
+function drawCat(ctx, x, y, width, height, timer, state, isHero = false) {
   const drawY = y + 20; 
 
   ctx.save();
@@ -1142,7 +1142,7 @@ function drawCat(ctx, x, y, width, height, timer, state, isHero) {
   ctx.fillStyle = '#ffc0cb';
   ctx.beginPath(); ctx.moveTo(-8, -34); ctx.lineTo(-3, -40); ctx.lineTo(-3, -32); ctx.fill();
 
-  // Big Shiny Eyes!
+  // Big Shiny Eyes! (Com Cílios v1.13)
   if (Math.sin(timer * 4) > 0.95) {
      // Blinking
      ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
@@ -1156,6 +1156,11 @@ function drawCat(ctx, x, y, width, height, timer, state, isHero) {
      ctx.fillStyle = '#fff';
      ctx.beginPath(); ctx.arc(-23.5, -26.5, 1.2, 0, Math.PI*2); ctx.fill();
      ctx.beginPath(); ctx.arc(-11.5, -26.5, 1.2, 0, Math.PI*2); ctx.fill();
+     
+     // Cílios Gatinha
+     ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.lineCap = 'round';
+     ctx.beginPath(); ctx.moveTo(-10, -28); ctx.lineTo(-4, -34); ctx.stroke();
+     ctx.beginPath(); ctx.moveTo(-8, -27); ctx.lineTo(-2, -30); ctx.stroke();
   }
 
   // Pink boop nose
@@ -1242,10 +1247,10 @@ const heroImageMap = {
   frida: './frida-game.png',
   cinder: './Cinder-game.png',
   iris: './unicorn-game.png',
-  barbie: './barbie-game.png'
+  baby: './baby-game.png'
 };
-const heroNameMap = { luna: 'Luna', frida: 'Frida', cinder: 'Cinder', iris: 'Iris', barbie: 'Barbie' };
-const heroNicknameMap = { luna: 'Luna Salsicha', frida: 'Frida Gorducha', cinder: 'Cinder Gatinha', iris: 'Íris Unicórnio', barbie: 'Barbie Ursinha' };
+const heroNameMap = { luna: 'Luna', frida: 'Frida', cinder: 'Cinder', iris: 'Iris', baby: 'Baby' };
+const heroNicknameMap = { luna: 'Luna Salsicha', frida: 'Frida Gorducha', cinder: 'Cinder Gatinha', iris: 'Íris Unicórnio', baby: 'Baby Ursinha' };
 
 function updateHeroImages(kind) {
   const img = heroImageMap[kind] || heroImageMap.luna;
@@ -1272,7 +1277,7 @@ function updateHeroImages(kind) {
         else if(val==='frida') icon='🐕';
         else if(val==='cinder') icon='🐱';
         else if(val==='iris') icon='🦄';
-        else if(val==='barbie') icon='🐻';
+        else if(val==='baby') icon='🐻';
         
         btn.innerHTML = icon + " " + (heroNameMap[val] || val);
         btn.style.opacity = '1';
@@ -1283,7 +1288,7 @@ function updateHeroImages(kind) {
     if(kind==='frida') { p = 'phaseReadyFrida'; }
     if(kind==='cinder') { p = 'phaseReadyCinder'; }
     if(kind==='iris') { p = 'phaseReadyIris'; }
-    if(kind==='barbie') { p = 'phaseReadyBarbie'; }
+    if(kind==='baby') { p = 'phaseReadyBaby'; }
 
     const phaseBubble = document.getElementById('phase-bubble');
     if (phaseBubble) phaseBubble.textContent = dict[p] || "";
@@ -1362,7 +1367,7 @@ function startGame() {
   // Ajusta tamanho físico conforme o herói (mesmos tamanhos dos sprites originais do jogo)
   if (player.kind === 'cinder') { player.width = 60; player.height = 35; }
   else if (player.kind === 'frida') { player.width = 110; player.height = 50; }
-  else if (player.kind === 'barbie') { player.width = 90; player.height = 60; }
+  else if (player.kind === 'baby') { player.width = 90; player.height = 60; }
   else { player.width = 80; player.height = 30; } // Luna padrão
   resetPhase();                     // Prepara o cenário
   UI.startScreen.classList.add('hidden'); // Esconde o menu inicial
@@ -1672,27 +1677,27 @@ function update(dt) {
     if (valid && bulldogs.length < 2) { 
       // Pool de obstáculos: todos MENOS o herói selecionado
       // Aumentamos a presença da Íris na lista para que ela apareça com mais frequência!
-      let kinds = ['cinder', 'frida', 'iris', 'iris', 'iris', 'white_barbie', 'brown_barbie', 'panda_barbie'];
+      let kinds = ['cinder', 'frida', 'iris', 'iris', 'iris', 'white_baby', 'brown_baby', 'panda_baby'];
       if (player.kind !== 'luna') kinds.push('luna');
       
       // Remove o herói atual e variantes dele
       if (player.kind === 'cinder') kinds = kinds.filter(k => k !== 'cinder');
       else if (player.kind === 'frida') kinds = kinds.filter(k => k !== 'frida');
       else if (player.kind === 'iris') kinds = kinds.filter(k => k !== 'iris');
-      else if (player.kind === 'barbie') kinds = kinds.filter(k => !k.includes('barbie'));
+      else if (player.kind === 'baby') kinds = kinds.filter(k => !k.includes('baby'));
       
       const t = kinds[Math.floor(Math.random() * kinds.length)];
       let w = 80, h = 50; 
       if (t === 'cinder') { w = 60; h = 35; }
       else if (t === 'frida') { w = 110; h = 55; }
       else if (t === 'luna') { w = 80; h = 40; }
-      else if (t === 'iris') { w = 80; h = 60; }
-      else if (t.includes('barbie')) { w = 90; h = 60; }
+      else if (t === 'iris') { w = 90; h = 60; }
+      else if (t.includes('baby')) { w = 90; h = 60; }
       
       bulldogs.push({ x: canvas.width, y: GROUND_Y, width: w, height: h, state: 'idle', animTimer: 0, kind: t }); 
       if (t === 'cinder') soundMeow(); 
       else if (t === 'iris') soundWhinny(); 
-      else if (t.includes('barbie')) soundBear(); 
+      else if (t.includes('baby')) soundBear(); 
       else if (t === 'luna') soundDachshundBark();
       else soundDogBark();
     }
@@ -1733,11 +1738,12 @@ function update(dt) {
       b.vy += 1500 * dt;           // Gravidade puxando pra baixo
       b.x -= game.speed * dt;      // O chão se move, então ele vai pra trás
       if (b.y >= GROUND_Y) {       // Tocou o chão!
-         b.y = GROUND_Y;
-         b.state = 'eating';       // Agora ele está comendo/feliz
-         b.animTimer = 0;
+          b.y = GROUND_Y;
+          b.state = b.kind === 'iris' ? 'sitting' : 'eating'; // Iris senta, outros comem
+          b.animTimer = 0;
+          b.sitTimer = 1.5; // Tempo que a Íris fica sentada
          soundHappy();             // Som de cachorro feliz
-         createExplosion(b.x, b.y - 30, '#ffb6c1', 20); // Coraçõezinhos!
+         createExplosion(b.x, b.y - 30, '#ffb6c1', 60); // O MONTE DE CORAÇÕES v1.16!
          game.score += 20; globalCoins += 20; updateCoinsDisplay(); // Você ganha moedas por alimentar ele
          updateUI();
       }
@@ -1751,6 +1757,15 @@ function update(dt) {
       }
       if (b.x + b.width < -100) bulldogs.splice(i, 1); // Sumiu da tela, a gente remove
     } 
+    // ESTADO: Sentada (Íris reagindo ao carinho/tiro v1.13)
+    else if (b.state === 'sitting') {
+      b.x -= game.speed * dt;
+      b.sitTimer -= dt;
+      b.animTimer += dt;
+      if (b.sitTimer <= 0 || b.x + b.width < -100) {
+          bulldogs.splice(i, 1);
+      }
+    }
     // ESTADO: Bravo (Se você encostar nele, você perde vida!)
     else {
       b.x -= game.speed * dt;
@@ -1758,16 +1773,15 @@ function update(dt) {
       
       /**
        * DETECÇÃO DE COLISÃO:
-       * A gente calcula a distância entre a Luna e o Bulldog.
-       * Se a distância for muito pequena, significa que eles se bateram!
        */
       if (!player.isFalling && (!player.invincibleTimer || player.invincibleTimer <= 0) &&
           Math.abs(player.x - b.x) < player.width/2 + b.width/2 - 10 &&
           Math.abs(player.y - player.height/2 - (b.y - b.height/2)) < player.height/2 + b.height/2 - 10) {
         
         if (player.vy > 0) { // Pulo estilo Mario
-          b.state = 'eating';
+          b.state = b.kind === 'iris' ? 'sitting' : 'eating';
           b.animTimer = 0;
+          b.sitTimer = 1.5;
           soundHappy();
           createExplosion(b.x, b.y - 30, '#ffb6c1', 20);
           game.score += 20; globalCoins += 20; updateCoinsDisplay();
@@ -1919,11 +1933,17 @@ function update(dt) {
     for(let j = bulldogs.length - 1; j >= 0; j--) {
       let b = bulldogs[j];
       if (b.state === 'idle' && Math.abs(bullets[i].x - b.x) < b.width/2 + 20 && Math.abs(bullets[i].y - (b.y - b.height/2)) < b.height + 20) {
-        if (b.kind === 'cinder' && bullets[i].type === 'bone') continue; // Cinder ignores bone!
-        b.state = 'jumping_to_eat'; 
-        b.vy = -400; 
+        if (b.kind === 'cinder' && bullets[i].type === 'bone') continue; 
+        
+        if (b.kind === 'iris') {
+             b.state = 'jumping_to_eat'; b.vy = -400; b.sitTimer = 1.5;
+             createExplosion(b.x, b.y - 30, '#ffb6c1', 80); // Muitos corações no impacto!
+             soundWhinny();
+        } else {
+             b.state = 'jumping_to_eat'; b.vy = -400; 
+             createExplosion(b.x, b.y - 30, '#ffb6c1', 20);
+        }
         b.animTimer = 0;
-        soundJump();
         hit = true;
         break;
       }
@@ -2229,22 +2249,40 @@ function drawLunaMenu(ctx, x, y, size, timer) {
   ctx.restore();
 }
 
-function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFalling, type = 'luna') {
-  if (player.dead) return; 
+function drawMenuDogs(timer) {
+  // Animação dos ícones de heróis no menu
+  const heroes = ['luna', 'frida', 'cinder', 'baby', 'iris'];
+  heroes.forEach((h, i) => {
+    const el = document.querySelector(`.hero-bubble[data-hero="${h}"] canvas`);
+    if (el) {
+      const c = el.getContext('2d');
+      c.clearRect(0, 0, el.width, el.height);
+      drawAnimatedAnimal(c, el.width/2, el.height/2 + 10, 40, 25, timer + i, false, false, h, 'running', true);
+    }
+  });
+}
+
+function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFalling, type = 'luna', state = 'running', isHero = false) {
+  if (player.dead && type === player.kind) return; 
   
   let bodyColor1, bodyColor2, earColor;
   let isIris = (type === 'iris');
+  let isBaby = (type === 'baby');
   
   if (type === 'luna') {
     bodyColor1 = '#B2663E'; bodyColor2 = '#5C2E0A'; earColor = '#5C2E0A';
   } else if (isIris) {
     bodyColor1 = '#fff5fd'; bodyColor2 = '#ffd1f0'; earColor = '#ff66ff';
+  } else if (isBaby) {
+    bodyColor1 = '#ffccff'; bodyColor2 = '#ff99ff'; earColor = '#ff66ff';
   } else {
     bodyColor1 = '#ffccff'; bodyColor2 = '#ff99ff'; earColor = '#ff66ff';
   }
 
-  const bW = isIris ? width + 8 : width;
-  const bH = isIris ? height + 2 : height;
+  // Íris sem escala reduzida para obstáculo (v1.17)
+  const iScale = (isIris && !state) ? 0.5 : 1.0;
+  const bW = (isIris ? width : width);
+  const bH = (isIris ? height : height);
 
   const drawY = y + 20; 
   ctx.save();
@@ -2257,6 +2295,12 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   ctx.scale(player.scale || 1, player.scale || 1);
   if (isFalling) ctx.rotate(player.rotation || 0);
   else if (isJumping) ctx.rotate(-Math.PI / 12);
+  else if ((state === 'sitting' || state === 'eating') && type === 'iris') {
+      // BARRIGA PARA CIMA NO UNICÓRNIO (v1.16)
+      ctx.translate(0, -bH/2);
+      ctx.rotate(Math.PI);
+      ctx.translate(0, bH/2);
+  }
   
   ctx.shadowColor = 'rgba(0,0,0,0.3)';
   ctx.shadowBlur = 10;
@@ -2282,45 +2326,57 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     ctx.lineTo(bW/2 + 2, -bH - 5);
     ctx.fill();
 
-    // CRINA EM SPIKES (Estilo Moicano Arco-Íris v1.12)
-    const mColors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
+    // CRINA FLORIDA (Estilo Arco-Íris Fluido v1.18)
+    const mColors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3', '#ff00ff'];
     ctx.save();
-    ctx.translate(bW/2 - 5, -bH - 40);
+    ctx.translate(bW/2 - 10, -bH - 35);
     for(let i=0; i<mColors.length; i++) {
         ctx.fillStyle = mColors[i];
         ctx.beginPath();
-        // Triângulos (Spikes) colados no pescoço
-        ctx.moveTo(-i*4, i*5); 
-        ctx.lineTo(-i*4 - 15, i*5 - 15); // Ponta do spike
-        ctx.lineTo(-i*4 - 5, i*5 + 10);
+        // Elipses suaves simulando cabelo/crina
+        const wave = Math.sin(timer * 5 + i * 0.5) * 5;
+        ctx.ellipse(-i*6, i*3 + wave, 12, 8, -Math.PI/6, 0, Math.PI*2);
         ctx.fill();
     }
     ctx.restore();
     
-    // CABEÇA MESTRE (Focinho Afilado)
-    ctx.save();
-    ctx.translate(bW/2 + 8, -bH - 45); 
+    // MOCHILA UNIVERSAL (v1.16)
+    if (isHero || state !== 'running') {
+        ctx.save();
+        ctx.translate(0, -45);
+        ctx.fillStyle = '#6d4c41'; ctx.beginPath(); ctx.roundRect(-8, -12, 16, 18, 5); ctx.fill();
+        ctx.fillStyle = '#8d6e63'; ctx.beginPath(); ctx.roundRect(-4, -8, 8, 10, 3); ctx.fill();
+        ctx.restore();
+    }
+
+    ctx.restore();
     
+    // CABEÇA MESTRE (Pescoço Fluido v1.18)
+    ctx.save();
+    ctx.translate(bW/2 + 8, -bH - 45);
+    
+    // Rosto Unicórnio (Menos Dragão, Mais Cavalo)
     ctx.fillStyle = bodyGrad;
     ctx.beginPath();
-    ctx.moveTo(0, 0); 
-    ctx.bezierCurveTo(-12, -15, 0, -35, 12, -40); // Testa
-    ctx.lineTo(52, -28); // Ponte do nariz (longa e fina)
-    ctx.bezierCurveTo(62, -22, 62, -8, 52, -2); // Ponta do focinho afilada
-    ctx.bezierCurveTo(40, 5, 20, 10, 0, 5); // Mandíbula
-    ctx.closePath();
+    ctx.ellipse(0, 0, 18, 16, 0, 0, Math.PI*2);
     ctx.fill();
-
-    // CHIFRE ESPIRALADO
-    const hornGrad = ctx.createLinearGradient(0, -60, 0, -10);
-    hornGrad.addColorStop(0, '#ffd700'); hornGrad.addColorStop(0.5, '#fff700'); hornGrad.addColorStop(1, '#ffaa00');
-    ctx.fillStyle = hornGrad;
+    
+    // Focinho (Muzzle)
     ctx.beginPath();
-    ctx.moveTo(8, -38); ctx.lineTo(12, -85); ctx.lineTo(22, -35); ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,0.1)'; ctx.lineWidth = 1.5;
-    for(let j=1; j<5; j++) {
-        ctx.beginPath(); ctx.moveTo(9, -40 - j*10); ctx.lineTo(18, -45 - j*10); ctx.stroke();
-    }
+    ctx.ellipse(12, 10, 14, 12, 0.2, 0, Math.PI*2);
+    ctx.fill();
+    
+    // CHIFRE ESPIRAL (Mais Centralizado v1.18)
+    ctx.fillStyle = '#f0e68c'; // Khaki / Gold
+    ctx.beginPath();
+    ctx.moveTo(-5, -12);
+    ctx.lineTo(0, -45); // Horn tip
+    ctx.lineTo(5, -12);
+    ctx.fill();
+    // Spiral detail
+    ctx.strokeStyle = '#daa520'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(-2, -20); ctx.lineTo(2, -28); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-1, -30); ctx.lineTo(1, -38); ctx.stroke();
 
     // ORELHA TRIANGULAR POSICIONADA
     ctx.save();
@@ -2332,19 +2388,20 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     ctx.beginPath(); ctx.moveTo(-3,0); ctx.lineTo(3,0); ctx.lineTo(0,-16); ctx.fill();
     ctx.restore();
 
-    // OLHO FEMININO (Com Cílios)
+    // OLHO FEMININO (Com Cílios v1.13)
     let blink = Math.sin(timer * 4) > 0.96;
     if (blink) {
-        ctx.strokeStyle = '#000'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(25, -24); ctx.quadraticCurveTo(35, -20, 45, -24); ctx.stroke();
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(25*iScale, -24*iScale); ctx.quadraticCurveTo(35*iScale, -20*iScale, 45*iScale, -24*iScale); ctx.stroke();
     } else {
-        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(35, -26, 10, 13, 0.1, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(37, -24, 6, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(40, -28, 3, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(35*iScale, -26*iScale, 10*iScale, 13*iScale, 0.1, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(37*iScale, -24*iScale, 6*iScale, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(40*iScale, -28*iScale, 3*iScale, 0, Math.PI*2); ctx.fill();
         
+        // Cílios Femininos
         ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
-        ctx.beginPath(); ctx.moveTo(42, -33); ctx.lineTo(48, -38); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(44, -30); ctx.lineTo(51, -33); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(45, -27); ctx.lineTo(52, -28); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(42*iScale, -33*iScale); ctx.lineTo(48*iScale, -38*iScale); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(44*iScale, -30*iScale); ctx.lineTo(51*iScale, -33*iScale); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(45*iScale, -27*iScale); ctx.lineTo(52*iScale, -28*iScale); ctx.stroke();
     }
 
     // NARINA 
@@ -2360,6 +2417,23 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
 
   ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
 
+  // MOCHILA REMOVIDA PARA ÍRIS (Usa Tanque v1.14)
+  if (player.kind === type && !isIris) {
+    ctx.save();
+    ctx.translate(isIris ? -15 : -5, -bH - 5);
+    // Base da mochila
+    ctx.fillStyle = '#444';
+    ctx.beginPath(); ctx.roundRect(-width/3, -15, width/1.5, 20, 5); ctx.fill();
+    // Tanque de bolinhas
+    ctx.fillStyle = '#222';
+    ctx.beginPath(); ctx.roundRect(-width/4, -35, width/2, 25, 8); ctx.fill();
+    ctx.strokeStyle = '#ff00ff'; ctx.lineWidth = 2; ctx.stroke();
+    // Bolinha brilhante no topo
+    ctx.fillStyle = '#ff00ff';
+    ctx.beginPath(); ctx.arc(0, -38, 4, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
   // Outfit/Roupas
   if (player.outfit === 'suit' && player.kind === type) {
     ctx.fillStyle = '#000';
@@ -2369,6 +2443,15 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     ctx.beginPath(); ctx.moveTo(-10, -height - 2); ctx.lineTo(0, -10); ctx.lineTo(10, -height - 2); ctx.fill();
     ctx.fillStyle = '#f00';
     ctx.beginPath(); ctx.moveTo(-5, -height + 2); ctx.lineTo(5, -height + 10); ctx.lineTo(-5, -height + 10); ctx.lineTo(5, -height + 2); ctx.fill();
+  }
+
+  // REAÇÃO FOFA ÍRIS (Corações v1.13)
+  if (state === 'sitting') {
+      const heartTimer = (Date.now() / 1000) * 8;
+      ctx.fillStyle = '#ff69b4';
+      ctx.font = '20px Arial';
+      ctx.fillText('❤️', 30, -bH - 20 + Math.sin(heartTimer)*10);
+      ctx.fillText('💋', 50, -bH - 40 + Math.cos(heartTimer)*10);
   }
 
   // Somente Luna desenha a cabeça padrão aqui
@@ -2386,7 +2469,7 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     ctx.fillStyle = '#000';
     ctx.beginPath(); ctx.arc(width/2 + 33, -height - 14, 4, 0, Math.PI*2); ctx.fill();
     
-    // Olhos Luna
+    // Olhos Luna/Cinder/Baby (Com Cílios v1.13)
     let eyeX = width/2 + 12;
     let eyeY = -height - 22;
     if (Math.sin(timer * 4) > 0.96) {
@@ -2396,6 +2479,11 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
       ctx.beginPath(); ctx.ellipse(eyeX, eyeY, 5, 8, 0, 0, Math.PI*2); ctx.fill();
       ctx.fillStyle = '#000';
       ctx.beginPath(); ctx.arc(eyeX + 2, eyeY - 2, 3.5, 0, Math.PI*2); ctx.fill();
+      
+      // Eyelashes for Luna/Cinder/Baby
+      ctx.strokeStyle = '#000'; ctx.lineWidth = 1.2; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(eyeX + 3, eyeY - 6); ctx.lineTo(eyeX + 8, eyeY - 10); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(eyeX + 5, eyeY - 3); ctx.lineTo(eyeX + 10, eyeY - 6); ctx.stroke();
     }
     // Orelhas Luna
     ctx.save();
@@ -2433,18 +2521,25 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
 
   // PATAS (Harmonizadas v1.12)
   ctx.fillStyle = isIris ? bodyColor2 : earColor; 
-  const swing = isJumping || isFalling ? 0 : Math.sin(timer * 20) * 12;
+  let swing = isJumping || isFalling ? 0 : Math.sin(timer * 20) * 12;
+  if (state === 'sitting') swing = 0; // Para de mexer ao sentar
+
   const pHeight = isIris ? 35 : 15;
   ctx.beginPath();
   if (isIris) {
-    ctx.roundRect(-bW/2 + 10 + swing, -pHeight, 8, pHeight, 2);
-    ctx.roundRect(bW/2 - 20 - swing, -pHeight, 8, pHeight, 2);
-    ctx.roundRect(-bW/2 + 22 - swing, -pHeight, 8, pHeight, 2);
-    ctx.roundRect(bW/2 - 12 + swing, -pHeight, 8, pHeight, 2);
+    if (state === 'sitting') {
+        // Patas dobradas (Sentada)
+        ctx.roundRect(-bW/2 + 5, -12, 15, 8, 4);
+        ctx.roundRect(bW/2 - 20, -12, 15, 8, 4);
+    } else {
+        ctx.roundRect(-bW/2 + 10 + swing, -pHeight, 8, pHeight, 2);
+        ctx.roundRect(bW/2 - 20 - swing, -pHeight, 8, pHeight, 2);
+        ctx.roundRect(-bW/2 + 22 - swing, -pHeight, 8, pHeight, 2);
+        ctx.roundRect(bW/2 - 12 + swing, -pHeight, 8, pHeight, 2);
+    }
     
     ctx.fillStyle = 'rgba(0,0,0,0.1)';
-    ctx.fillRect(-bW/2 + 10 + swing, -5, 8, 5);
-    ctx.fillRect(bW/2 - 20 - swing, -5, 8, 5);
+    ctx.fillRect(-bW/2 + 10 + (state==='sitting'?0:swing), -5, 8, 5);
   } else {
     ctx.roundRect(-width/2 + 10 + swing, -pHeight, 8, pHeight, 4);
     ctx.roundRect(width/2 - 20 - swing, -pHeight, 8, pHeight, 4);
@@ -2452,6 +2547,16 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     ctx.roundRect(width/2 - 10 + swing, -pHeight, 8, pHeight, 4);
   }
   ctx.fill();
+
+  // EQUIPAMENTO: MOCHILA UNIVERSAL (v1.16)
+  if (player.kind === type || state !== 'idle') {
+    ctx.save();
+    // Posição base da mochila nas costas
+    ctx.translate(-width/2 + 5, -height - 5);
+    ctx.fillStyle = '#6d4c41'; ctx.beginPath(); ctx.roundRect(-8, -12, 16, 18, 5); ctx.fill();
+    ctx.fillStyle = '#8d6e63'; ctx.beginPath(); ctx.roundRect(-4, -8, 8, 10, 3); ctx.fill();
+    ctx.restore();
+  }
 
   ctx.restore();
 }
@@ -2577,6 +2682,15 @@ function drawBulldog(ctx, x, y, width, height, timer, state, isHero) {
   ctx.ellipse(0, -height/2 + 5, width/2 - 15, height/2 - 5, 0, 0, Math.PI*2);
   ctx.fill();
 
+  // MOCHILA UNIVERSAL (v1.16)
+  if (state !== 'idle' || isHero) {
+      ctx.save();
+      ctx.translate(-width/2 + 10, -height - 5);
+      ctx.fillStyle = '#6d4c41'; ctx.beginPath(); ctx.roundRect(-8, -12, 16, 18, 5); ctx.fill();
+      ctx.fillStyle = '#8d6e63'; ctx.beginPath(); ctx.roundRect(-4, -8, 8, 10, 3); ctx.fill();
+      ctx.restore();
+  }
+
   // Patas dianteiras
   ctx.fillStyle = bBody;
   ctx.beginPath(); ctx.roundRect(-width/2 + 5 + swing, -12, 12, 18, 4); ctx.fill();
@@ -2616,7 +2730,7 @@ function drawBulldog(ctx, x, y, width, height, timer, state, isHero) {
     ctx.beginPath(); ctx.arc(-width/2 - 12, -height/2 + 15, 6, 0, Math.PI); ctx.stroke();
   }
 
-  // 2 OLHOS grandes com brilho e piscar
+  // 2 OLHOS grandes com brilho e cílios (v1.13)
   if (Math.sin(timer * 4) > 0.95) {
     ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(-width/2 - 10, -height/2 - 8); ctx.lineTo(-width/2 - 2, -height/2 - 8); ctx.stroke();
@@ -2629,6 +2743,7 @@ function drawBulldog(ctx, x, y, width, height, timer, state, isHero) {
     ctx.beginPath(); ctx.arc(-width/2 - 6, -height/2 - 8, 3, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = '#fff';
     ctx.beginPath(); ctx.arc(-width/2 - 7, -height/2 - 10, 1.2, 0, Math.PI*2); ctx.fill();
+    
     // Olho direito
     ctx.fillStyle = '#fff';
     ctx.beginPath(); ctx.ellipse(-width/2 + 5, -height/2 - 10, 5, 7, 0, 0, Math.PI*2); ctx.fill();
@@ -2636,6 +2751,13 @@ function drawBulldog(ctx, x, y, width, height, timer, state, isHero) {
     ctx.beginPath(); ctx.arc(-width/2 + 4, -height/2 - 10, 3, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = '#fff';
     ctx.beginPath(); ctx.arc(-width/2 + 3, -height/2 - 12, 1.2, 0, Math.PI*2); ctx.fill();
+
+    // Cílios Femininos Frida (v1.13)
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 1.2; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(-width/2 - 8, -height/2 - 14); ctx.lineTo(-width/2 - 14, -height/2 - 20); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-width/2 - 6, -height/2 - 15); ctx.lineTo(-width/2 - 10, -height/2 - 22); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-width/2 + 7, -height/2 - 16); ctx.lineTo(-width/2 + 12, -height/2 - 22); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-width/2 + 9, -height/2 - 17); ctx.lineTo(-width/2 + 15, -height/2 - 24); ctx.stroke();
   }
 
   // Orelha caída animada (vento quando pula!)
@@ -2650,26 +2772,27 @@ function drawBulldog(ctx, x, y, width, height, timer, state, isHero) {
 
   ctx.restore();
 
-  if (state === 'eating' || state === 'jumping_to_eat') {
+  // Removido osso da boca no pulo da Frida (v1.14)
+  if (state === 'eating') {
     ctx.save();
-    ctx.translate(x - width/2 - 10, drawY + (state === 'eating' ? 10 : -15));
+    ctx.translate(x - width/2 - 10, drawY + 10);
     ctx.rotate(timer * 15); 
     drawBone(ctx, 0, 0, 0);
     ctx.restore();
   }
 }
 
-function drawBear(ctx, x, y, kind, timer, state, isHero) {
+function drawBear(ctx, x, y, kind, timer, state, isHero = false) {
   ctx.save();
   
   let baseColor1 = '#8B4513'; 
   let baseColor2 = '#A0522D';
   let bellyColor = '#cda177';
-  if (kind === 'white_barbie') {
+  if (kind === 'white_baby') {
       baseColor1 = '#f5f5f5'; baseColor2 = '#ffffff'; bellyColor = '#e0e0e0';
-  } else if (kind === 'panda_barbie') {
+  } else if (kind === 'panda_baby') {
       baseColor1 = '#111111'; baseColor2 = '#222222'; bellyColor = '#ffffff';
-  } else if (kind === 'pink' || kind === 'barbie' || kind === 'barbie_bear') {
+  } else if (kind === 'pink' || kind === 'baby' || kind === 'baby_bear') {
       baseColor1 = '#ff80bf'; baseColor2 = '#ff4d94'; bellyColor = '#ffb3d9';
   }
 
@@ -2692,7 +2815,7 @@ function drawBear(ctx, x, y, kind, timer, state, isHero) {
      ctx.beginPath(); ctx.ellipse(-20, 10 + wag, 8, 12, -0.8, 0, Math.PI*2); ctx.fill(); 
      ctx.beginPath(); ctx.ellipse(20, 10 - wag, 8, 12, 0.8, 0, Math.PI*2); ctx.fill(); 
      
-     ctx.fillStyle = (kind === 'panda_barbie') ? '#fff' : baseColor1;
+     ctx.fillStyle = (kind === 'panda_baby') ? '#fff' : baseColor1;
      ctx.beginPath(); ctx.ellipse(0, 25, 20, 15, 0, 0, Math.PI*2); ctx.fill();
      
      ctx.fillStyle = baseColor1;
@@ -2730,52 +2853,55 @@ function drawBear(ctx, x, y, kind, timer, state, isHero) {
 
      // Cabeca
      ctx.translate(-25, -35); 
-     ctx.fillStyle = (kind === 'panda_barbie') ? '#fff' : baseColor1;
+     ctx.fillStyle = (kind === 'panda_baby') ? '#fff' : baseColor1;
      ctx.beginPath(); ctx.ellipse(0, 0, 18, 16, 0, 0, Math.PI*2); ctx.fill();
      
-     // Orelhas animadas
+     // Orelhas separadas (v1.13)
      ctx.save();
      let earAngle = Math.sin(timer * 3) * 0.1;
      if (state === 'jumping_to_eat') earAngle = Math.sin(timer * 30) * 0.4;
      ctx.fillStyle = baseColor2;
-     if(kind === 'panda_barbie') ctx.fillStyle = '#111';
-     ctx.save(); ctx.translate(5, -12); ctx.rotate(earAngle);
+     if(kind === 'panda_baby') ctx.fillStyle = '#111';
+     ctx.save(); ctx.translate(14, -12); ctx.rotate(earAngle);
      ctx.beginPath(); ctx.arc(0, 0, 7, 0, Math.PI*2); ctx.fill();
      ctx.restore();
-     ctx.save(); ctx.translate(-5, -12); ctx.rotate(-earAngle);
+     ctx.save(); ctx.translate(-14, -12); ctx.rotate(-earAngle);
      ctx.beginPath(); ctx.arc(0, 0, 7, 0, Math.PI*2); ctx.fill();
      ctx.restore();
      ctx.restore();
 
-     // Manchas do Panda
-     if (kind === 'panda_barbie') {
+     // Manchas do Panda (Baby)
+     if (kind === 'panda_baby') {
          ctx.fillStyle = '#111';
          ctx.beginPath(); ctx.ellipse(-5, -2, 6, 8, -0.3, 0, Math.PI*2); ctx.fill();
          ctx.beginPath(); ctx.ellipse(8, -2, 6, 8, 0.3, 0, Math.PI*2); ctx.fill();
      }
 
-     // Olhos com piscar
-     if (Math.sin(timer * 4) > 0.95) {
+     // Olhos Femininos Grandes e Brilhantes (v1.13)
+     if (Math.sin(timer * 4) > 0.96) {
        ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
        ctx.beginPath(); ctx.moveTo(-8, -2); ctx.lineTo(-2, -2); ctx.stroke();
        ctx.beginPath(); ctx.moveTo(5, -2); ctx.lineTo(11, -2); ctx.stroke();
      } else {
        ctx.fillStyle = '#fff';
-       ctx.beginPath(); ctx.arc(-5, -2, 4, 0, Math.PI*2); ctx.fill();
-       ctx.beginPath(); ctx.arc(8, -2, 4, 0, Math.PI*2); ctx.fill();
+       ctx.beginPath(); ctx.ellipse(-5, -2, 6, 8, 0, 0, Math.PI*2); ctx.fill();
+       ctx.beginPath(); ctx.ellipse(8, -2, 6, 8, 0, 0, Math.PI*2); ctx.fill();
        ctx.fillStyle = '#000';
-       ctx.beginPath(); ctx.arc(-6, -2, 2, 0, Math.PI*2); ctx.fill();
-       ctx.beginPath(); ctx.arc(7, -2, 2, 0, Math.PI*2); ctx.fill();
-       ctx.fillStyle = '#fff';
-       ctx.beginPath(); ctx.arc(-7, -3, 1, 0, Math.PI*2); ctx.fill();
-       ctx.beginPath(); ctx.arc(6, -3, 1, 0, Math.PI*2); ctx.fill();
-     }
-     
-     // Sobrancelha malvada (só inimigo)
-     if (!isHero) {
-       ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
-       ctx.beginPath(); ctx.moveTo(-8, -6); ctx.lineTo(-2, -4); ctx.stroke();
-       ctx.beginPath(); ctx.moveTo(11, -6); ctx.lineTo(5, -4); ctx.stroke();
+       ctx.beginPath(); ctx.arc(-4.5, -1, 3.5, 0, Math.PI*2); ctx.fill();
+       ctx.beginPath(); ctx.arc(7.5, -1, 3.5, 0, Math.PI*2); ctx.fill();
+       ctx.fillStyle = '#fff'; // Brilho extra
+       ctx.beginPath(); ctx.arc(-3, -3, 1.5, 0, Math.PI*2); ctx.fill();
+       ctx.beginPath(); ctx.arc(6, -3, 1.5, 0, Math.PI*2); ctx.fill();
+       
+       // Cílios Ursinha (Luxuosos v1.13)
+       ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+       ctx.beginPath(); ctx.moveTo(-10, -6); ctx.lineTo(-16, -12); ctx.stroke();
+       ctx.beginPath(); ctx.moveTo(-8, -8); ctx.lineTo(-12, -14); ctx.stroke();
+       ctx.beginPath(); ctx.moveTo(-6, -9); ctx.lineTo(-8, -15); ctx.stroke();
+       
+       ctx.beginPath(); ctx.moveTo(12, -6); ctx.lineTo(18, -12); ctx.stroke();
+       ctx.beginPath(); ctx.moveTo(10, -8); ctx.lineTo(14, -14); ctx.stroke();
+       ctx.beginPath(); ctx.moveTo(8, -9); ctx.lineTo(10, -15); ctx.stroke();
      }
 
      // Focinho
@@ -3460,20 +3586,20 @@ function render() {
         ctx.fillStyle = '#fff'; ctx.font = 'bold 20px Arial'; ctx.fillText('Zzz', 15, -35 + Math.sin(b.animTimer * 3) * 5);
       } else {
         ctx.translate(b.x, 0); ctx.scale(-1, 1); ctx.translate(-b.x, 0);
-        drawAnimatedAnimal(ctx, b.x, b.y, b.width, 30, b.animTimer, false, false, 'luna');
+        drawAnimatedAnimal(ctx, b.x, b.y, b.width, 30, b.animTimer, false, false, 'luna', b.state, false);
       }
       ctx.restore();
     } else if (b.kind === 'iris') {
        // Íris looks RIGHT, so flip for obstacle
        ctx.save();
        ctx.translate(b.x, 0); ctx.scale(-1, 1); ctx.translate(-b.x, 0);
-       drawAnimatedAnimal(ctx, b.x, b.y, b.width, b.height, b.animTimer, false, false, 'iris');
+        drawAnimatedAnimal(ctx, b.x, b.y, b.width, b.height, b.animTimer, false, false, 'iris', b.state, false);
        ctx.restore();
     } else {
-       // frida, cinder, barbie face LEFT. Do NOT flip for obstacle.
+       // frida, cinder, baby face LEFT. Do NOT flip for obstacle.
        if (b.kind === 'frida') drawBulldog(ctx, b.x, b.y, b.width, b.height, b.animTimer, b.state);
        else if (b.kind === 'cinder') drawCat(ctx, b.x, b.y, b.width, b.height, b.animTimer, b.state);
-       else if (b.kind.includes('barbie')) drawBear(ctx, b.x, b.y, 'pink', b.animTimer, b.state);
+       else if (b.kind.includes('baby')) drawBear(ctx, b.x, b.y, 'pink', b.animTimer, b.state);
        else drawBear(ctx, b.x, b.y, b.kind, b.animTimer, b.state);
     }
   }
@@ -3619,7 +3745,7 @@ function render() {
     
     // LUNA and IRIS face RIGHT by default.
     if (player.kind === 'luna') {
-      drawAnimatedAnimal(ctx, player.x, player.y, player.width, player.height, player.animTimer, player.isJumping, player.isFalling, 'luna');
+      drawAnimatedAnimal(ctx, player.x, player.y, player.width, player.height, player.animTimer, player.isJumping, player.isFalling, 'luna', player.state, true);
     } else if (player.kind === 'iris') {
        // ESCALA 80% para a Íris como pedido
        ctx.save();
@@ -3638,23 +3764,12 @@ function render() {
 
       if (player.kind === 'frida') drawBulldog(ctx, player.x, player.y, player.width, player.height, player.animTimer, st, true);
       else if (player.kind === 'cinder') drawCat(ctx, player.x, player.y, player.width, player.height, player.animTimer, st, true);
-      else if (player.kind === 'barbie') drawBear(ctx, player.x, player.y, 'pink', player.animTimer, st, true);
+      else if (player.kind === 'baby') drawBear(ctx, player.x, player.y, 'pink', player.animTimer, st, true);
       
       ctx.restore();
     }
     
-    // Tanquezinho (Canhão) nas costas de todos exceto Luna
-    if (player.kind !== 'luna') {
-      ctx.save();
-      // Ajustado: x - 15 (mais para trás) e y - 8 (colado no corpo)
-      ctx.translate(player.x - 15, player.y + 20 - player.height - 8);
-      ctx.fillStyle = '#00bfff'; ctx.beginPath(); ctx.roundRect(-12, -12, 24, 18, 6); ctx.fill();
-      ctx.fillStyle = '#ccffff'; ctx.beginPath(); ctx.roundRect(-6, -8, 12, 10, 3); ctx.fill();
-      ctx.fillStyle = '#ff1493'; ctx.beginPath(); ctx.roundRect(-5, -16, 10, 5, 2); ctx.fill();
-      ctx.fillStyle = '#aaa'; 
-      ctx.beginPath(); ctx.moveTo(12, -4); ctx.lineTo(20, -2); ctx.lineTo(20, 2); ctx.lineTo(12, 4); ctx.fill();
-      ctx.restore();
-    }
+    // Equipamento agora desenhado pelas funções de cada animal (v1.14)
     
     // Timer de Power-up
     if (player.tripleShotTimer > 0 || player.doubleShotTimer > 0) {
