@@ -2229,17 +2229,6 @@ function drawLunaMenu(ctx, x, y, size, timer) {
   ctx.restore();
 }
 
-function drawMenuDogs(timer) {
-  // Canva components removed, using CSS animation for the icon img
-  return;
-}
-
-/**
- * DESENHANDO A LUNA (drawDog):
- * Esta é a função mais importante! Ela desenha a nossa heroína Luna.
- * A gente usa formas geométricas (retângulos arredondados, círculos) 
- * para montar o corpo dela.
- */
 function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFalling, type = 'luna') {
   if (player.dead) return; 
   
@@ -2284,42 +2273,41 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     ctx.roundRect(-bW/2, -bH - 10, bW, bH, 18);
     ctx.fill();
     
-    // PESCOÇO (Conexão Sólida v1.11)
+    // PESCOÇO (Conexão Garantida v1.12)
     ctx.fillStyle = bodyGrad;
     ctx.beginPath();
-    ctx.moveTo(bW/2 - 15, -bH - 5);
-    ctx.lineTo(bW/2 - 5, -bH - 35);
-    ctx.lineTo(bW/2 + 15, -bH - 35);
-    ctx.lineTo(bW/2, -bH - 5);
+    ctx.moveTo(bW/2 - 18, -bH - 5);
+    ctx.lineTo(bW/2 - 8, -bH - 40); // Sobe até a nuca
+    ctx.lineTo(bW/2 + 12, -bH - 40);
+    ctx.lineTo(bW/2 + 2, -bH - 5);
     ctx.fill();
 
-    // CRINA EM MECHAS CURVAS (Hair Style v1.11)
-    const mColors = ['#ff69b4', '#da70d6', '#9370db', '#87ceeb', '#98fb98', '#ffffed'];
+    // CRINA EM SPIKES (Estilo Moicano Arco-Íris v1.12)
+    const mColors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
     ctx.save();
-    ctx.translate(bW/2 - 12, -bH - 20);
+    ctx.translate(bW/2 - 5, -bH - 40);
     for(let i=0; i<mColors.length; i++) {
         ctx.fillStyle = mColors[i];
         ctx.beginPath();
-        // Mechas pontiagudas e curvas (Bezier) para parecer cabelo real
-        ctx.moveTo(-i*4, -i*5);
-        ctx.bezierCurveTo(-25 - i*5, -10 - i*10, -35 - i*5, 10 + i*10, -5 - i*4, 15 + i*5);
-        ctx.bezierCurveTo(-20 - i*5, 10 + i*5, -15 - i*5, -5 - i*5, -i*4, -i*5);
+        // Triângulos (Spikes) colados no pescoço
+        ctx.moveTo(-i*4, i*5); 
+        ctx.lineTo(-i*4 - 15, i*5 - 15); // Ponta do spike
+        ctx.lineTo(-i*4 - 5, i*5 + 10);
         ctx.fill();
     }
     ctx.restore();
     
-    // CABEÇA MESTRE (Focinho Afilado - Adeus Capivara)
+    // CABEÇA MESTRE (Focinho Afilado)
     ctx.save();
-    ctx.translate(bW/2 + 5, -bH - 40);
+    ctx.translate(bW/2 + 8, -bH - 45); 
     
     ctx.fillStyle = bodyGrad;
     ctx.beginPath();
-    // Crânio afilado (trapézio longo)
     ctx.moveTo(0, 0); 
-    ctx.bezierCurveTo(-10, -15, 0, -35, 15, -40); // Testa
-    ctx.lineTo(55, -25); // Ponte do nariz (Longa e afilada)
-    ctx.bezierCurveTo(65, -18, 65, -5, 55, 0); // Ponta do focinho (Fina)
-    ctx.bezierCurveTo(45, 5, 25, 10, 5, 5); // Mandíbula
+    ctx.bezierCurveTo(-12, -15, 0, -35, 12, -40); // Testa
+    ctx.lineTo(52, -28); // Ponte do nariz (longa e fina)
+    ctx.bezierCurveTo(62, -22, 62, -8, 52, -2); // Ponta do focinho afilada
+    ctx.bezierCurveTo(40, 5, 20, 10, 0, 5); // Mandíbula
     ctx.closePath();
     ctx.fill();
 
@@ -2328,16 +2316,15 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     hornGrad.addColorStop(0, '#ffd700'); hornGrad.addColorStop(0.5, '#fff700'); hornGrad.addColorStop(1, '#ffaa00');
     ctx.fillStyle = hornGrad;
     ctx.beginPath();
-    ctx.moveTo(10, -38); ctx.lineTo(15, -85); ctx.lineTo(25, -35); ctx.fill();
-    // Detalhes do chifre
-    ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 2;
+    ctx.moveTo(8, -38); ctx.lineTo(12, -85); ctx.lineTo(22, -35); ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.1)'; ctx.lineWidth = 1.5;
     for(let j=1; j<5; j++) {
-        ctx.beginPath(); ctx.moveTo(12, -40 - j*10); ctx.lineTo(22, -45 - j*10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(9, -40 - j*10); ctx.lineTo(18, -45 - j*10); ctx.stroke();
     }
 
     // ORELHA TRIANGULAR POSICIONADA
     ctx.save();
-    ctx.translate(0, -30);
+    ctx.translate(-2, -32);
     ctx.rotate(-0.4);
     ctx.fillStyle = bodyColor1;
     ctx.beginPath(); ctx.moveTo(-6,0); ctx.lineTo(6,0); ctx.lineTo(0,-22); ctx.fill();
@@ -2345,27 +2332,24 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     ctx.beginPath(); ctx.moveTo(-3,0); ctx.lineTo(3,0); ctx.lineTo(0,-16); ctx.fill();
     ctx.restore();
 
-    // OLHO FEMININO (Com Cílios v1.11)
+    // OLHO FEMININO (Com Cílios)
     let blink = Math.sin(timer * 4) > 0.96;
     if (blink) {
-        ctx.strokeStyle = '#000'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(25, -22); ctx.quadraticCurveTo(35, -18, 45, -22); ctx.stroke();
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(25, -24); ctx.quadraticCurveTo(35, -20, 45, -24); ctx.stroke();
     } else {
-        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(35, -24, 10, 13, 0.1, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(37, -22, 6, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(40, -26, 3, 0, Math.PI*2); ctx.fill(); // Brilho
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(35, -26, 10, 13, 0.1, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(37, -24, 6, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(40, -28, 3, 0, Math.PI*2); ctx.fill();
         
-        // CÍLIOS (Feminino)
         ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
-        ctx.beginPath(); ctx.moveTo(42, -31); ctx.lineTo(48, -36); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(44, -28); ctx.lineTo(51, -31); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(45, -25); ctx.lineTo(52, -26); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(42, -33); ctx.lineTo(48, -38); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(44, -30); ctx.lineTo(51, -33); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(45, -27); ctx.lineTo(52, -28); ctx.stroke();
     }
 
-    // NARINA E SORRISO
+    // NARINA 
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath(); ctx.arc(58, -12, 2.5, 0, Math.PI*2); ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,0.2)'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.arc(50, -5, 8, 0.2, 1.2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(55, -15, 2.5, 0, Math.PI*2); ctx.fill();
 
     ctx.restore();
 
@@ -2422,40 +2406,45 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     ctx.restore();
   }
 
-  // RABO ( Rainbow Flow v1.11 - Subiu para o Topo)
+  // RABO (Fluxo Natural v1.12 - Apontando para CIMA)
   ctx.save();
   if (isIris) {
-      ctx.translate(-bW/2 + 3, -bH - 12); // Posição elevada no traseiro
+      ctx.translate(-bW/2, -bH - 5); 
   } else {
       ctx.translate(-width/2 + 5, -height - 5);
   }
-  ctx.rotate(Math.sin(timer * 15) * 0.4 - 0.7);
+  ctx.rotate(Math.sin(timer * 15) * 0.3 - 1.2); 
   
   if (isIris) {
-      const rColors = ['#ff0000', '#ffa500', '#ffff00', '#008000', '#0000ff', '#4b0082', '#ee82ee'];
-      for(let i=0; i<7; i++) {
+      const rColors = ['#ff0000', '#ffa500', '#ffff00', '#008000', '#0000ff', '#9400d3'];
+      ctx.save();
+      for(let i=0; i<rColors.length; i++) {
           ctx.fillStyle = rColors[i];
           ctx.beginPath();
-          ctx.ellipse(-12 - i*2, -2 + i*2, 18, 6, 0.4, 0, Math.PI*2);
+          ctx.ellipse(-10 - i*2, -i*2, 22, 7, 0.2, 0, Math.PI*2);
           ctx.fill();
       }
+      ctx.restore();
   } else {
       ctx.fillStyle = bodyGrad;
       ctx.beginPath(); ctx.roundRect(-20, -5, 25, 8, 4); ctx.fill();
   }
   ctx.restore();
 
-  // PATAS (Profissional v1.11 - Curvas e Cascos)
-  ctx.fillStyle = isIris ? '#daa520' : earColor; 
+  // PATAS (Harmonizadas v1.12)
+  ctx.fillStyle = isIris ? bodyColor2 : earColor; 
   const swing = isJumping || isFalling ? 0 : Math.sin(timer * 20) * 12;
   const pHeight = isIris ? 35 : 15;
   ctx.beginPath();
   if (isIris) {
-    // Patas com leve inclinação 'Real'
     ctx.roundRect(-bW/2 + 10 + swing, -pHeight, 8, pHeight, 2);
     ctx.roundRect(bW/2 - 20 - swing, -pHeight, 8, pHeight, 2);
     ctx.roundRect(-bW/2 + 22 - swing, -pHeight, 8, pHeight, 2);
     ctx.roundRect(bW/2 - 12 + swing, -pHeight, 8, pHeight, 2);
+    
+    ctx.fillStyle = 'rgba(0,0,0,0.1)';
+    ctx.fillRect(-bW/2 + 10 + swing, -5, 8, 5);
+    ctx.fillRect(bW/2 - 20 - swing, -5, 8, 5);
   } else {
     ctx.roundRect(-width/2 + 10 + swing, -pHeight, 8, pHeight, 4);
     ctx.roundRect(width/2 - 20 - swing, -pHeight, 8, pHeight, 4);
