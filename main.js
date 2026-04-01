@@ -2254,8 +2254,8 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     bodyColor1 = '#ffccff'; bodyColor2 = '#ff99ff'; earColor = '#ff66ff';
   }
 
-  const bW = isIris ? width + 5 : width;
-  const bH = isIris ? height : height;
+  const bW = isIris ? width + 8 : width;
+  const bH = isIris ? height + 2 : height;
 
   const drawY = y + 20; 
   ctx.save();
@@ -2280,77 +2280,92 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   ctx.fillStyle = bodyGrad;
   ctx.beginPath();
   if (isIris) {
-    // CORPO Unicórnio (Elegante)
-    ctx.roundRect(-bW/2, -bH - 10, bW, bH, 15);
+    // CORPO Unicórnio (Anatomia Refinada)
+    ctx.roundRect(-bW/2, -bH - 10, bW, bH, 18);
     ctx.fill();
     
-    // CRINA EM MECHAS (Efeito v1.10 - Cabelo fluindo)
+    // PESCOÇO (Conexão Sólida v1.11)
+    ctx.fillStyle = bodyGrad;
+    ctx.beginPath();
+    ctx.moveTo(bW/2 - 15, -bH - 5);
+    ctx.lineTo(bW/2 - 5, -bH - 35);
+    ctx.lineTo(bW/2 + 15, -bH - 35);
+    ctx.lineTo(bW/2, -bH - 5);
+    ctx.fill();
+
+    // CRINA EM MECHAS CURVAS (Hair Style v1.11)
     const mColors = ['#ff69b4', '#da70d6', '#9370db', '#87ceeb', '#98fb98', '#ffffed'];
     ctx.save();
-    ctx.translate(bW/2 - 22, -bH - 10);
+    ctx.translate(bW/2 - 12, -bH - 20);
     for(let i=0; i<mColors.length; i++) {
         ctx.fillStyle = mColors[i];
-        ctx.save();
-        ctx.rotate(-0.2 + i * 0.1);
         ctx.beginPath();
-        // Elipses alongadas para parecer cabelo
-        ctx.ellipse(-i*5, -i*3, 15, 25, 0, 0, Math.PI*2);
+        // Mechas pontiagudas e curvas (Bezier) para parecer cabelo real
+        ctx.moveTo(-i*4, -i*5);
+        ctx.bezierCurveTo(-25 - i*5, -10 - i*10, -35 - i*5, 10 + i*10, -5 - i*4, 15 + i*5);
+        ctx.bezierCurveTo(-20 - i*5, 10 + i*5, -15 - i*5, -5 - i*5, -i*4, -i*5);
         ctx.fill();
-        ctx.restore();
     }
     ctx.restore();
     
-    // CABEÇA MESTRE (Trapezoidal com cantos ovais - Estilo Cavalo Oficial)
+    // CABEÇA MESTRE (Focinho Afilado - Adeus Capivara)
     ctx.save();
-    ctx.translate(bW/2 - 5, -bH - 35);
+    ctx.translate(bW/2 + 5, -bH - 40);
     
     ctx.fillStyle = bodyGrad;
     ctx.beginPath();
-    // Crânio (Base larga na bochecha)
-    ctx.moveTo(0, 0);
-    ctx.bezierCurveTo(-15, -10, -15, -35, 10, -45); // Topo da cabeça
-    ctx.bezierCurveTo(25, -50, 45, -40, 55, -20); // Nariz/Focinho superior
-    ctx.bezierCurveTo(60, -5, 55, 5, 45, 10); // Ponta do focinho
-    ctx.bezierCurveTo(35, 15, 15, 15, 5, 10);  // Base do queixo
+    // Crânio afilado (trapézio longo)
+    ctx.moveTo(0, 0); 
+    ctx.bezierCurveTo(-10, -15, 0, -35, 15, -40); // Testa
+    ctx.lineTo(55, -25); // Ponte do nariz (Longa e afilada)
+    ctx.bezierCurveTo(65, -18, 65, -5, 55, 0); // Ponta do focinho (Fina)
+    ctx.bezierCurveTo(45, 5, 25, 10, 5, 5); // Mandíbula
     ctx.closePath();
     ctx.fill();
 
-    // CHIFRE (Com detalhes de anéis)
+    // CHIFRE ESPIRALADO
     const hornGrad = ctx.createLinearGradient(0, -60, 0, -10);
     hornGrad.addColorStop(0, '#ffd700'); hornGrad.addColorStop(0.5, '#fff700'); hornGrad.addColorStop(1, '#ffaa00');
     ctx.fillStyle = hornGrad;
     ctx.beginPath();
-    ctx.moveTo(15, -45); ctx.lineTo(25, -85); ctx.lineTo(35, -40); ctx.fill();
-    // Linhas do chifre (espiral)
-    ctx.strokeStyle = 'rgba(0,0,0,0.2)'; ctx.lineWidth = 2;
-    for(let j=1; j<4; j++) {
-        ctx.beginPath(); ctx.moveTo(20, -45 - j*10); ctx.lineTo(30, -55 - j*10); ctx.stroke();
+    ctx.moveTo(10, -38); ctx.lineTo(15, -85); ctx.lineTo(25, -35); ctx.fill();
+    // Detalhes do chifre
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 2;
+    for(let j=1; j<5; j++) {
+        ctx.beginPath(); ctx.moveTo(12, -40 - j*10); ctx.lineTo(22, -45 - j*10); ctx.stroke();
     }
 
-    // ORELHA LATERAL (Atrás do chifre)
+    // ORELHA TRIANGULAR POSICIONADA
     ctx.save();
-    ctx.translate(5, -35);
-    ctx.rotate(-0.5);
+    ctx.translate(0, -30);
+    ctx.rotate(-0.4);
     ctx.fillStyle = bodyColor1;
     ctx.beginPath(); ctx.moveTo(-6,0); ctx.lineTo(6,0); ctx.lineTo(0,-22); ctx.fill();
-    ctx.fillStyle = '#ffb6c1'; // Interior da orelha (rosinha)
-    ctx.beginPath(); ctx.moveTo(-3,0); ctx.lineTo(3,0); ctx.lineTo(0,-15); ctx.fill();
+    ctx.fillStyle = '#ffb6c1';
+    ctx.beginPath(); ctx.moveTo(-3,0); ctx.lineTo(3,0); ctx.lineTo(0,-16); ctx.fill();
     ctx.restore();
 
-    // OLHO EQUILIBRADO (Expressivo)
+    // OLHO FEMININO (Com Cílios v1.11)
     let blink = Math.sin(timer * 4) > 0.96;
     if (blink) {
-        ctx.strokeStyle = '#000'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(25, -20); ctx.quadraticCurveTo(35, -15, 45, -20); ctx.stroke();
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(25, -22); ctx.quadraticCurveTo(35, -18, 45, -22); ctx.stroke();
     } else {
-        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(35, -22, 10, 13, 0.1, 0, Math.PI*2); ctx.fill(); // Esclera
-        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(38, -20, 6, 0, Math.PI*2); ctx.fill(); // Pupila
-        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(41, -24, 3, 0, Math.PI*2); ctx.fill(); // Brilho 1
-        ctx.beginPath(); ctx.arc(35, -16, 1.5, 0, Math.PI*2); ctx.fill(); // Brilho 2
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(35, -24, 10, 13, 0.1, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(37, -22, 6, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(40, -26, 3, 0, Math.PI*2); ctx.fill(); // Brilho
+        
+        // CÍLIOS (Feminino)
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(42, -31); ctx.lineTo(48, -36); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(44, -28); ctx.lineTo(51, -31); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(45, -25); ctx.lineTo(52, -26); ctx.stroke();
     }
 
-    // NARINA
+    // NARINA E SORRISO
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath(); ctx.arc(52, -5, 3, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(58, -12, 2.5, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.2)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(50, -5, 8, 0.2, 1.2); ctx.stroke();
 
     ctx.restore();
 
@@ -2407,20 +2422,22 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     ctx.restore();
   }
 
-  // RABO (Rainbow Layers)
+  // RABO ( Rainbow Flow v1.11 - Subiu para o Topo)
   ctx.save();
   if (isIris) {
-      ctx.translate(-bW/2 + 5, -bH - 5); 
+      ctx.translate(-bW/2 + 3, -bH - 12); // Posição elevada no traseiro
   } else {
       ctx.translate(-width/2 + 5, -height - 5);
   }
-  ctx.rotate(Math.sin(timer * 15) * 0.3 - 0.5);
+  ctx.rotate(Math.sin(timer * 15) * 0.4 - 0.7);
   
   if (isIris) {
       const rColors = ['#ff0000', '#ffa500', '#ffff00', '#008000', '#0000ff', '#4b0082', '#ee82ee'];
       for(let i=0; i<7; i++) {
           ctx.fillStyle = rColors[i];
-          ctx.beginPath(); ctx.ellipse(-12 - i*2, -2 + i*2, 16, 6, 0.5, 0, Math.PI*2); ctx.fill();
+          ctx.beginPath();
+          ctx.ellipse(-12 - i*2, -2 + i*2, 18, 6, 0.4, 0, Math.PI*2);
+          ctx.fill();
       }
   } else {
       ctx.fillStyle = bodyGrad;
@@ -2428,16 +2445,17 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   }
   ctx.restore();
 
-  // PATAS
-  ctx.fillStyle = isIris ? '#daa520' : earColor; // Cascos dourados para Íris
-  const swing = isJumping || isFalling ? 0 : Math.sin(timer * 20) * 10;
-  const pHeight = isIris ? 32 : 15;
+  // PATAS (Profissional v1.11 - Curvas e Cascos)
+  ctx.fillStyle = isIris ? '#daa520' : earColor; 
+  const swing = isJumping || isFalling ? 0 : Math.sin(timer * 20) * 12;
+  const pHeight = isIris ? 35 : 15;
   ctx.beginPath();
   if (isIris) {
-    ctx.roundRect(-bW/2 + 10 + swing, -pHeight, 8, pHeight, 3);
-    ctx.roundRect(bW/2 - 20 - swing, -pHeight, 8, pHeight, 3);
-    ctx.roundRect(-bW/2 + 22 - swing, -pHeight, 8, pHeight, 3);
-    ctx.roundRect(bW/2 - 12 + swing, -pHeight, 8, pHeight, 3);
+    // Patas com leve inclinação 'Real'
+    ctx.roundRect(-bW/2 + 10 + swing, -pHeight, 8, pHeight, 2);
+    ctx.roundRect(bW/2 - 20 - swing, -pHeight, 8, pHeight, 2);
+    ctx.roundRect(-bW/2 + 22 - swing, -pHeight, 8, pHeight, 2);
+    ctx.roundRect(bW/2 - 12 + swing, -pHeight, 8, pHeight, 2);
   } else {
     ctx.roundRect(-width/2 + 10 + swing, -pHeight, 8, pHeight, 4);
     ctx.roundRect(width/2 - 20 - swing, -pHeight, 8, pHeight, 4);
