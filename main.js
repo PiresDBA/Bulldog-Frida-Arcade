@@ -79,7 +79,8 @@ const i18n = {
     unlockMsg: "Desbloquear por {cost} moedas?",
     notEnoughCoins: "Moedas insuficientes!",
     locked: "🔒",
-    tripleShot: "Tiro Triplo!"
+    tripleShot: "Tiro Triplo!",
+    touchToStart: "TOQUE NA IMAGEM PARA COMEÇAR"
   },
   en: {
     score: "SCORE", phase: "PHASE", selectHero: "SELECT HERO", ctrlShoot: "Shoot",
@@ -103,7 +104,8 @@ const i18n = {
     unlockMsg: "Unlock for {cost} coins?",
     notEnoughCoins: "Not enough coins!",
     locked: "🔒",
-    tripleShot: "Triple Shot!"
+    tripleShot: "Triple Shot!",
+    touchToStart: "TOUCH IMAGE TO START"
   },
   es: {
     score: "PUNTOS", phase: "FASE", selectHero: "ELIGE TU HÉROE", ctrlShoot: "Disparar",
@@ -127,7 +129,8 @@ const i18n = {
     unlockMsg: "¿Desbloquear por {cost} monedas?",
     notEnoughCoins: "¡Monedas insuficientes!",
     locked: "🔒",
-    tripleShot: "¡Tiro Triple!"
+    tripleShot: "¡Tiro Triple!",
+    touchToStart: "TOCA LA IMAGEN PARA EMPEZAR"
   },
   zh: {
     score: "得分", phase: "阶段", selectHero: "英雄选择", ctrlShoot: "射击",
@@ -151,7 +154,8 @@ const i18n = {
     unlockMsg: "用 {cost} 金币解锁吗？",
     notEnoughCoins: "金币不足！",
     locked: "🔒",
-    tripleShot: "三连发！"
+    tripleShot: "三连发！",
+    touchToStart: "点击图片开始游戏"
   }
 };
 
@@ -2250,6 +2254,10 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     bodyColor1 = '#ffccff'; bodyColor2 = '#ff99ff'; earColor = '#ff66ff';
   }
 
+  // Se for Íris, reduzimos levemente o tamanho do corpo para elegância
+  const bW = isIris ? width - 5 : width;
+  const bH = isIris ? height - 5 : height;
+
   const drawY = y + 20; 
   ctx.save();
   
@@ -2266,41 +2274,75 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   ctx.shadowBlur = 10;
   ctx.shadowOffsetY = 8;
   
-  const bodyGrad = ctx.createLinearGradient(0, -height - 10, 0, 0);
+  const bodyGrad = ctx.createLinearGradient(0, -bH - 10, 0, 0);
   bodyGrad.addColorStop(0, bodyColor1);
   bodyGrad.addColorStop(1, bodyColor2);
 
   ctx.fillStyle = bodyGrad;
   ctx.beginPath();
   if (isIris) {
-    // CORPO Unicórnio (Arredondado - Horse Shape)
-    ctx.roundRect(-width/2, -height - 10, width, height, 15);
+    // CORPO Unicórnio (Menor e Arredondado)
+    ctx.roundRect(-bW/2, -bH - 10, bW, bH, 15);
     ctx.fill();
     
-    // CRINA COMO PESCOÇO (Inverted Slant for Horse Posture)
-    const mColors = ['#f00', '#f90', '#ff0', '#0f0', '#0ff', '#00f', '#90f'];
+    // CRINA COMO PESCOÇO (MUITO MAIS CURTO - v1.8)
+    const mColors = ['#f00', '#f90', '#ff0', '#0f0']; // Apenas 4 bolinhas
     ctx.save();
-    // Começa mais para a esquerda/trás e sobe para a direita/frente
-    ctx.translate(width/2 - 25, -height - 15); 
+    ctx.translate(bW/2 - 20, -bH - 10); 
     for(let i=0; i<mColors.length; i++) {
         ctx.fillStyle = mColors[i];
         ctx.beginPath();
-        // i*2.2 (indo para a direita), -i*6 (indo para cima)
-        ctx.arc(i*2.2, -i*6, 12, 0, Math.PI*2);
+        // i*2.5 (indo para a direita/frente), i*(-4) (subindo pouco)
+        ctx.arc(i*3.5, -i*5, 12, 0, Math.PI*2);
         ctx.fill();
     }
     
-    // CHIFRE ARCO-ÍRIS
-    const hornGrad = ctx.createLinearGradient(0, -35, 0, 0);
-    hornGrad.addColorStop(0, '#f00');
-    hornGrad.addColorStop(0.5, '#ffff00');
-    hornGrad.addColorStop(1, '#00ffff');
-    ctx.fillStyle = hornGrad;
-    ctx.save();
-    ctx.translate(15, -60); // Ajustado para o slant frontal
-    ctx.rotate(0.3);
-    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-6, -35); ctx.lineTo(10, 0); ctx.fill();
+    // REDESENHANDO A CABEÇA (Formato Cavalo/Triangular)
     ctx.restore();
+    ctx.save();
+    ctx.translate(bW/2 - 10, -bH - 35); // Posição colada no pescoço curto
+    
+    ctx.fillStyle = bodyGrad;
+    ctx.beginPath();
+    // Crânio alongado
+    ctx.moveTo(0, 0);
+    ctx.lineTo(45, 10);  // Focinho ponto 1
+    ctx.lineTo(45, 30);  // Focinho ponto 2
+    ctx.lineTo(0, 30);   // Base da cabeça
+    ctx.closePath();
+    ctx.fill();
+
+    // CHIFRE NA TESTA (Mais para a frente)
+    const hornGrad = ctx.createLinearGradient(0, -35, 0, 0);
+    hornGrad.addColorStop(0, '#f00'); hornGrad.addColorStop(0.5, '#ffff00'); hornGrad.addColorStop(1, '#00ffff');
+    ctx.fillStyle = hornGrad;
+    ctx.beginPath();
+    ctx.moveTo(10, 5); 
+    ctx.lineTo(15, -35); // Ponta do chifre
+    ctx.lineTo(25, 8);
+    ctx.fill();
+
+    // OLHO
+    ctx.fillStyle = Math.sin(timer * 4) > 0.96 ? '#000' : '#fff';
+    ctx.beginPath();
+    if (Math.sin(timer * 4) > 0.96) ctx.fillRect(15, 12, 8, 2);
+    else {
+        ctx.ellipse(18, 14, 5, 7, 0, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(20, 12, 3, 0, Math.PI*2); ctx.fill();
+    }
+
+    // NARIZ
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(40, 22, 3, 0, Math.PI*2); ctx.fill();
+
+    // ORELHA
+    ctx.save();
+    ctx.translate(10, 5);
+    ctx.rotate(-Math.PI/8 + Math.sin(timer * 20) * 0.4);
+    ctx.fillStyle = earColor;
+    ctx.beginPath(); ctx.moveTo(-4,0); ctx.lineTo(4,0); ctx.lineTo(0,-18); ctx.fill();
+    ctx.restore();
+
     ctx.restore();
 
   } else {
@@ -2321,85 +2363,45 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     ctx.beginPath(); ctx.moveTo(-5, -height + 2); ctx.lineTo(5, -height + 10); ctx.lineTo(-5, -height + 10); ctx.lineTo(5, -height + 2); ctx.fill();
   }
 
-  const headGrad = ctx.createRadialGradient(width/2 + 5, -height - 17, 0, width/2 + 5, -height - 17, 30);
-  headGrad.addColorStop(0, bodyColor1);
-  headGrad.addColorStop(1, bodyColor2);
-
-  ctx.fillStyle = headGrad;
-  ctx.beginPath();
-  if (isIris) {
-    // CABEÇA Unicórnio (Posicionada para COBRIR a crina)
-    ctx.roundRect(width/2 - 10, -height - 75, 40, 30, 15);
-  } else {
+  // Somente Luna desenha a cabeça padrão aqui
+  if (!isIris) {
+    const headGrad = ctx.createRadialGradient(width/2 + 5, -height - 17, 0, width/2 + 5, -height - 17, 30);
+    headGrad.addColorStop(0, bodyColor1);
+    headGrad.addColorStop(1, bodyColor2);
+    ctx.fillStyle = headGrad;
+    ctx.beginPath();
     ctx.roundRect(width/2 - 10, -height - 30, 30, 25, 12);
-  }
-  ctx.fill();
-
-  // FOCINHO
-  ctx.fillStyle = headGrad;
-  ctx.beginPath();
-  if (isIris) {
-      // Cavalo Snout (Mais reto/triangular)
-      ctx.moveTo(width/2 + 15, -height - 65);
-      ctx.lineTo(width/2 + 35, -height - 62);
-      ctx.lineTo(width/2 + 35, -height - 48);
-      ctx.lineTo(width/2 + 15, -height - 45);
-  } else {
-      ctx.roundRect(width/2 + 10, -height - 20, 25, 15, 8);
-  }
-  ctx.fill();
-  
-  // NARIZ
-  ctx.fillStyle = '#000';
-  ctx.beginPath();
-  if (isIris) ctx.arc(width/2 + 32, -height - 55, 4, 0, Math.PI*2);
-  else ctx.arc(width/2 + 33, -height - 14, 4, 0, Math.PI*2);
-  ctx.fill();
-
-  // OLHOS E PISCADA
-  let eyeX = isIris ? width/2 + 8 : width/2 + 12;
-  let eyeY = isIris ? -height - 65 : -height - 22;
-
-  if (Math.sin(timer * 4) > 0.96) {
-     ctx.fillStyle = '#000'; 
-     ctx.fillRect(eyeX - 4, eyeY - 1, 8, 2);
-  } else {
-    ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.ellipse(eyeX, eyeY, 5, 8, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.roundRect(width/2 + 10, -height - 20, 25, 15, 8);
+    ctx.fill();
     ctx.fillStyle = '#000';
-    ctx.beginPath(); ctx.arc(eyeX + 2, eyeY - 2, 3.5, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.arc(eyeX + 3, eyeY - 3, 1.5, 0, Math.PI*2); ctx.fill();
-  }
-
-  // ORELHAS
-  ctx.save();
-  if (isIris) {
-    ctx.translate(eyeX - 8, eyeY - 10);
-  } else {
+    ctx.beginPath(); ctx.arc(width/2 + 33, -height - 14, 4, 0, Math.PI*2); ctx.fill();
+    
+    // Olhos Luna
+    let eyeX = width/2 + 12;
+    let eyeY = -height - 22;
+    if (Math.sin(timer * 4) > 0.96) {
+       ctx.fillStyle = '#000'; ctx.fillRect(eyeX - 4, eyeY - 1, 8, 2);
+    } else {
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.ellipse(eyeX, eyeY, 5, 8, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#000';
+      ctx.beginPath(); ctx.arc(eyeX + 2, eyeY - 2, 3.5, 0, Math.PI*2); ctx.fill();
+    }
+    // Orelhas Luna
+    ctx.save();
     ctx.translate(width/2, -height - 25);
+    ctx.rotate(-Math.PI/8 + Math.sin(timer * 20) * 0.4);
+    ctx.fillStyle = earColor;
+    ctx.beginPath(); ctx.ellipse(-2, 12, 6, 15, 0, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
   }
-  
-  let earFlap = 0;
-  if (isFalling) earFlap = -Math.PI/2 + Math.sin(timer * 30) * 0.3;
-  else if (isJumping) earFlap = -Math.PI/3 + Math.sin(timer * 40) * 0.6; 
-  else earFlap = -Math.PI/8 + Math.sin(timer * 20) * 0.4;
-  ctx.rotate(earFlap);
-  
-  ctx.fillStyle = earColor;
-  ctx.beginPath();
-  if (isIris) { 
-      ctx.moveTo(-4, 0); ctx.lineTo(4, 0); ctx.lineTo(0, -15); 
-  } else {
-      ctx.ellipse(-2, 12, 6, 15, 0, 0, Math.PI*2);
-  }
-  ctx.fill();
-  ctx.restore();
 
-  // RABO (Conectado ao corpo)
+  // RABO (In Íris, positioned HIGHER up the back)
   ctx.save();
   if (isIris) {
-      ctx.translate(-width/2 + 5, -height - 2); // Baixado para sair de "dentro" do corpo
+      ctx.translate(-bW/2 + 5, -bH - 5); // Subiu para o topo do traseiro
   } else {
       ctx.translate(-width/2 + 5, -height - 5);
   }
@@ -2422,10 +2424,17 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   const swing = isJumping || isFalling ? 0 : Math.sin(timer * 20) * 10;
   const pHeight = isIris ? 30 : 15;
   ctx.beginPath();
-  ctx.roundRect(-width/2 + 10 + swing, -pHeight, 8, pHeight, 4);
-  ctx.roundRect(width/2 - 20 - swing, -pHeight, 8, pHeight, 4);
-  ctx.roundRect(-width/2 + 20 - swing, -pHeight, 8, pHeight, 4);
-  ctx.roundRect(width/2 - 10 + swing, -pHeight, 8, pHeight, 4);
+  if (isIris) {
+    ctx.roundRect(-bW/2 + 10 + swing, -pHeight, 8, pHeight, 4);
+    ctx.roundRect(bW/2 - 20 - swing, -pHeight, 8, pHeight, 4);
+    ctx.roundRect(-bW/2 + 20 - swing, -pHeight, 8, pHeight, 4);
+    ctx.roundRect(bW/2 - 10 + swing, -pHeight, 8, pHeight, 4);
+  } else {
+    ctx.roundRect(-width/2 + 10 + swing, -pHeight, 8, pHeight, 4);
+    ctx.roundRect(width/2 - 20 - swing, -pHeight, 8, pHeight, 4);
+    ctx.roundRect(-width/2 + 20 - swing, -pHeight, 8, pHeight, 4);
+    ctx.roundRect(width/2 - 10 + swing, -pHeight, 8, pHeight, 4);
+  }
   ctx.fill();
 
   ctx.restore();

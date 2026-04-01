@@ -439,16 +439,7 @@ p {
     align-items: center;
     animation: none;
     margin: 0;
-  }
-
-  #start-screen .luna-dialog::after {
-    content: 'TOQUE PARA COMEÇAR';
-    font-family: 'Righteous', cursive;
-    font-size: 14px;
-    color: #ffea00;
-    text-shadow: 0 0 10px #ffea00;
-    margin-top: 8px;
-    animation: blinkGlow 1s infinite alternate;
+    cursor: pointer;
   }
 
   #start-screen .menu-dog-anim {

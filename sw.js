@@ -1,45 +1,40 @@
-const CACHE_NAME = 'frida-arcade-v1.5';
+const CACHE_NAME = 'frida-arcade-v1.8';
 const ASSETS = [
   './',
-  'index.html',
-  'main.js',
-  'style.css',
-  'manifest.json',
-  'frida-icon.png',
-  'luna-menu-transparent.png',
-  'luna-icon.png',
-  'frida-game.png',
-  'Cinder-game.png',
-  'unicorn-game.png',
-  'barbie-game.png',
-  'urso-sem-fundo.png',
-  'luna-latindo.mp3',
-  'bgm.mp3',
-  'cartoon_bgm.mp3',
-  'bear1.mp3',
-  'bear2.mp3',
-  'bear3.mp3',
-  'crow.mp3'
+  './index.html',
+  './style.css',
+  './main.js',
+  './manifest.json',
+  './frida-icon.png',
+  './luna-icon.png',
+  './cinder-icon.png',
+  './barbie-icon.png',
+  './iris-icon.png',
+  './luna-menu-transparent.png',
+  './cartoon_bgm.mp3',
+  './luna-latindo.mp3'
 ];
 
-self.addEventListener('install', event => {
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
-  self.skipWaiting();
 });
 
-self.addEventListener('activate', event => {
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    )
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+      );
+    })
   );
-  self.clients.claim();
 });
 
-self.addEventListener('fetch', event => {
+self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    })
   );
 });
