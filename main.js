@@ -1680,9 +1680,9 @@ function update(dt) {
       const t = kinds[Math.floor(Math.random() * kinds.length)];
       let w = 80, h = 50; 
       if (t === 'cinder') { w = 60; h = 35; }
-      else if (t === 'frida') { w = 110; h = 50; }
+      else if (t === 'frida') { w = 110; h = 55; }
       else if (t === 'luna') { w = 80; h = 40; }
-      else if (t === 'iris') { w = 90; h = 65; }
+      else if (t === 'iris') { w = 80; h = 60; }
       else if (t.includes('barbie')) { w = 90; h = 60; }
       
       bulldogs.push({ x: canvas.width, y: GROUND_Y, width: w, height: h, state: 'idle', animTimer: 0, kind: t }); 
@@ -2248,22 +2248,12 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   
   if (type === 'luna') {
     bodyColor1 = '#B2663E'; bodyColor2 = '#5C2E0A'; earColor = '#5C2E0A';
-  } else if (type === 'frida') {
-    bodyColor1 = '#e6b800'; bodyColor2 = '#997a00'; earColor = '#cc9900';
-    isFrida = true;
-  } else if (type === 'cinder') {
-    bodyColor1 = '#95a5a6'; bodyColor2 = '#34495e'; earColor = '#2c3e50';
-    isCat = true;
-  } else if (type === 'barbie' || type.includes('barbie')) {
-    bodyColor1 = '#ff80bf'; bodyColor2 = '#ff4d94'; earColor = '#ff1a75'; // Barbie Pink
-    isBarbie = true;
-    isBear = true;
-  } else if (type === 'iris' || type === 'iris') {
+  } else if (type === 'iris') {
     bodyColor1 = '#ffccff'; bodyColor2 = '#ff99ff'; earColor = '#ff66ff'; // Iris Pink/Purple
     isIris = true;
   } else {
-    bodyColor1 = '#9b59b6'; bodyColor2 = '#4a235a'; earColor = '#3e1a4d';
-    isBear = true;
+    // Default fallback
+    bodyColor1 = '#ffccff'; bodyColor2 = '#ff99ff'; earColor = '#ff66ff';
   }
 
   const drawY = y + 20; 
@@ -2288,18 +2278,18 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
 
   ctx.fillStyle = bodyGrad;
   ctx.beginPath();
-  if (isBear) {
-    ctx.roundRect(-width/1.8, -height - 15, width*1.1, height+10, (height+10)/2);
-  } else if (isIris) {
-    ctx.roundRect(-width/2, -height - 15, width, height+5, (height+5)/2);
+  if (isIris) {
+    // UNICORN HORSE BODY
+    // Corpo mais curto e alto que um cachorro
+    ctx.roundRect(-width/2, -height - 10, width, height, 10);
+    ctx.fill();
+    
+    // PESCOÇO (Neck) - Na Direita
+    ctx.beginPath();
+    ctx.roundRect(width/2 - 15, -height - 40, 20, 40, 10);
+    ctx.fill();
   } else {
     ctx.roundRect(-width/2, -height - 10, width, height, height/2);
-  }
-  if (type === 'panda_barbie') {
-    ctx.fill();
-    ctx.fillStyle = '#2c3e50'; 
-    ctx.beginPath(); ctx.roundRect(-width/2+10, -height - 10, 20, height, 5); ctx.fill();
-  } else {
     ctx.fill();
   }
 
@@ -2338,8 +2328,9 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
 
   ctx.fillStyle = headGrad;
   ctx.beginPath();
-  if (isBear) {
-    ctx.roundRect(width/2 - 15, -height - 35, 35, 35, 17.5);
+  if (isIris) {
+    // CABEÇA Unicórnio (no topo do pescoço)
+    ctx.roundRect(width/2 - 5, -height - 50, 35, 25, 12);
   } else {
     ctx.roundRect(width/2 - 10, -height - 30, 30, 25, 12);
   }
@@ -2378,50 +2369,53 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   // Focinho
   ctx.fillStyle = headGrad;
   ctx.beginPath();
-  if (!isBear) ctx.roundRect(width/2 + 10, -height - 20, 25, 15, 8);
+  if (isIris) ctx.roundRect(width/2 + 20, -height - 45, 20, 15, 8);
+  else ctx.roundRect(width/2 + 10, -height - 20, 25, 15, 8);
   ctx.fill();
   
   // Nariz
   ctx.fillStyle = '#000';
   ctx.beginPath();
-  if (isBear) ctx.arc(width/2 + 18, -height - 14, 5, 0, Math.PI*2);
+  if (isIris) ctx.arc(width/2 + 38, -height - 38, 4, 0, Math.PI*2);
   else ctx.arc(width/2 + 33, -height - 14, 4, 0, Math.PI*2);
   ctx.fill();
 
   // Olhos
+  let eyeX = isIris ? width/2 + 12 : width/2 + 12;
+  let eyeY = isIris ? -height - 42 : -height - 22;
+
   if (Math.sin(timer * 4) > 0.96) {
      ctx.fillStyle = headGrad; 
      ctx.beginPath();
-     if (isBear) ctx.ellipse(width/2 - 2, -height - 25, 5, 5, 0, 0, Math.PI*2);
-     else ctx.ellipse(width/2 + 12, -height - 22, 6, 9, 0, 0, Math.PI*2);
+     ctx.ellipse(eyeX, eyeY, 6, 9, 0, 0, Math.PI*2);
      ctx.fill();
      ctx.fillStyle = '#000'; 
-     if (isBear) ctx.fillRect(width/2 - 6, -height - 25, 8, 2);
-     else ctx.fillRect(width/2 + 8, -height - 22, 8, 2);
+     ctx.fillRect(eyeX - 4, eyeY, 8, 2);
   } else {
     // Normal Eyes
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    if (isBear) ctx.ellipse(width/2 - 2, -height - 25, 4, 4, 0, 0, Math.PI*2);
-    else ctx.ellipse(width/2 + 12, -height - 22, 5, 8, 0, 0, Math.PI*2);
+    ctx.ellipse(eyeX, eyeY, 5, 8, 0, 0, Math.PI*2);
     ctx.fill();
 
     ctx.fillStyle = '#000';
     ctx.beginPath();
-    if (isBear) ctx.arc(width/2, -height - 25, 2.5, 0, Math.PI*2);
-    else ctx.arc(width/2 + 14, -height - 24, 3.5, 0, Math.PI*2);
+    ctx.arc(eyeX + 2, eyeY - 2, 3.5, 0, Math.PI*2);
     ctx.fill();
     
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    if (isBear) ctx.arc(width/2, -height - 26, 1.0, 0, Math.PI*2);
-    else ctx.arc(width/2 + 15, -height - 25, 1.5, 0, Math.PI*2);
+    ctx.arc(eyeX + 3, eyeY - 3, 1.5, 0, Math.PI*2);
     ctx.fill();
   }
 
   // Orelhas animadas
   ctx.save();
-  ctx.translate(width/2, -height - 25);
+  if (isIris) {
+    ctx.translate(width/2 + 10, -height - 50);
+  } else {
+    ctx.translate(width/2, -height - 25);
+  }
   let earFlap = 0;
   if (isFalling) earFlap = -Math.PI/2 + Math.sin(timer * 30) * 0.3;
   else if (isJumping) earFlap = -Math.PI/3 + Math.sin(timer * 40) * 0.6; 
@@ -2430,45 +2424,39 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   
   ctx.fillStyle = earColor;
   ctx.beginPath();
-  if (isCat) { ctx.moveTo(-5,-2); ctx.lineTo(6,-2); ctx.lineTo(0,-18); }
-  else if (isBear) { ctx.arc(0, -12, 10, 0, Math.PI*2); }
-  else if (isFrida) { ctx.ellipse(2, -8, 6, 12, Math.PI/4, 0, Math.PI*2); }
+  if (isIris) { ctx.ellipse(0, 0, 6, 12, 0, 0, Math.PI*2); }
   else { ctx.ellipse(-2, 12, 6, 15, 0, 0, Math.PI*2); } // Luna
   ctx.fill();
   ctx.restore();
 
   // Rabo animado
   ctx.save();
-  if (isBear) {
-    ctx.translate(-width/2 - 10, -height);
-  } else {
-    ctx.translate(-width/2 + 5, -height - 5);
-  }
+  ctx.translate(-width/2 + 5, -height - 5);
   ctx.rotate(Math.sin(timer * 15) * 0.3 - 0.5);
   ctx.fillStyle = bodyGrad;
   ctx.beginPath();
-  if (isCat) {
-      ctx.roundRect(-25, -2, 30, 4, 2); 
-      ctx.roundRect(-25, -10, 4, 10, 2); 
-  } else if (isBear) {
-      ctx.arc(-5, 0, 10, 0, Math.PI*2);
-  } else if (isFrida) {
-      ctx.roundRect(-10, -5, 15, 6, 3);
+  if (isIris) {
+      // Rabo Longo Unicórnio (Arco-íris)
+      const rColors = ['#f00', '#f90', '#ff0', '#0f0', '#0ff', '#00f', '#90f'];
+      for(let i=0; i<7; i++) {
+          ctx.fillStyle = rColors[i];
+          ctx.beginPath(); ctx.ellipse(-15 - i*2, 10 + i*2, 15, 5, 0.5, 0, Math.PI*2); ctx.fill();
+      }
   } else { // Luna
       ctx.roundRect(-20, -5, 25, 8, 4);
+      ctx.fill();
   }
-  ctx.fill();
   ctx.restore();
 
-  // Patas balançantes
+  // Patas balançantes (Mais longas para Íris)
   ctx.fillStyle = earColor;
   const swing = isJumping || isFalling ? 0 : Math.sin(timer * 20) * 10;
-  
+  const pHeight = isIris ? 30 : 15;
   ctx.beginPath();
-  ctx.roundRect(-width/2 + 10 + swing, -15, 8, 15, 4);
-  ctx.roundRect(width/2 - 20 - swing, -15, 8, 15, 4);
-  ctx.roundRect(-width/2 + 20 - swing, -15, 8, 15, 4);
-  ctx.roundRect(width/2 - 10 + swing, -15, 8, 15, 4);
+  ctx.roundRect(-width/2 + 10 + swing, -pHeight, 8, pHeight, 4);
+  ctx.roundRect(width/2 - 20 - swing, -pHeight, 8, pHeight, 4);
+  ctx.roundRect(-width/2 + 20 - swing, -pHeight, 8, pHeight, 4);
+  ctx.roundRect(width/2 - 10 + swing, -pHeight, 8, pHeight, 4);
   ctx.fill();
 
   ctx.restore();
@@ -2687,6 +2675,8 @@ function drawBear(ctx, x, y, kind, timer, state, isHero) {
       baseColor1 = '#f5f5f5'; baseColor2 = '#ffffff'; bellyColor = '#e0e0e0';
   } else if (kind === 'panda_barbie') {
       baseColor1 = '#111111'; baseColor2 = '#222222'; bellyColor = '#ffffff';
+  } else if (kind === 'pink' || kind === 'barbie' || kind === 'barbie_bear') {
+      baseColor1 = '#ff80bf'; baseColor2 = '#ff4d94'; bellyColor = '#ffb3d9';
   }
 
   const drawY = y;
@@ -3395,7 +3385,7 @@ function render() {
   }
 
   // Draw Boss Fears Animados
-  if (boss) {
+  if (boss && boss.active) {
     ctx.save();
     ctx.translate(boss.x, boss.y);
     
@@ -3428,6 +3418,7 @@ function render() {
     ctx.restore();
   }
 
+  // 5. UFOS
   for(let u of ufos) {
     ctx.save();
     ctx.translate(u.x, u.y);
@@ -3455,90 +3446,50 @@ function render() {
     ctx.restore();
   }
 
+  // 6. OBSTÁCULOS (BULLDOGS)
   for(let b of bulldogs) {
     if (b.kind === 'luna') {
-      // Placa de nome LUNA (só quando andando)
-      if (b.state !== 'eating') {
-        ctx.save();
-        ctx.fillStyle = 'rgba(0,0,0,0.5)';
-        ctx.fillRect(b.x - 20, b.y + 20 - 30 - 35, 40, 15);
-        ctx.fillStyle = '#B2663E';
-        ctx.font = '10px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('LUNA', b.x, b.y + 20 - 30 - 27);
-        ctx.restore();
-      }
-      
+      // Luna obstacle faces RIGHT by default, obstacles come from right, so FLIP
       ctx.save();
       if (b.state === 'eating') {
-        // Salsichinha enrolada dormindo em TAMANHO REAL! (proporcional aos 80px)
+        // Sleep animation
         ctx.translate(b.x, b.y + 10);
-        ctx.shadowColor = 'rgba(0,0,0,0.5)';
-        ctx.shadowBlur = 8;
-        
-        const bodyGrad = ctx.createLinearGradient(0, -30, 0, 0);
-        bodyGrad.addColorStop(0, '#B2663E'); // Top
-        bodyGrad.addColorStop(1, '#5C2E0A'); // Bottom (darker belly area)
-
-        // Corpo grande de salsicha enrolada (raio 35x20)
-        ctx.fillStyle = bodyGrad;
-        ctx.beginPath(); ctx.ellipse(-5, -5, 35, 20, 0, 0, Math.PI*2); ctx.fill();
-        
-        // Patinhas encolhidas
-        ctx.fillStyle = '#5C2E0A';
-        ctx.beginPath(); ctx.ellipse(-20, 10, 10, 6, -0.2, 0, Math.PI*2); ctx.fill();
+        ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 8;
+        ctx.fillStyle = '#B2663E'; ctx.beginPath(); ctx.ellipse(-5, -5, 35, 20, 0, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#5C2E0A'; ctx.beginPath(); ctx.ellipse(-20, 10, 10, 6, -0.2, 0, Math.PI*2); ctx.fill();
         ctx.beginPath(); ctx.ellipse(15, 10, 10, 6, 0.2, 0, Math.PI*2); ctx.fill();
-        
-        // Cabeça
-        ctx.fillStyle = bodyGrad;
-        ctx.beginPath(); ctx.ellipse(-25, -2, 18, 14, -0.3, 0, Math.PI*2); ctx.fill();
-        
-        // Focinho comprido característico de Dachshund
+        ctx.fillStyle = '#B2663E'; ctx.beginPath(); ctx.ellipse(-25, -2, 18, 14, -0.3, 0, Math.PI*2); ctx.fill();
         ctx.beginPath(); ctx.ellipse(-38, 5, 10, 7, -0.6, 0, Math.PI*2); ctx.fill();
-        
-        // Nariz preto molhadozinho
-        ctx.fillStyle = '#000';
-        ctx.beginPath(); ctx.arc(-45, 9, 4, 0, Math.PI*2); ctx.fill();
-        
-        // Olhinho sonolento
-        ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.arc(-28, -5, 5, Math.PI, 0); ctx.stroke();
-        
-        // Orelha comprida cobrindo o corpo feito cobertor
-        ctx.fillStyle = '#5C2E0A';
-        ctx.beginPath(); ctx.ellipse(-15, 5, 10, 16, 0.4, 0, Math.PI*2); ctx.fill();
-        
-        ctx.shadowBlur = 0;
-        
-        // Zzz
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 20px Arial';
-        ctx.fillText('Zzz', 15, -35 + Math.sin(b.animTimer * 3) * 5);
-        
+        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(-45, 9, 4, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(-28, -5, 5, Math.PI, 0); ctx.stroke();
+        ctx.fillStyle = '#5C2E0A'; ctx.beginPath(); ctx.ellipse(-15, 5, 10, 16, 0.4, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.font = 'bold 20px Arial'; ctx.fillText('Zzz', 15, -35 + Math.sin(b.animTimer * 3) * 5);
       } else {
-        // Normal: espelha pra esquerda
-        ctx.translate(b.x, 0);
-        ctx.scale(-1, 1);
-        ctx.translate(-b.x, 0);
-        drawAnimatedAnimal(ctx, b.x, b.y, b.width, b.height || 30, b.animTimer, false, false, 'luna');
+        ctx.translate(b.x, 0); ctx.scale(-1, 1); ctx.translate(-b.x, 0);
+        drawAnimatedAnimal(ctx, b.x, b.y, b.width, 30, b.animTimer, false, false, 'luna');
       }
       ctx.restore();
+    } else if (b.kind === 'iris') {
+       // Íris looks RIGHT, so flip for obstacle
+       ctx.save();
+       ctx.translate(b.x, 0); ctx.scale(-1, 1); ctx.translate(-b.x, 0);
+       drawAnimatedAnimal(ctx, b.x, b.y, b.width, b.height, b.animTimer, false, false, 'iris');
+       ctx.restore();
     } else {
-      // TODOS os outros agora usam drawAnimatedAnimal para garantir que Íris e Barbie apareçam!
-      ctx.save();
-      ctx.translate(b.x, 0);
-      ctx.scale(-1, 1);
-      ctx.translate(-b.x, 0);
-      drawAnimatedAnimal(ctx, b.x, b.y, b.width, b.height, b.animTimer, false, false, b.kind);
-      ctx.restore();
+       // frida, cinder, barbie face LEFT. Do NOT flip for obstacle.
+       if (b.kind === 'frida') drawBulldog(ctx, b.x, b.y, b.width, b.height, b.animTimer, b.state);
+       else if (b.kind === 'cinder') drawCat(ctx, b.x, b.y, b.width, b.height, b.animTimer, b.state);
+       else if (b.kind.includes('barbie')) drawBear(ctx, b.x, b.y, 'pink', b.animTimer, b.state);
+       else drawBear(ctx, b.x, b.y, b.kind, b.animTimer, b.state);
     }
   }
 
+  // 7. ENEMIES
   for(let e of enemies) {
     drawAnimal(ctx, e.x, e.y, e.type, e.timer, e.badType);
   }
 
+  // 8. BOMBS
   for(let b of bombs) {
     ctx.save();
     ctx.translate(b.x, b.y);
@@ -3554,6 +3505,7 @@ function render() {
     ctx.restore();
   }
 
+  // 9. SAVED ANIMALS
   for(let sa of savedAnimals) {
     ctx.save();
     ctx.translate(sa.x, sa.y);
@@ -3572,6 +3524,7 @@ function render() {
     ctx.restore();
   }
 
+  // 10. HELICOPTERS
   for(let h of helicopters) {
     ctx.save();
     ctx.translate(h.x, h.y);
@@ -3596,6 +3549,7 @@ function render() {
     ctx.restore();
   }
 
+  // 11. BULLETS & PARTICLES
   for(let b of bullets) {
     drawBone(ctx, b.x, b.y, b.rot);
   }
@@ -3654,6 +3608,7 @@ function render() {
   }
   ctx.globalAlpha = 1;
 
+  // 12. PLAYER HERO
   if (player.x > -50) {
     ctx.save();
     
@@ -3668,20 +3623,28 @@ function render() {
       ctx.translate(-player.x, -(player.y + 20));
     }
     
-    // Todos os heróis usam drawAnimatedAnimal para garantir visibilidade (Íris, Barbie, etc)
-    // Luna olha naturalmente pra direita, os outros espelhamos
+    // LUNA and IRIS face RIGHT by default.
     if (player.kind === 'luna') {
       drawAnimatedAnimal(ctx, player.x, player.y, player.width, player.height, player.animTimer, player.isJumping, player.isFalling, 'luna');
+    } else if (player.kind === 'iris') {
+       drawAnimatedAnimal(ctx, player.x, player.y, player.width, player.height, player.animTimer, player.isJumping, player.isFalling, 'iris');
     } else {
+      // Others face LEFT by default, MUST FLIP for player.
       ctx.save();
       ctx.translate(player.x, 0);
       ctx.scale(-1, 1);
       ctx.translate(-player.x, 0);
-      drawAnimatedAnimal(ctx, player.x, player.y, player.width, player.height, player.animTimer, player.isJumping, player.isFalling, player.kind);
+      
+      let st = player.isJumping ? 'jumping_to_eat' : 'idle';
+      if (player.isFalling) st = 'eating';
+
+      if (player.kind === 'frida') drawBulldog(ctx, player.x, player.y, player.width, player.height, player.animTimer, st, true);
+      else if (player.kind === 'cinder') drawCat(ctx, player.x, player.y, player.width, player.height, player.animTimer, st, true);
+      else if (player.kind === 'barbie') drawBear(ctx, player.x, player.y, 'pink', player.animTimer, st, true);
+      
       ctx.restore();
     }
     
-    // Tanquezinho (Canhão) nas costas de todos exceto Luna
     // Tanquezinho (Canhão) nas costas de todos exceto Luna
     if (player.kind !== 'luna') {
       ctx.save();
