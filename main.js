@@ -69,13 +69,13 @@ const i18n = {
     introLuna: "Oi! Sou a Luna Salsicha! Aperte o botão da aventura para resgatarmos meus amiguinhos!",
     introFrida: "Oi! Sou a Frida Gorducha! Aperte o botão da aventura para resgatarmos meus amiguinhos!",
     introCinder: "Oi! Sou a Cinder Gatinha! Aperte o botão da aventura para resgatarmos meus amiguinhos!",
-    introBear: "Oi! Sou o Urso Fofo! Aperte o botão da aventura para resgatarmos meus amiguinhos!",
-    introUnicorn: "Oi! Sou o Unicórnio Mágico! Vamos espalhar cores e resgatar todos!",
+    introBarbie: "Oi! Sou a Barbie Ursinha! Sou rosa e adoro aventuras!",
+    introIris: "Oi! Sou a Íris Unicórnio! Vamos espalhar cores e resgatar todos!",
     phaseReadyLuna: "Vamos lá! A Luna está pronta!",
     phaseReadyFrida: "Vamos lá! A Frida está pronta!",
     phaseReadyCinder: "Vamos lá! A Cinder está pronta!",
-    phaseReadyBear: "Vamos lá! O Urso está pronto!",
-    phaseReadyUnicorn: "Vamos lá! O Unicórnio está pronto!",
+    phaseReadyBarbie: "Vamos lá! A Barbie está pronta!",
+    phaseReadyIris: "Vamos lá! A Íris está pronta!",
     unlockMsg: "Desbloquear por {cost} moedas?",
     notEnoughCoins: "Moedas insuficientes!",
     locked: "🔒",
@@ -93,13 +93,13 @@ const i18n = {
     introLuna: "Hi! I'm Luna Sausage! Press the adventure button to rescue my friends!",
     introFrida: "Hi! I'm Chubby Frida! Press the adventure button to rescue my friends!",
     introCinder: "Hi! I'm Cinder Kitty! Press the adventure button to rescue my friends!",
-    introBear: "Hi! I'm Fluffy Bear! Press the adventure button to rescue my friends!",
-    introUnicorn: "Hi! I'm Magic Unicorn! Let's spread colors and rescue everyone!",
+    introBarbie: "Hi! I'm Barbie Bear! I'm pink and love adventures!",
+    introIris: "Hi! I'm Iris Unicorn! Let's spread colors and rescue everyone!",
     phaseReadyLuna: "Let's go! Luna is ready!",
     phaseReadyFrida: "Let's go! Frida is ready!",
     phaseReadyCinder: "Let's go! Cinder is ready!",
-    phaseReadyBear: "Let's go! Fluffy Bear is ready!",
-    phaseReadyUnicorn: "Let's go! Unicorn is ready!",
+    phaseReadyBarbie: "Let's go! Barbie is ready!",
+    phaseReadyIris: "Let's go! Iris is ready!",
     unlockMsg: "Unlock for {cost} coins?",
     notEnoughCoins: "Not enough coins!",
     locked: "🔒",
@@ -117,13 +117,13 @@ const i18n = {
     introLuna: "¡Hola! ¡Soy Luna Salchicha! ¡Presiona el botón de aventura para rescatar a mis amiguitos!",
     introFrida: "¡Hola! ¡Soy Frida Gordita! ¡Presiona el botón de aventura para rescatar a mis amiguitos!",
     introCinder: "¡Hola! ¡Soy Cinder Gatita! ¡Presiona el botón de aventura para rescatar a mis amiguitos!",
-    introBear: "¡Hola! ¡Soy el Oso Tierno! ¡Presiona el botón de aventura para rescatar a mis amiguitos!",
-    introUnicorn: "¡Hola! ¡Soy el Unicornio Mágico! ¡Vamos a rescatar a todos!",
+    introBarbie: "¡Hola! ¡Soy Barbie Osita! ¡Soy rosa y divertida!",
+    introIris: "¡Hola! ¡Soy Íris Unicornio! ¡Vamos a rescatar a todos!",
     phaseReadyLuna: "¡Vamos! ¡Luna está lista!",
     phaseReadyFrida: "¡Vamos! ¡Frida está lista!",
     phaseReadyCinder: "¡Vamos! ¡Cinder está lista!",
-    phaseReadyBear: "¡Vamos! ¡El Oso está listo!",
-    phaseReadyUnicorn: "¡Vamos! ¡El Unicornio está listo!",
+    phaseReadyBarbie: "¡Vamos! ¡Barbie está lista!",
+    phaseReadyIris: "¡Vamos! ¡Íris está lista!",
     unlockMsg: "¿Desbloquear por {cost} monedas?",
     notEnoughCoins: "¡Monedas insuficientes!",
     locked: "🔒",
@@ -141,8 +141,8 @@ const i18n = {
     introLuna: "你好！我是香肠狗露娜！请按冒险按钮解救我的小伙伴！",
     introFrida: "你好！我是胖嘟嘟的弗里达！请按冒险按钮解救我的小伙伴！",
     introCinder: "你好！我是小猫灰姑娘！请按冒险按钮解救我的小伙伴！",
-    introBear: "你好！我是毛绒绒的熊！请按冒险按钮解救我的小伙伴！",
-    introUnicorn: "你好！我是彩虹独角兽！让我们出发去解救大家吧！",
+    introBarbie: "你好！我是芭比熊！我是粉红色的，喜欢挑战！",
+    introIris: "你好！我是艾丽丝独角兽！让我们出发去解救大家吧！",
     phaseReadyLuna: "走吧！露娜准备好了！",
     phaseReadyFrida: "走吧！弗里达准备好了！",
     phaseReadyCinder: "走吧！灰姑娘准备好了！",
@@ -191,8 +191,8 @@ let unlockedHeroes = JSON.parse(localStorage.getItem('luna_arcade_unlocked') || 
 
 const HERO_PRICES = {
   cinder: 1500,
-  unicorn: 3000,
-  bear: 5000
+  iris: 3000,
+  barbie: 5000
 };
 
 // Updates visual coin count
@@ -1020,20 +1020,6 @@ let nextAmmo = 'bone';
 function drawCat(ctx, x, y, width, height, timer, state, isHero) {
   const drawY = y + 20; 
 
-  // Name Tag (esconde quando é herói)
-  if (!isHero) {
-    ctx.save();
-    ctx.translate(x, drawY);
-    ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillRect(-width/2 - 10, -height - 40, 45, 15);
-    ctx.fillStyle = '#FFB6C1';
-    ctx.font = '10px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('CINDER', -width/2 + 12, -height - 32);
-    ctx.restore();
-  }
-
   ctx.save();
   ctx.translate(x, drawY);
   
@@ -1251,11 +1237,11 @@ const heroImageMap = {
   luna: './luna-icon.png',
   frida: './frida-game.png',
   cinder: './Cinder-game.png',
-  unicorn: './unicorn-game.png',
-  bear: './urso-sem-fundo.png'
+  iris: './unicorn-game.png',
+  barbie: './barbie-game.png'
 };
-const heroNameMap = { luna: 'Luna', frida: 'Frida', cinder: 'Cinder', unicorn: 'Uni', bear: 'Urso' };
-const heroNicknameMap = { luna: 'Luna Salsicha', frida: 'Frida Gorducha', cinder: 'Cinder Gatinha', unicorn: 'Unicórnio Mágico', bear: 'Urso Fofo' };
+const heroNameMap = { luna: 'Luna', frida: 'Frida', cinder: 'Cinder', iris: 'Iris', barbie: 'Barbie' };
+const heroNicknameMap = { luna: 'Luna Salsicha', frida: 'Frida Gorducha', cinder: 'Cinder Gatinha', iris: 'Íris Unicórnio', barbie: 'Barbie Ursinha' };
 
 function updateHeroImages(kind) {
   const img = heroImageMap[kind] || heroImageMap.luna;
@@ -1281,8 +1267,8 @@ function updateHeroImages(kind) {
         if(val==='luna') icon='🌭';
         else if(val==='frida') icon='🐕';
         else if(val==='cinder') icon='🐱';
-        else if(val==='unicorn') icon='🦄';
-        else if(val==='bear') icon='🐻';
+        else if(val==='iris') icon='🦄';
+        else if(val==='barbie') icon='🐻';
         
         btn.innerHTML = icon + " " + (heroNameMap[val] || val);
         btn.style.opacity = '1';
@@ -1292,8 +1278,8 @@ function updateHeroImages(kind) {
     let p = 'phaseReadyLuna';
     if(kind==='frida') { p = 'phaseReadyFrida'; }
     if(kind==='cinder') { p = 'phaseReadyCinder'; }
-    if(kind==='unicorn') { p = 'phaseReadyUnicorn'; }
-    if(kind==='bear') { p = 'phaseReadyBear'; }
+    if(kind==='iris') { p = 'phaseReadyIris'; }
+    if(kind==='barbie') { p = 'phaseReadyBarbie'; }
 
     const phaseBubble = document.getElementById('phase-bubble');
     if (phaseBubble) phaseBubble.textContent = dict[p] || "";
@@ -1372,7 +1358,7 @@ function startGame() {
   // Ajusta tamanho físico conforme o herói (mesmos tamanhos dos sprites originais do jogo)
   if (player.kind === 'cinder') { player.width = 60; player.height = 35; }
   else if (player.kind === 'frida') { player.width = 110; player.height = 50; }
-  else if (player.kind === 'bear') { player.width = 90; player.height = 60; }
+  else if (player.kind === 'barbie') { player.width = 90; player.height = 60; }
   else { player.width = 80; player.height = 30; } // Luna padrão
   resetPhase();                     // Prepara o cenário
   UI.startScreen.classList.add('hidden'); // Esconde o menu inicial
@@ -1681,27 +1667,27 @@ function update(dt) {
     }
     if (valid && bulldogs.length < 2) { 
       // Pool de obstáculos: todos MENOS o herói selecionado
-      let kinds = ['cinder', 'frida', 'unicorn', 'white_bear', 'brown_bear', 'panda_bear'];
+      let kinds = ['cinder', 'frida', 'iris', 'white_barbie', 'brown_barbie', 'panda_barbie'];
       if (player.kind !== 'luna') kinds.push('luna');
       
       // Remove o herói atual e variantes dele
       if (player.kind === 'cinder') kinds = kinds.filter(k => k !== 'cinder');
       else if (player.kind === 'frida') kinds = kinds.filter(k => k !== 'frida');
-      else if (player.kind === 'unicorn') kinds = kinds.filter(k => k !== 'unicorn');
-      else if (player.kind === 'bear') kinds = kinds.filter(k => !k.includes('bear'));
+      else if (player.kind === 'iris') kinds = kinds.filter(k => k !== 'iris');
+      else if (player.kind === 'barbie') kinds = kinds.filter(k => !k.includes('barbie'));
       
       const t = kinds[Math.floor(Math.random() * kinds.length)];
       let w = 80, h = 50; 
       if (t === 'cinder') { w = 60; h = 35; }
       else if (t === 'frida') { w = 110; h = 50; }
       else if (t === 'luna') { w = 80; h = 40; }
-      else if (t === 'unicorn') { w = 90; h = 65; }
-      else if (t.includes('bear')) { w = 90; h = 60; }
+      else if (t === 'iris') { w = 90; h = 65; }
+      else if (t.includes('barbie')) { w = 90; h = 60; }
       
       bulldogs.push({ x: canvas.width, y: GROUND_Y, width: w, height: h, state: 'idle', animTimer: 0, kind: t }); 
       if (t === 'cinder') soundMeow(); 
-      else if (t === 'unicorn') soundWhinny(); // Placeholder or actual sound
-      else if (t.includes('bear')) soundBear(); 
+      else if (t === 'iris') soundWhinny(); 
+      else if (t.includes('barbie')) soundBear(); 
       else if (t === 'luna') soundDachshundBark();
       else soundDogBark();
     }
@@ -2256,6 +2242,8 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   let isBear = false;
   let isCat = false;
   let isFrida = false;
+  let isIris = false;
+  let isBarbie = false;
   
   if (type === 'luna') {
     bodyColor1 = '#B2663E'; bodyColor2 = '#5C2E0A'; earColor = '#5C2E0A';
@@ -2265,18 +2253,22 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   } else if (type === 'cinder') {
     bodyColor1 = '#95a5a6'; bodyColor2 = '#34495e'; earColor = '#2c3e50';
     isCat = true;
+  } else if (type === 'barbie' || type.includes('barbie')) {
+    bodyColor1 = '#ff80bf'; bodyColor2 = '#ff4d94'; earColor = '#ff1a75'; // Barbie Pink
+    isBarbie = true;
+    isBear = true;
+  } else if (type === 'iris' || type === 'iris') {
+    bodyColor1 = '#ffccff'; bodyColor2 = '#ff99ff'; earColor = '#ff66ff'; // Iris Pink/Purple
+    isIris = true;
   } else {
     bodyColor1 = '#9b59b6'; bodyColor2 = '#4a235a'; earColor = '#3e1a4d';
-    if(type === 'brown_bear') { bodyColor1 = '#CD853F'; bodyColor2='#8B4513'; earColor='#5C2E0A'; }
-    else if(type === 'white_bear') { bodyColor1 = '#ecf0f1'; bodyColor2='#bdc3c7'; earColor='#7f8c8d'; }
-    else if(type === 'panda_bear') { bodyColor1 = '#ecf0f1'; bodyColor2='#bdc3c7'; earColor='#2c3e50'; }
     isBear = true;
   }
 
   const drawY = y + 20; 
   ctx.save();
   
-  if (player.invincible && player.kind === type) { // Pisca pisca só pro hero
+  if (player.invincible && player.kind === type) { 
     ctx.globalAlpha = (Math.floor(Date.now() / 150) % 2 === 0) ? 0.3 : 0.8;
   }
   
@@ -2296,13 +2288,13 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   ctx.fillStyle = bodyGrad;
   ctx.beginPath();
   if (isBear) {
-    // Urso é mais gordinho
     ctx.roundRect(-width/1.8, -height - 15, width*1.1, height+10, (height+10)/2);
+  } else if (isIris) {
+    ctx.roundRect(-width/2, -height - 15, width, height+5, (height+5)/2);
   } else {
-    // Corpo padrão de quadrupede
     ctx.roundRect(-width/2, -height - 10, width, height, height/2);
   }
-  if (type === 'panda_bear') {
+  if (type === 'panda_barbie') {
     ctx.fill();
     ctx.fillStyle = '#2c3e50'; 
     ctx.beginPath(); ctx.roundRect(-width/2+10, -height - 10, 20, height, 5); ctx.fill();
@@ -2322,6 +2314,21 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     ctx.beginPath(); ctx.moveTo(-10, -height - 2); ctx.lineTo(0, -10); ctx.lineTo(10, -height - 2); ctx.fill();
     ctx.fillStyle = '#f00';
     ctx.beginPath(); ctx.moveTo(-5, -height + 2); ctx.lineTo(5, -height + 10); ctx.lineTo(-5, -height + 10); ctx.lineTo(5, -height + 2); ctx.fill();
+  }
+
+  // Unicórnio Mane (rainbow mane)
+  if (isIris) {
+    ctx.save();
+    const colors = ['#f00', '#f90', '#ff0', '#0f0', '#0ff', '#00f', '#90f'];
+    ctx.translate(width/2 - 10, -height - 35);
+    for(let i=0; i<7; i++) {
+        ctx.fillStyle = colors[i];
+        ctx.beginPath(); ctx.ellipse(-5 - i*2, 5 + i*2, 10, 5, 0.5, 0, Math.PI*2); ctx.fill();
+    }
+    // Horn
+    ctx.fillStyle = '#fffabb';
+    ctx.beginPath(); ctx.moveTo(15, -15); ctx.lineTo(10, -45); ctx.lineTo(25, -15); ctx.fill();
+    ctx.restore();
   }
 
   const headGrad = ctx.createRadialGradient(width/2 + 5, -height - 17, 0, width/2 + 5, -height - 17, 30);
@@ -2533,19 +2540,6 @@ function drawFood(ctx, x, y, rot, type) {
 function drawBulldog(ctx, x, y, width, height, timer, state, isHero) {
   const drawY = y + 20;
 
-  // Placa de nome (esconde quando é herói pra não espelhar)
-  if (!isHero) {
-    ctx.save();
-    ctx.translate(x, drawY);
-    ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillRect(-width/2 - 10, -height - 35, 40, 15);
-    ctx.fillStyle = '#FFD700';
-    ctx.font = '12px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('FRIDA', -width/2 + 10, -height - 24);
-    ctx.restore();
-  }
-
   ctx.save();
   ctx.translate(x, drawY); 
   
@@ -2685,26 +2679,12 @@ function drawBulldog(ctx, x, y, width, height, timer, state, isHero) {
 function drawBear(ctx, x, y, kind, timer, state, isHero) {
   ctx.save();
   
-  // Placa de nome (esconde quando é herói)
-  if (!isHero) {
-    ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillRect(x - 25, y - 70, 50, 15);
-    ctx.fillStyle = '#fff';
-    ctx.font = '10px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    let name = "URSO";
-    if(kind === 'white_bear') name = "POLAR";
-    if(kind === 'panda_bear') name = "PANDA";
-    ctx.fillText(name, x, y - 62);
-  }
-  
   let baseColor1 = '#8B4513'; 
   let baseColor2 = '#A0522D';
   let bellyColor = '#cda177';
-  if (kind === 'white_bear') {
+  if (kind === 'white_barbie') {
       baseColor1 = '#f5f5f5'; baseColor2 = '#ffffff'; bellyColor = '#e0e0e0';
-  } else if (kind === 'panda_bear') {
+  } else if (kind === 'panda_barbie') {
       baseColor1 = '#111111'; baseColor2 = '#222222'; bellyColor = '#ffffff';
   }
 
@@ -2727,7 +2707,7 @@ function drawBear(ctx, x, y, kind, timer, state, isHero) {
      ctx.beginPath(); ctx.ellipse(-20, 10 + wag, 8, 12, -0.8, 0, Math.PI*2); ctx.fill(); 
      ctx.beginPath(); ctx.ellipse(20, 10 - wag, 8, 12, 0.8, 0, Math.PI*2); ctx.fill(); 
      
-     ctx.fillStyle = (kind === 'panda_bear') ? '#fff' : baseColor1;
+     ctx.fillStyle = (kind === 'panda_barbie') ? '#fff' : baseColor1;
      ctx.beginPath(); ctx.ellipse(0, 25, 20, 15, 0, 0, Math.PI*2); ctx.fill();
      
      ctx.fillStyle = baseColor1;
@@ -2765,7 +2745,7 @@ function drawBear(ctx, x, y, kind, timer, state, isHero) {
 
      // Cabeca
      ctx.translate(-25, -35); 
-     ctx.fillStyle = (kind === 'panda_bear') ? '#fff' : baseColor1;
+     ctx.fillStyle = (kind === 'panda_barbie') ? '#fff' : baseColor1;
      ctx.beginPath(); ctx.ellipse(0, 0, 18, 16, 0, 0, Math.PI*2); ctx.fill();
      
      // Orelhas animadas
@@ -2773,7 +2753,7 @@ function drawBear(ctx, x, y, kind, timer, state, isHero) {
      let earAngle = Math.sin(timer * 3) * 0.1;
      if (state === 'jumping_to_eat') earAngle = Math.sin(timer * 30) * 0.4;
      ctx.fillStyle = baseColor2;
-     if(kind === 'panda_bear') ctx.fillStyle = '#111';
+     if(kind === 'panda_barbie') ctx.fillStyle = '#111';
      ctx.save(); ctx.translate(5, -12); ctx.rotate(earAngle);
      ctx.beginPath(); ctx.arc(0, 0, 7, 0, Math.PI*2); ctx.fill();
      ctx.restore();
@@ -2783,7 +2763,7 @@ function drawBear(ctx, x, y, kind, timer, state, isHero) {
      ctx.restore();
 
      // Manchas do Panda
-     if (kind === 'panda_bear') {
+     if (kind === 'panda_barbie') {
          ctx.fillStyle = '#111';
          ctx.beginPath(); ctx.ellipse(-5, -2, 6, 8, -0.3, 0, Math.PI*2); ctx.fill();
          ctx.beginPath(); ctx.ellipse(8, -2, 6, 8, 0.3, 0, Math.PI*2); ctx.fill();
@@ -3444,29 +3424,6 @@ function render() {
     ctx.fillStyle = '#f00';
     ctx.fillRect(-40, -50, 80 * (boss.hp / boss.maxHp), 10);
     
-    // Fear Name Plate
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillRect(-50, 50, 100, 20);
-    ctx.fillStyle = '#fff';
-    ctx.font = '12px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    
-    let fearName = 'MOTO';
-    if (boss.type === 'wind') fearName = 'VENTANIA';
-    else if (boss.type === 'storm') fearName = 'TROVÃO';
-    else if (boss.type === 'vacuum') fearName = 'ASPIRADOR';
-    else if (boss.type === 'car') fearName = 'CARRO';
-    else if (boss.type === 'motorcycle') fearName = 'MOTO';
-    else if (boss.type === 'seagull') fearName = 'GAIVOTA VESGA';
-    else if (boss.type === 'bigdog') fearName = 'ILDA';
-    else if (boss.type === 'broom') fearName = 'VASSOURA';
-    else if (boss.type === 'fireworks') fearName = 'FOGOS';
-    else if (boss.type === 'hose') fearName = 'BANHO';
-
-    ctx.fillText(fearName, 0, 60);
-
     ctx.restore();
   }
 
