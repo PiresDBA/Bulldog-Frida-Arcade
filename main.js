@@ -2313,103 +2313,54 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
   ctx.fillStyle = bodyGrad;
   ctx.beginPath();
   if (isIris) {
-    // CORPO Unicórnio (Anatomia Refinada)
+    // CORPO Unicórnio (v1.17 Estável)
     ctx.roundRect(-bW/2, -bH - 10, bW, bH, 18);
     ctx.fill();
     
-    // PESCOÇO (Conexão Garantida v1.12)
+    // PESCOÇO
     ctx.fillStyle = bodyGrad;
     ctx.beginPath();
     ctx.moveTo(bW/2 - 18, -bH - 5);
-    ctx.lineTo(bW/2 - 8, -bH - 40); // Sobe até a nuca
+    ctx.lineTo(bW/2 - 8, -bH - 40); 
     ctx.lineTo(bW/2 + 12, -bH - 40);
     ctx.lineTo(bW/2 + 2, -bH - 5);
     ctx.fill();
 
-    // CRINA FLORIDA (Estilo Arco-Íris Fluido v1.18)
-    const mColors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3', '#ff00ff'];
+    // CRINA EM SPIKES (Pedido pelo usuário v1.19)
+    const mColors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
     ctx.save();
-    ctx.translate(bW/2 - 10, -bH - 35);
+    ctx.translate(bW/2 - 5, -bH - 40);
     for(let i=0; i<mColors.length; i++) {
         ctx.fillStyle = mColors[i];
         ctx.beginPath();
-        // Elipses suaves simulando cabelo/crina
-        const wave = Math.sin(timer * 5 + i * 0.5) * 5;
-        ctx.ellipse(-i*6, i*3 + wave, 12, 8, -Math.PI/6, 0, Math.PI*2);
+        ctx.moveTo(-i*4, i*5); 
+        ctx.lineTo(-i*4 - 15, i*5 - 15); 
+        ctx.lineTo(-i*4 - 5, i*5 + 10);
         ctx.fill();
     }
     ctx.restore();
     
-    // MOCHILA UNIVERSAL (v1.16)
-    if (isHero || state !== 'running') {
-        ctx.save();
-        ctx.translate(0, -45);
-        ctx.fillStyle = '#6d4c41'; ctx.beginPath(); ctx.roundRect(-8, -12, 16, 18, 5); ctx.fill();
-        ctx.fillStyle = '#8d6e63'; ctx.beginPath(); ctx.roundRect(-4, -8, 8, 10, 3); ctx.fill();
-        ctx.restore();
-    }
-
-    ctx.restore();
-    
-    // CABEÇA MESTRE (Pescoço Fluido v1.18)
+    // CABEÇA Unicórnio
     ctx.save();
-    ctx.translate(bW/2 + 8, -bH - 45);
-    
-    // Rosto Unicórnio (Menos Dragão, Mais Cavalo)
+    ctx.translate(bW/2 + 8, -bH - 45); 
     ctx.fillStyle = bodyGrad;
     ctx.beginPath();
-    ctx.ellipse(0, 0, 18, 16, 0, 0, Math.PI*2);
-    ctx.fill();
-    
-    // Focinho (Muzzle)
+    ctx.ellipse(0, 0, 16, 14, 0, 0, Math.PI*2); ctx.fill();
     ctx.beginPath();
-    ctx.ellipse(12, 10, 14, 12, 0.2, 0, Math.PI*2);
-    ctx.fill();
-    
-    // CHIFRE ESPIRAL (Mais Centralizado v1.18)
-    ctx.fillStyle = '#f0e68c'; // Khaki / Gold
+    ctx.ellipse(15, 5, 22, 12, 0.2, 0, Math.PI*2); ctx.fill();
+
+    // CHIFRE
+    const hornGrad = ctx.createLinearGradient(0, -60, 0, -10);
+    hornGrad.addColorStop(0, '#ffd700'); hornGrad.addColorStop(1, '#ffaa00');
+    ctx.fillStyle = hornGrad;
     ctx.beginPath();
-    ctx.moveTo(-5, -12);
-    ctx.lineTo(0, -45); // Horn tip
-    ctx.lineTo(5, -12);
-    ctx.fill();
-    // Spiral detail
-    ctx.strokeStyle = '#daa520'; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(-2, -20); ctx.lineTo(2, -28); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(-1, -30); ctx.lineTo(1, -38); ctx.stroke();
+    ctx.moveTo(8, -38); ctx.lineTo(12, -85); ctx.lineTo(22, -35); ctx.fill();
 
-    // ORELHA TRIANGULAR POSICIONADA
-    ctx.save();
-    ctx.translate(-2, -32);
-    ctx.rotate(-0.4);
-    ctx.fillStyle = bodyColor1;
-    ctx.beginPath(); ctx.moveTo(-6,0); ctx.lineTo(6,0); ctx.lineTo(0,-22); ctx.fill();
-    ctx.fillStyle = '#ffb6c1';
-    ctx.beginPath(); ctx.moveTo(-3,0); ctx.lineTo(3,0); ctx.lineTo(0,-16); ctx.fill();
-    ctx.restore();
-
-    // OLHO FEMININO (Com Cílios v1.13)
-    let blink = Math.sin(timer * 4) > 0.96;
-    if (blink) {
-        ctx.strokeStyle = '#000'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(25*iScale, -24*iScale); ctx.quadraticCurveTo(35*iScale, -20*iScale, 45*iScale, -24*iScale); ctx.stroke();
-    } else {
-        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(35*iScale, -26*iScale, 10*iScale, 13*iScale, 0.1, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(37*iScale, -24*iScale, 6*iScale, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(40*iScale, -28*iScale, 3*iScale, 0, Math.PI*2); ctx.fill();
-        
-        // Cílios Femininos
-        ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
-        ctx.beginPath(); ctx.moveTo(42*iScale, -33*iScale); ctx.lineTo(48*iScale, -38*iScale); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(44*iScale, -30*iScale); ctx.lineTo(51*iScale, -33*iScale); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(45*iScale, -27*iScale); ctx.lineTo(52*iScale, -28*iScale); ctx.stroke();
-    }
-
-    // NARINA 
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath(); ctx.arc(55, -15, 2.5, 0, Math.PI*2); ctx.fill();
+    // OLHO
+    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(10, -5, 5, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(12, -5, 2.5, 0, Math.PI*2); ctx.fill();
 
     ctx.restore();
-
   } else {
     ctx.roundRect(-width/2, -height - 10, width, height, height/2);
     ctx.fill();
