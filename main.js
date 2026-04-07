@@ -2327,7 +2327,11 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     ctx.strokeStyle = 'rgba(180,80,120,0.5)'; ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.arc(22, 13, 6, 0.1, Math.PI - 0.1); ctx.stroke();
 
-    // CHIFRE ESPIRALADO dourado
+    // CHIFRE ESPIRALADO dourado (Apontando para frente)
+    ctx.save();
+    ctx.translate(2, -26);
+    ctx.rotate(Math.PI / 2.2); // Roda quase 90 graus para frente
+    ctx.translate(-2, 26);
     const hornGrad2 = ctx.createLinearGradient(0, -65, 0, -25);
     hornGrad2.addColorStop(0, '#fff0a0'); hornGrad2.addColorStop(0.5, '#ffd700'); hornGrad2.addColorStop(1, '#ffaa00');
     ctx.fillStyle = hornGrad2;
@@ -2338,6 +2342,7 @@ function drawAnimatedAnimal(ctx, x, y, width, height, timer, isJumping, isFallin
     for(let j = 1; j < 5; j++) {
       ctx.beginPath(); ctx.moveTo(-4, -30 - j*9); ctx.lineTo(8, -36 - j*9); ctx.stroke();
     }
+    ctx.restore();
 
     // ORELHA esquerda pontuda e fofa
     ctx.save();
@@ -2786,16 +2791,16 @@ function drawBear(ctx, x, y, kind, timer, state, isHero) {
      ctx.fillStyle = (kind === 'panda_barbie') ? '#fff' : baseColor1;
      ctx.beginPath(); ctx.ellipse(0, 0, 18, 16, 0, 0, Math.PI*2); ctx.fill();
      
-     // Orelhas animadas
+     // Orelhas animadas separadas (mais afastadas)
      ctx.save();
      let earAngle = Math.sin(timer * 3) * 0.1;
      if (state === 'jumping_to_eat') earAngle = Math.sin(timer * 30) * 0.4;
      ctx.fillStyle = baseColor2;
      if(kind === 'panda_barbie') ctx.fillStyle = '#111';
-     ctx.save(); ctx.translate(5, -12); ctx.rotate(earAngle);
+     ctx.save(); ctx.translate(14, -12); ctx.rotate(earAngle);
      ctx.beginPath(); ctx.arc(0, 0, 7, 0, Math.PI*2); ctx.fill();
      ctx.restore();
-     ctx.save(); ctx.translate(-5, -12); ctx.rotate(-earAngle);
+     ctx.save(); ctx.translate(-14, -12); ctx.rotate(-earAngle);
      ctx.beginPath(); ctx.arc(0, 0, 7, 0, Math.PI*2); ctx.fill();
      ctx.restore();
      ctx.restore();
