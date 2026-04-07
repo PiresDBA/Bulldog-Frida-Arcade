@@ -1280,7 +1280,7 @@ function updateHeroImages(kind) {
         else if(val==='frida') icon='🐕';
         else if(val==='cinder') icon='🐱';
         else if(val==='iris') icon='🦄';
-        else if(val==='Baby') icon='🐻';
+        else if(val==='barbie') icon='🐻';
         
         btn.innerHTML = icon + " " + (heroNameMap[val] || val);
         btn.style.opacity = '1';
@@ -1291,7 +1291,7 @@ function updateHeroImages(kind) {
     if(kind==='frida') { p = 'phaseReadyFrida'; }
     if(kind==='cinder') { p = 'phaseReadyCinder'; }
     if(kind==='iris') { p = 'phaseReadyIris'; }
-    if(kind==='Baby') { p = 'phaseReadyBaby'; }
+    if(kind==='barbie') { p = 'phaseReadyBaby'; }
 
     const phaseBubble = document.getElementById('phase-bubble');
     if (phaseBubble) phaseBubble.textContent = dict[p] || "";
@@ -1370,7 +1370,7 @@ function startGame() {
   // Ajusta tamanho físico conforme o herói (mesmos tamanhos dos sprites originais do jogo)
   if (player.kind === 'cinder') { player.width = 60; player.height = 35; }
   else if (player.kind === 'frida') { player.width = 110; player.height = 50; }
-  else if (player.kind === 'Baby') { player.width = 90; player.height = 60; }
+  else if (player.kind === 'barbie') { player.width = 90; player.height = 60; }
   else { player.width = 80; player.height = 30; } // Luna padrão
   resetPhase();                     // Prepara o cenário
   UI.startScreen.classList.add('hidden'); // Esconde o menu inicial
@@ -1687,7 +1687,7 @@ function update(dt) {
       if (player.kind === 'cinder') kinds = kinds.filter(k => k !== 'cinder');
       else if (player.kind === 'frida') kinds = kinds.filter(k => k !== 'frida');
       else if (player.kind === 'iris') kinds = kinds.filter(k => k !== 'iris');
-      else if (player.kind === 'Baby') kinds = kinds.filter(k => !k.includes('Baby'));
+      else if (player.kind === 'barbie') kinds = kinds.filter(k => !k.includes('barbie'));
       
       const t = kinds[Math.floor(Math.random() * kinds.length)];
       let w = 80, h = 50; 
@@ -1695,12 +1695,12 @@ function update(dt) {
       else if (t === 'frida') { w = 110; h = 55; }
       else if (t === 'luna') { w = 80; h = 40; }
       else if (t === 'iris') { w = 80; h = 60; }
-      else if (t.includes('Baby')) { w = 90; h = 60; }
+      else if (t.includes('barbie')) { w = 90; h = 60; }
       
       bulldogs.push({ x: canvas.width, y: GROUND_Y, width: w, height: h, state: 'idle', animTimer: 0, kind: t }); 
       if (t === 'cinder') soundMeow(); 
       else if (t === 'iris') soundWhinny(); 
-      else if (t.includes('Baby')) soundBear(); 
+      else if (t.includes('barbie')) soundBear(); 
       else if (t === 'luna') soundDachshundBark();
       else soundDogBark();
     }
@@ -2722,7 +2722,7 @@ function drawBear(ctx, x, y, kind, timer, state, isHero) {
       baseColor1 = '#f5f5f5'; baseColor2 = '#ffffff'; bellyColor = '#e0e0e0';
   } else if (kind === 'panda_barbie') {
       baseColor1 = '#111111'; baseColor2 = '#222222'; bellyColor = '#ffffff';
-  } else if (kind === 'pink' || kind === 'Baby' || kind === 'barbie_bear') {
+  } else if (kind === 'pink' || kind === 'barbie' || kind === 'barbie_bear') {
       baseColor1 = '#ff80bf'; baseColor2 = '#ff4d94'; bellyColor = '#ffb3d9';
   }
 
@@ -3556,7 +3556,7 @@ function render() {
        // frida, cinder, barbie face LEFT. Do NOT flip for obstacle.
        if (b.kind === 'frida') drawBulldog(ctx, b.x, b.y, b.width, b.height, b.animTimer, b.state);
        else if (b.kind === 'cinder') drawCat(ctx, b.x, b.y, b.width, b.height, b.animTimer, b.state);
-       else if (b.kind.includes('Baby')) drawBear(ctx, b.x, b.y, 'pink', b.animTimer, b.state);
+       else if (b.kind.includes('barbie')) drawBear(ctx, b.x, b.y, 'pink', b.animTimer, b.state);
        else drawBear(ctx, b.x, b.y, b.kind, b.animTimer, b.state);
     }
   }
@@ -3721,7 +3721,7 @@ function render() {
 
       if (player.kind === 'frida') drawBulldog(ctx, player.x, player.y, player.width, player.height, player.animTimer, st, true);
       else if (player.kind === 'cinder') drawCat(ctx, player.x, player.y, player.width, player.height, player.animTimer, st, true);
-      else if (player.kind === 'Baby') drawBear(ctx, player.x, player.y, 'pink', player.animTimer, st, true);
+      else if (player.kind === 'barbie') drawBear(ctx, player.x, player.y, 'pink', player.animTimer, st, true);
       
       ctx.restore();
     }
