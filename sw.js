@@ -1,4 +1,4 @@
-const CACHE_NAME = 'frida-arcade-v1.18';
+const CACHE_NAME = 'frida-arcade-v2.1';
 const ASSETS = [
   './',
   './index.html',
