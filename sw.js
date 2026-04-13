@@ -1,5 +1,5 @@
-const CACHE_NAME = 'frida-arcade-v3.1';
-const VERSION = '3.1';
+const CACHE_NAME = 'frida-arcade-v3.2';
+const VERSION = '3.2';
 const ASSETS = [
   './',
   './index.html',

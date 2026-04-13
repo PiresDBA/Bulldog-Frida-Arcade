@@ -1408,6 +1408,7 @@ function jump() {
  * Reinicia todos os valores para o padrão de uma nova partida.
  */
 function startGame() {
+  if (window.MonetizationManager) window.MonetizationManager.gameplayStart();
   gameState = 'PLAYING';            // Muda o estado para "Jogando"
   game.score = 0;                   // Zera os pontos
   game.phase = 1;                   // Volta para a fase 1
@@ -3870,6 +3871,7 @@ if(copyPixBtn) {
 
 // === EXIT GAME LOGIC ===
 function exitToMenu() {
+  if (window.MonetizationManager) window.MonetizationManager.gameplayStop();
   gameState = 'MENU';
   if(bgmAudio) { bgmAudio.pause(); bgmAudio.currentTime = 0; }
   if(lunaLateAudio) { lunaLateAudio.pause(); lunaLateAudio.currentTime = 0; }
