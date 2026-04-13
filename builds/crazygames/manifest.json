@@ -1,0 +1,18 @@
+{
+  "name": "Bulldog Frida Arcade",
+  "short_name": "Frida Arcade",
+  "description": "Ajude a Frida a resgatar seus amiguinhos na maior aventura!",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#090a0f",
+  "theme_color": "#3366ff",
+  "icons": [
+    {
+      "src": "frida-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

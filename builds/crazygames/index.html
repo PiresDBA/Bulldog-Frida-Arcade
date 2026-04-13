@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Luna Arcade" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#3366ff" />
+  <title>Bulldog Frida Arcade</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+
+  <!-- Otimizações de Performance: Preload de Assets Essenciais -->
+  <link rel="preload" href="cartoon_bgm.mp3" as="audio">
+  <link rel="preload" href="luna-latindo.mp3" as="audio">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Righteous&family=Press+Start+2P&display=swap" as="style">
+  
+  <!-- MONETIZAÇÃO SDKs -->
+  <script src="https://sdk.crazygames.com/crazygames-sdk-v2.js"></script>
+  <script src="https://gamepix.blob.core.windows.net/gpxlib/dev/gamepix.js"></script>
+  <script src="https://game-cdn.poki.com/scripts/v2/poki-sdk.js"></script>
+  <script src="https://html5.api.gamedistribution.com/main.min.js"></script>
+</head>
+  <body>
+    <div id="yt-player-container" style="position: absolute; opacity: 0; pointer-events: none; overflow: hidden; z-index: -100;">
+      <div id="yt-player"></div>
+    </div>
+    
+    <!-- TELA DE ROTAÇÃO -->
+    <div id="rotate-screen">
+    <div id="rotate-content">
+      <div id="rotate-icon">📱</div>
+      <h2>Vire o celular!</h2>
+      <p>O jogo funciona melhor na horizontal 🐕</p>
+    </div>
+  </div>
+
+  <div id="game-container">
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div id="ui-layer">
+      <div class="hud">
+        <div id="score-display"><span data-i18n="score">SCORE</span>: <span id="score">0</span></div>
+        <div id="phase-display"><span data-i18n="phase">PHASE</span>: <span id="phase">1</span></div>
+        <div id="lives-display">❤️ <span id="lives">3</span></div>
+        <div id="coins-display">🪙 <span id="coins">0</span></div>
+      </div>
+    </div>
+
+    <div id="start-screen" class="screen">
+      <!-- Seletor de Idiomas (Bandeiras Verticais no Canto Direito Inferior) -->
+      <div id="lang-selector" style="position: absolute; bottom: 20px; right: 10px; display: flex; flex-direction: column-reverse; gap: 8px; z-index: 999; pointer-events: auto;">
+        <button class="lang-btn" data-lang="pt" style="background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.2); padding: 4px; font-size:24px; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor:pointer; transition:all 0.2s; line-height:1;" title="Português">
+          <img src="./flag_br.png" alt="PT" style="width:28px; height:28px; border-radius:50%; object-fit: cover;">
+        </button>
+        <button class="lang-btn" data-lang="en" style="background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.2); padding: 4px; font-size:24px; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor:pointer; transition:all 0.2s; line-height:1;" title="English">
+          <img src="./flag_us.png" alt="US" style="width:28px; height:28px; border-radius:50%; object-fit: cover;">
+        </button>
+        <button class="lang-btn" data-lang="es" style="background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.2); padding: 4px; font-size:24px; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor:pointer; transition:all 0.2s; line-height:1;" title="Español">
+          <img src="./flag_es.png" alt="ES" style="width:28px; height:28px; border-radius:50%; object-fit: cover;">
+        </button>
+        <button class="lang-btn" data-lang="zh" style="background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.2); padding: 4px; font-size:24px; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor:pointer; transition:all 0.2s; line-height:1;" title="Mandarin">
+          <img src="./flag_cn.png" alt="ZH" style="width:28px; height:28px; border-radius:50%; object-fit: cover;">
+        </button>
+      </div>
+      
+      <h1 class="title-3d">MULTI ANIMAL ARCADE</h1>
+
+      <div id="hero-selector" style="text-align: center; margin-bottom: 12px; display: inline-block;">
+        <div data-i18n="selectHero" style="font-size:11px; color:#ffcc00; margin-bottom:4px; font-family:'Righteous', cursive; letter-spacing: 1px;">SELECT HERO</div>
+        <div style="display: flex; gap: 4px; border-radius: 12px; background: rgba(0,0,0,0.4); padding: 4px; border: 1px solid rgba(255,255,255,0.1); width: 100%; box-sizing: border-box;">
+          <button class="hero-btn selected" data-val="luna" style="background:#B2663E; flex: 1; padding: 5px; color: white;">🌭 Luna</button>
+          <button class="hero-btn" data-val="frida" style="background:#a6722d; flex: 1; padding: 5px; color: white;">🐕 Frida</button>
+          <button class="hero-btn" data-val="cinder" style="background:#9aa1a2; flex: 1; padding: 5px; color: white;">🐱 Cindy</button>
+          <button class="hero-btn" data-val="iris" style="background:#ff69b4; flex: 1; padding: 5px; color: white;">🦄 Íris</button>
+          <button class="hero-btn" data-val="barbie" style="background:#ff1493; flex: 1; padding: 5px; color: white;">🐻 Barbie</button>
+        </div>
+      </div>
+
+      <div class="luna-dialog" id="luna-menu-dialog" style="cursor:pointer; display:flex; flex-direction:column; align-items:center;">
+        <img id="menu-dog-img" src="./luna-icon.png" class="menu-dog-anim" alt="Luna Salsicha">
+        <div data-i18n="touchToStart" style="font-family:'Righteous', cursive; font-size:14px; color:#ffea00; text-shadow:0 0 10px #ffea00; margin-top:8px; animation: blinkGlow 1s infinite alternate;">TOQUE PARA COMEÇAR</div>
+      </div>
+
+      <div class="controls" style="text-align: center; margin-bottom: 5px; font-size: 11px; color: #ccc;">
+        <span class="key">Z</span>/<span class="key">J</span>: <span data-i18n="ctrlShoot">Shoot</span> &nbsp;|&nbsp; <span class="key">↑</span>/<span class="key">Espaço</span>: <span data-i18n="ctrlJump">Jump</span> &nbsp;|&nbsp; <span class="key">←</span>/<span class="key">→</span>: <span data-i18n="ctrlMove">Move</span>
+      </div>
+
+      <div id="difficulty-selector" style="text-align: center; margin-bottom: 12px; display: inline-block;">
+        <div data-i18n="gameMode" style="font-size:11px; color:#ffcc00; margin-bottom:4px; font-family:'Righteous', cursive; letter-spacing: 1px;">GAME MODE</div>
+        <div style="display: flex; gap: 4px; border-radius: 12px; background: rgba(0,0,0,0.4); padding: 4px; border: 1px solid rgba(255,255,255,0.1);">
+          <button class="diff-btn" data-val="easy" style="background:#2ecc71; flex: 1; min-width: 60px;" data-i18n="easy">Easy</button>
+          <button class="diff-btn selected" data-val="medium" style="background:#f1c40f; flex: 1; min-width: 60px;" data-i18n="medium">Normal</button>
+          <button class="diff-btn" data-val="hard" style="background:#e74c3c; flex: 1; min-width: 60px;" data-i18n="hard">Hard</button>
+        </div>
+      </div>
+
+      <button id="start-btn" class="btn" data-i18n="startBtn">Play Now!</button>
+
+      <!-- Banner de instalação -->
+      <div id="install-banner" style="display:none; margin-top:10px; text-align:center;">
+        <button id="install-btn" class="btn"
+          style="background: linear-gradient(135deg,#7b2ff7,#f107a3); font-size:13px; padding:6px 18px;">
+          📲 Instalar na tela inicial
+        </button>
+        <p id="ios-hint" style="display:none; font-size:11px; color:#aaa; margin-top:5px;">
+          No Safari: toque em <strong style='color:#fff'>⬆ Compartilhar</strong> → <strong style='color:#fff'>Adicionar
+            à Tela de Início</strong>
+        </p>
+      </div>
+
+      <!-- Botão de Doação (novo) -->
+      <button id="open-donation-btn" class="btn" style="background: linear-gradient(135deg, #FF7B00, #FF5500); font-size:12px; padding:6px 15px; margin-top: 15px; border: 2px solid #FFCC00;" data-i18n="donateBtn">🥣 Alimente Nossos Bichinhos</button>
+
+      <!-- Modal de Doação / História da Vida Real -->
+      <div id="donation-modal" style="display:none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000; align-items:center; justify-content:center; flex-direction:column; padding:20px; box-sizing:border-box;">
+        <div style="background: linear-gradient(to bottom, #4a1c40, #220822); border: 2px solid #ff1493; border-radius: 12px; padding: 15px; text-align: center; max-width: 400px; box-shadow: 0 0 20px rgba(255, 20, 147, 0.5); overflow-y: auto; max-height: 90vh;">
+          <h2 data-i18n="donateTitle" style="color: #ffea00; font-family: 'Righteous', cursive; margin-top:0; font-size: 15px; margin-bottom: 5px;">AJUDE A ENCHER AS TIGELAS! 🐾</h2>
+          <div style="display:flex; justify-content:center; margin-bottom: 10px;">
+            <img src="./real_pets.jpg" style="width: 100%; max-height: 150px; object-fit: contain; border-radius: 8px; border: 2px solid #32BCAD; background: #000;">
+          </div>
+          <p data-i18n="donateStory" style="color:#fff; font-size:10px; line-height:1.2; margin-bottom:15px; margin-top:0;">Sabia que a Luna, Frida, Cinder e todos esses bichinhos do jogo são nossos pets na vida real?<br><br>Qualquer doação nos ajuda a comprar ração e petiscos para eles. Quer nos ajudar a encher as tigelas da nossa turminha?</p>
+          
+          <button id="copy-pix-btn" class="btn" style="background: #32BCAD; font-size: 13px; width: 100%; margin-bottom: 10px; padding: 8px;" data-i18n="donatePix">Copiar Chave PIX</button>
+          <a href="https://ko-fi.com/fridaeluna" target="_blank" style="text-decoration:none;">
+            <button class="btn" style="background: #FF5E5B; font-size: 13px; width: 100%; margin-bottom: 15px; padding: 8px;" data-i18n="donateKofi">Apoiar no Ko-fi ☕</button>
+          </a>
+          
+          <button id="close-donation-btn" style="background: transparent; color: #aaa; border: 1px solid #777; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-family:'Press Start 2P', cursive; font-size:8px;" data-i18n="closeBtn">FECHAR</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="phase-complete-screen" class="screen hidden"
+      style="background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);">
+      <div class="luna-dialog" style="margin-bottom: 20px;">
+        <div class="bubble" id="victory-bubble" data-i18n="victoryText">Congratulations! Boss defeated!</div>
+        <img id="victory-dog-img" src="./luna-icon.png" class="menu-dog-anim" alt="Hero">
+      </div>
+      <button id="continue-btn" class="btn" data-i18n="continueBtn">Continue Adventure</button>
+    </div>
+
+    <div id="continue-screen" class="screen hidden" style="background: rgba(0,0,0,0.9); backdrop-filter: blur(5px);">
+      <h1 class="title-3d" style="color:#ffcc00; font-size: 60px;" data-i18n="continueQ">CONTINUE?</h1>
+      <p style="font-size: 40px; margin-top: 0; color: #fff;" id="continue-timer">10</p>
+      <div style="display: flex; gap: 20px;">
+        <button id="btn-yes-continue" class="btn"
+          style="background: linear-gradient(135deg, #4CAF50, #2E7D32); min-width: 120px;" data-i18n="yes">YES</button>
+        <button id="btn-no-continue" class="btn"
+          style="background: linear-gradient(135deg, #f44336, #c62828); min-width: 120px;" data-i18n="no">NO</button>
+      </div>
+      <p style="margin-top: 20px; color: #fff;"><span data-i18n="continuesLeft">Continues remaining</span>: <span id="continues-left">5</span></p>
+    </div>
+
+    <div id="game-over-screen" class="screen hidden">
+      <h1 class="title-3d" style="color:#ff3333;text-shadow:0 0 20px #f00;">GAME OVER</h1>
+      <p style="font-size:24px;"><span data-i18n="finalScore">Final Score</span>: <span id="final-score">0</span></p>
+
+      <div id="record-input-container" style="margin-top: 15px;">
+        <input type="text" id="player-name" placeholder="Name" maxlength="10" data-i18n-placeholder="namePlaceholder"
+          style="padding: 10px; border-radius: 5px; border: none; font-family: inherit; text-align: center; width: 220px;">
+        <button id="save-score-btn" class="btn"
+          style="padding: 10px 20px; font-size: 14px; margin-top: 10px; background: #ffcc00; color: #000;" data-i18n="saveScore">
+          Save Score!</button>
+      </div>
+
+      <div id="high-scores-container"
+        style="margin: 20px 0; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; width: 300px; border: 1px solid rgba(255,255,255,0.2);">
+        <h2 style="color: #ffcc00; font-size: 14px; text-shadow: 1px 1px #000; margin-bottom: 15px;" data-i18n="topRecords">🏆 TOP SCORES</h2>
+        <div id="high-scores-list" style="font-size: 16px; color: #fff; text-align: left; line-height: 1.6;">
+          <!-- preenchido via JS -->
+        </div>
+      </div>
+
+      <button id="restart-btn" class="btn" data-i18n="tryAgain">Try Again</button>
+    </div>
+
+    <div id="phase-transition" class="screen hidden">
+      <h1 class="phase-text"><span data-i18n="phase">Phase</span> <span id="next-phase">2</span>!</h1>
+      <div class="luna-dialog" style="margin-top: 20px;">
+        <div class="bubble" id="phase-bubble" style="font-size:16px;">Vamos lá! A Luna está pronta!</div>
+        <img id="phase-dog-img" src="./luna-icon.png" class="menu-dog-anim" style="width:120px;height:120px;" alt="Herói">
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTROLES TOUCH PARA CELULAR -->
+  <div id="touch-controls">
+    <div id="touch-left">
+      <button id="btn-left" class="touch-btn">◀</button>
+      <button id="btn-right" class="touch-btn">▶</button>
+      <button id="exit-btn" class="btn hidden" style="background:#e74c3c; border:none; color:white; padding:5px; font-size:10px; border-radius:8px; width:60px; height:35px; pointer-events: auto; display: block; margin-top: 10px;" data-i18n="exitBtn">EXIT</button>
+    </div>
+    <div id="touch-right">
+      <button id="btn-jump" class="touch-btn touch-action">↑ PULAR</button>
+      <button id="btn-shoot" class="touch-btn touch-action">🦴 ATIRAR</button>
+    </div>
+  </div>
+
+  <script src="./js/monetization.js"></script>
+  <script defer src="./main.js"></script>
+  <script>
+    // Register Service Worker for PWA (installable as app)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js?v=3.0')
+          .then(reg => console.log('SW registered:', reg.scope))
+          .catch(err => console.log('SW error:', err));
+      });
+    }
+
+    // Touch Controls wiring
+    function setupTouchControls() {
+      const controls = [
+        { id: 'btn-left', code: 'ArrowLeft', key: 'ArrowLeft' },
+        { id: 'btn-right', code: 'ArrowRight', key: 'ArrowRight' },
+        { id: 'btn-jump', code: 'ArrowUp', key: 'ArrowUp' },
+        { id: 'btn-shoot', code: 'KeyZ', key: 'z' }
+      ];
+
+      controls.forEach(({ id, code, key }) => {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        btn.addEventListener('touchstart', e => {
+          e.preventDefault();
+          window.dispatchEvent(new KeyboardEvent('keydown', { code, key, bubbles: true }));
+        }, { passive: false });
+        btn.addEventListener('touchend', e => {
+          e.preventDefault();
+          window.dispatchEvent(new KeyboardEvent('keyup', { code, key, bubbles: true }));
+        }, { passive: false });
+      });
+    }
+
+    setupTouchControls();
+
+    // Celular: toque na Luna para iniciar o jogo
+    const lunaImg = document.getElementById('menu-dog-img');
+    const startBtn = document.getElementById('start-btn');
+    if (lunaImg && startBtn) {
+      lunaImg.addEventListener('click', () => startBtn.click());
+      lunaImg.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        startBtn.click();
+      }, { passive: false });
+    }
+
+    // ===== PWA INSTALL PROMPT =====
+    let deferredPrompt = null;
+    const installBanner = document.getElementById('install-banner');
+    const installBtn = document.getElementById('install-btn');
+    const iosHint = document.getElementById('ios-hint');
+
+    // Detecta iOS (Safari não suporta beforeinstallprompt)
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone;
+
+    if (isIOS && !isInStandaloneMode) {
+      // Mostra dica de adição manual para usuários iOS
+      installBanner.style.display = 'block';
+      installBtn.style.display = 'none';
+      iosHint.style.display = 'block';
+    }
+
+    // Android/Chrome: captura o evento de instalação
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault(); // Impede o prompt automático
+      deferredPrompt = e;
+      if (!isInStandaloneMode) {
+        installBanner.style.display = 'block'; // Mostra nosso botão
+      }
+    });
+
+    // Quando o usuário clica em instalar
+    if (installBtn) {
+      installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          installBanner.style.display = 'none';
+        }
+        deferredPrompt = null;
+      });
+    }
+
+    // Se já instalado, esconde o banner
+    window.addEventListener('appinstalled', () => {
+      installBanner.style.display = 'none';
+    });
+
+    // Orientação: mostra aviso se portrait
+    function checkOrientation() {
+      const isPortrait = window.innerHeight > window.innerWidth;
+      const rotateScreen = document.getElementById('rotate-screen');
+      if (rotateScreen) {
+        rotateScreen.style.display = isPortrait ? 'flex' : 'none';
+      }
+    }
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(checkOrientation, 300);
+    });
+  </script>
+</body>
+
+</html>
