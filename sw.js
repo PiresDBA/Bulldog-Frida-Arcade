@@ -1,5 +1,5 @@
-const CACHE_NAME = 'frida-arcade-v2.5';
-const VERSION = '2.5';
+const CACHE_NAME = 'frida-arcade-v2.6';
+const VERSION = '2.6';
 const ASSETS = [
   './',
   './index.html',
@@ -12,6 +12,7 @@ const ASSETS = [
   './barbie-icon.png',
   './iris-icon.png',
   './luna-menu-transparent.png',
+  './real_pets.jpg',
   './cartoon_bgm.mp3',
   './luna-latindo.mp3'
 ];

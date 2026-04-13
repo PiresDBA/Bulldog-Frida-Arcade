@@ -97,6 +97,27 @@
             à Tela de Início</strong>
         </p>
       </div>
+
+      <!-- Botão de Doação (novo) -->
+      <button id="open-donation-btn" class="btn" style="background: linear-gradient(135deg, #FF7B00, #FF5500); font-size:12px; padding:6px 15px; margin-top: 15px; border: 2px solid #FFCC00;" data-i18n="donateBtn">🥣 Alimente Nossos Bichinhos</button>
+
+      <!-- Modal de Doação / História da Vida Real -->
+      <div id="donation-modal" style="display:none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000; align-items:center; justify-content:center; flex-direction:column; padding:20px; box-sizing:border-box;">
+        <div style="background: linear-gradient(to bottom, #4a1c40, #220822); border: 2px solid #ff1493; border-radius: 15px; padding: 20px; text-align: center; max-width: 400px; box-shadow: 0 0 20px rgba(255, 20, 147, 0.5);">
+          <h2 data-i18n="donateTitle" style="color: #ffea00; font-family: 'Righteous', cursive; margin-top:0; font-size: 18px;">AJUDE A ENCHER AS TIGELAS! 🐾</h2>
+          <div style="display:flex; justify-content:center; margin-bottom: 15px;">
+            <img src="./real_pets.jpg" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px; border: 2px solid #32BCAD;">
+          </div>
+          <p data-i18n="donateStory" style="color:#fff; font-size:12px; line-height:1.4; margin-bottom:20px;">Sabia que a Luna, Frida, Cinder e todos esses bichinhos do jogo são nossos pets na vida real?<br><br>Qualquer doação nos ajuda a comprar ração e petiscos para eles. Quer nos ajudar a encher as tigelas da nossa turminha?</p>
+          
+          <button id="copy-pix-btn" class="btn" style="background: #32BCAD; font-size: 13px; width: 100%; margin-bottom: 10px; padding: 8px;" data-i18n="donatePix">Copiar Chave PIX</button>
+          <a href="https://ko-fi.com/fridaeluna" target="_blank" style="text-decoration:none;">
+            <button class="btn" style="background: #FF5E5B; font-size: 13px; width: 100%; margin-bottom: 15px; padding: 8px;" data-i18n="donateKofi">Apoiar no Ko-fi ☕</button>
+          </a>
+          
+          <button id="close-donation-btn" style="background: transparent; color: #aaa; border: 1px solid #777; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-family:'Press Start 2P', cursive; font-size:8px;" data-i18n="closeBtn">FECHAR</button>
+        </div>
+      </div>
     </div>
 
     <div id="phase-complete-screen" class="screen hidden"
