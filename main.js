@@ -3847,24 +3847,34 @@ if(copyPixBtn) {
 }
 
 // === EXIT GAME LOGIC ===
+function exitToMenu() {
+  gameState = 'MENU';
+  if(bgmAudio) { bgmAudio.pause(); bgmAudio.currentTime = 0; }
+  if(lunaLateAudio) { lunaLateAudio.pause(); lunaLateAudio.currentTime = 0; }
+  stopBgNoise();
+  stopUfoSound();
+  UI.startScreen.classList.remove('hidden');
+  UI.gameOverScreen.classList.add('hidden');
+  if(UI.phaseTransition) UI.phaseTransition.classList.add('hidden');
+  if(UI.continueScreen) UI.continueScreen.classList.add('hidden');
+  if(UI.phaseCompleteScreen) UI.phaseCompleteScreen.classList.add('hidden');
+  UI.exitBtn.classList.add('hidden');
+  bullets = [];
+  upBullets = [];
+  enemies = [];
+  ufos = [];
+  bombs = [];
+  particles = [];
+  decorations = [];
+}
+
 if (UI.exitBtn) {
-  UI.exitBtn.addEventListener('click', (e) => {
+  const handleExit = (e) => {
     e.preventDefault();
     e.stopPropagation();
     e.stopImmediatePropagation();
-    gameState = 'MENU';
-    if(bgm) { bgm.pause(); bgm.currentTime = 0; }
-    if(lunaLateAudio) { lunaLateAudio.pause(); lunaLateAudio.currentTime = 0; }
-    UI.startScreen.classList.remove('hidden');
-    UI.gameOverScreen.classList.add('hidden');
-    if(UI.phaseTransition) UI.phaseTransition.classList.add('hidden');
-    if(UI.continueScreen) UI.continueScreen.classList.add('hidden');
-    if(UI.phaseCompleteScreen) UI.phaseCompleteScreen.classList.add('hidden');
-    UI.exitBtn.classList.add('hidden');
-    bullets = [];
-    upBullets = [];
-    enemies = [];
-    ufos = [];
-    bombs = [];
-  });
+    exitToMenu();
+  };
+  UI.exitBtn.addEventListener('click', handleExit);
+  UI.exitBtn.addEventListener('touchstart', handleExit, { passive: false });
 }

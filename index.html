@@ -191,7 +191,7 @@
     // Register Service Worker for PWA (installable as app)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=2.8')
+        navigator.serviceWorker.register('./sw.js?v=2.9')
           .then(reg => console.log('SW registered:', reg.scope))
           .catch(err => console.log('SW error:', err));
       });
