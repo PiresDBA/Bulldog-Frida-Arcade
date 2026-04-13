@@ -1,5 +1,5 @@
-const CACHE_NAME = 'frida-arcade-v3.0';
-const VERSION = '3.0';
+const CACHE_NAME = 'frida-arcade-v3.1';
+const VERSION = '3.1';
 const ASSETS = [
   './',
   './index.html',
@@ -13,8 +13,13 @@ const ASSETS = [
   './iris-icon.png',
   './luna-menu-transparent.png',
   './real_pets.jpg',
+  './flag_br.png',
+  './flag_us.png',
+  './flag_es.png',
+  './flag_cn.png',
   './cartoon_bgm.mp3',
-  './luna-latindo.mp3'
+  './luna-latindo.mp3',
+  './js/monetization.js'
 ];
 
 self.addEventListener('install', (event) => {

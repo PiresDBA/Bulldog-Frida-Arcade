@@ -191,6 +191,21 @@ const i18n = {
 let currentLang = localStorage.getItem('fridaArcade_lang') || navigator.language.substring(0, 2) || 'en';
 if (!i18n[currentLang]) currentLang = 'en';
 
+// --- MONETIZATION STATE ---
+let monetizationActive = false;
+
+window.addEventListener('monetizationPause', () => {
+  console.log("Game paused for ad...");
+  monetizationActive = true;
+  stopBGM();
+});
+
+window.addEventListener('monetizationResume', () => {
+  console.log("Game resumed after ad.");
+  monetizationActive = false;
+  if (gameState === 'PLAYING') startBGM();
+});
+
 function translateUI() {
   const dict = i18n[currentLang];
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -284,6 +299,12 @@ function showContinueScreen() {
     UI.continuesLeftText.parentElement.innerHTML = `<span style="color:#f1c40f; cursor:pointer;">🎥 Watch Ad to Continue!</span>`;
   }
   if (typeof translateUI === 'function') translateUI();
+  
+  // Avisa os portais que um anúncio agora seria legal
+  if (window.MonetizationManager) {
+    window.MonetizationManager.showAd('interstitial');
+    window.MonetizationManager.reportScore(game.score);
+  }
   
   stopBGM();
   
@@ -1568,6 +1589,7 @@ function createStarsExplosion(x, y, count) {
 }
 
 function update(dt) {
+  if (monetizationActive) return; // Bloqueia tudo se tiver propaganda
   if (gameState !== 'PLAYING') return;
   
   game.timeInPhase += dt * 1000;
