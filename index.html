@@ -41,7 +41,7 @@
         <div id="phase-display"><span data-i18n="phase">PHASE</span>: <span id="phase">1</span></div>
         <div id="lives-display">❤️ <span id="lives">3</span></div>
         <div id="coins-display">🪙 <span id="coins">0</span></div>
-        <button id="exit-btn" class="btn hidden" style="background:#e74c3c; border:none; color:white; padding:4px 8px; font-size:12px; border-radius:4px; margin-left: auto; height: 35px;" data-i18n="exitBtn">EXIT</button>
+        <button id="exit-btn" class="btn hidden" style="background:#e74c3c; border:none; color:white; padding:4px 8px; font-size:12px; border-radius:4px; margin-left: auto; height: 35px; pointer-events: auto; z-index: 100;" data-i18n="exitBtn">EXIT</button>
       </div>
     </div>
 
@@ -107,7 +107,7 @@
         <div style="background: linear-gradient(to bottom, #4a1c40, #220822); border: 2px solid #ff1493; border-radius: 12px; padding: 15px; text-align: center; max-width: 400px; box-shadow: 0 0 20px rgba(255, 20, 147, 0.5); overflow-y: auto; max-height: 90vh;">
           <h2 data-i18n="donateTitle" style="color: #ffea00; font-family: 'Righteous', cursive; margin-top:0; font-size: 15px; margin-bottom: 5px;">AJUDE A ENCHER AS TIGELAS! 🐾</h2>
           <div style="display:flex; justify-content:center; margin-bottom: 10px;">
-            <img src="./real_pets.jpg" style="width: 100%; max-height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid #32BCAD;">
+            <img src="./real_pets.jpg" style="width: 100%; max-height: 150px; object-fit: contain; border-radius: 8px; border: 2px solid #32BCAD; background: #000;">
           </div>
           <p data-i18n="donateStory" style="color:#fff; font-size:10px; line-height:1.2; margin-bottom:15px; margin-top:0;">Sabia que a Luna, Frida, Cinder e todos esses bichinhos do jogo são nossos pets na vida real?<br><br>Qualquer doação nos ajuda a comprar ração e petiscos para eles. Quer nos ajudar a encher as tigelas da nossa turminha?</p>
           
@@ -191,7 +191,7 @@
     // Register Service Worker for PWA (installable as app)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=2.7')
+        navigator.serviceWorker.register('./sw.js?v=2.8')
           .then(reg => console.log('SW registered:', reg.scope))
           .catch(err => console.log('SW error:', err));
       });

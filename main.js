@@ -941,7 +941,7 @@ function soundBear() {
 const crowAudio = new Audio('crow.mp3');
 function soundCrow() {
   const clone = crowAudio.cloneNode(true);
-  clone.volume = 1.0;
+  clone.volume = 0.3;
   clone.play().catch(e => console.log('Crow audio blocked: ', e));
 }
 
@@ -1643,7 +1643,7 @@ function update(dt) {
   }
   
   if (player.y >= GROUND_Y && !player.isFalling) {
-    if (overHole && !player.isJumping && (!player.invincibleTimer || player.invincibleTimer <= 0)) {
+    if (overHole && !player.isJumping && !player.invincible) {
       player.isFalling = true;
     } else {
       player.y = GROUND_Y;
@@ -3850,6 +3850,8 @@ if(copyPixBtn) {
 if (UI.exitBtn) {
   UI.exitBtn.addEventListener('click', (e) => {
     e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
     gameState = 'MENU';
     if(bgm) { bgm.pause(); bgm.currentTime = 0; }
     if(lunaLateAudio) { lunaLateAudio.pause(); lunaLateAudio.currentTime = 0; }
