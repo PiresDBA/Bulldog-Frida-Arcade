@@ -41,7 +41,6 @@
         <div id="phase-display"><span data-i18n="phase">PHASE</span>: <span id="phase">1</span></div>
         <div id="lives-display">❤️ <span id="lives">3</span></div>
         <div id="coins-display">🪙 <span id="coins">0</span></div>
-        <button id="exit-btn" class="btn hidden" style="background:#e74c3c; border:none; color:white; padding:4px 8px; font-size:12px; border-radius:4px; margin-left: auto; height: 35px; pointer-events: auto; z-index: 100;" data-i18n="exitBtn">EXIT</button>
       </div>
     </div>
 
@@ -179,6 +178,7 @@
     <div id="touch-left">
       <button id="btn-left" class="touch-btn">◀</button>
       <button id="btn-right" class="touch-btn">▶</button>
+      <button id="exit-btn" class="btn hidden" style="background:#e74c3c; border:none; color:white; padding:5px; font-size:10px; border-radius:8px; width:60px; height:35px; pointer-events: auto; display: block; margin-top: 10px;" data-i18n="exitBtn">EXIT</button>
     </div>
     <div id="touch-right">
       <button id="btn-jump" class="touch-btn touch-action">↑ PULAR</button>
@@ -191,7 +191,7 @@
     // Register Service Worker for PWA (installable as app)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=2.9')
+        navigator.serviceWorker.register('./sw.js?v=3.0')
           .then(reg => console.log('SW registered:', reg.scope))
           .catch(err => console.log('SW error:', err));
       });
