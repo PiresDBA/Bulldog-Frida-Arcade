@@ -6,7 +6,7 @@
 const MonetizationManager = {
   // CONFIGURAÇÕES (Preencha aqui quando tiver os IDs oficiais)
   config: {
-    gameDistributionID: "657101db-a06a-409f-a840-e40649a0b943", // PLACEHOLDER: Coloque seu ID aqui
+    gameDistributionID: "9049e85eb5d94bf98e16c6c932e080b2", // Official GameDistribution ID
     pokiEnabled: true,
   },
 
