@@ -88,16 +88,24 @@ const MonetizationManager = {
   gameplayStart() {
     if (this.isGameplayActive) return;
     this.isGameplayActive = true;
+    console.log("Gameplay Start Signal Sent");
     if (this.platform === 'poki' && window.PokiSDK) {
       window.PokiSDK.gameplayStart();
+    }
+    if (this.platform === 'crazygames' && window.CrazyGames) {
+      window.CrazyGames.SDK.game.gameplayStart();
     }
   },
 
   gameplayStop() {
     if (!this.isGameplayActive) return;
     this.isGameplayActive = false;
+    console.log("Gameplay Stop Signal Sent");
     if (this.platform === 'poki' && window.PokiSDK) {
       window.PokiSDK.gameplayStop();
+    }
+    if (this.platform === 'crazygames' && window.CrazyGames) {
+      window.CrazyGames.SDK.game.gameplayStop();
     }
   },
 
@@ -108,9 +116,21 @@ const MonetizationManager = {
     // CRAZY GAMES
     if (this.platform === 'crazygames' && window.CrazyGames) {
       window.CrazyGames.SDK.ad.requestAd(type, {
-        adStarted: () => { this.pauseGame(); if (callbacks.beforeAd) callbacks.beforeAd(); },
-        adFinished: () => { this.resumeGame(); if (callbacks.afterAd) callbacks.afterAd(); },
-        adError: () => { this.resumeGame(); if (callbacks.afterAd) callbacks.afterAd(); }
+        adStarted: () => { 
+            this.gameplayStop();
+            this.pauseGame(); 
+            if (callbacks.beforeAd) callbacks.beforeAd(); 
+        },
+        adFinished: () => { 
+            this.resumeGame(); 
+            this.gameplayStart();
+            if (callbacks.afterAd) callbacks.afterAd(); 
+        },
+        adError: () => { 
+            this.resumeGame(); 
+            this.gameplayStart();
+            if (callbacks.afterAd) callbacks.afterAd(); 
+        }
       });
     } 
     // GAMEPIX
@@ -142,6 +162,13 @@ const MonetizationManager = {
 
   reportScore(score) {
     if (this.platform === 'gamepix') window.GamePix.updateScore(score);
+  },
+
+  gameLoaded() {
+    if (this.platform === 'poki' && window.PokiSDK) window.PokiSDK.gameLoaded();
+    if (this.platform === 'crazygames' && window.CrazyGames) {
+        // CrazyGames doesn't strictly require gameLoaded in V2 but it helps tracking
+    }
   },
 
   // --- DATA MODULE (Cloud Save) ---
