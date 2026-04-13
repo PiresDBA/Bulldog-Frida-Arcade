@@ -52,7 +52,8 @@ const UI = {
   playerNameInput: document.getElementById('player-name'),       // Caixinha pra você digitar seu nome
   saveScoreBtn: document.getElementById('save-score-btn'),       // Botão pra salvar seu Recorde
   recordInputContainer: document.getElementById('record-input-container'),
-  coinsDisplay: document.getElementById('coins')
+  coinsDisplay: document.getElementById('coins'),
+  exitBtn: document.getElementById('exit-btn')
 };
 
 // --- i18n (Internacionalização) ---
@@ -86,7 +87,8 @@ const i18n = {
     donateStory: "Sabia que a Luna, Frida, Cinder e todos esses bichinhos do jogo são nossos pets na vida real?<br><br>Qualquer doação nos ajuda a comprar ração e petiscos para eles. Quer nos ajudar a encher as tigelas da nossa turminha?",
     donatePix: "Copiar Chave PIX",
     donateKofi: "Doar via Ko-fi ☕",
-    closeBtn: "FECHAR"
+    closeBtn: "FECHAR",
+    exitBtn: "SAIR"
   },
   en: {
     score: "SCORE", phase: "PHASE", selectHero: "SELECT HERO", ctrlShoot: "Shoot",
@@ -117,7 +119,8 @@ const i18n = {
     donateStory: "Did you know that Luna, Frida, Cinder, and all these game characters are our real-life pets?<br><br>Any donation helps us buy them food and treats. Want to help fill our furry family's bowls?",
     donatePix: "Copy BR Pix Key",
     donateKofi: "Support via Ko-fi ☕",
-    closeBtn: "CLOSE"
+    closeBtn: "CLOSE",
+    exitBtn: "EXIT"
   },
   es: {
     score: "PUNTOS", phase: "FASE", selectHero: "ELIGE TU HÉROE", ctrlShoot: "Disparar",
@@ -148,7 +151,8 @@ const i18n = {
     donateStory: "¿Sabías que Luna, Frida, Cinder y todos los personajes del juego son nuestras mascotas en la vida real?<br><br>Cualquier donación nos ayuda a comprarles comida y golosinas. ¿Quieres ayudarnos a llenar sus platos?",
     donatePix: "Copiar Clave PIX",
     donateKofi: "Apoyar en Ko-fi ☕",
-    closeBtn: "CERRAR"
+    closeBtn: "CERRAR",
+    exitBtn: "SALIR"
   },
   zh: {
     score: "得分", phase: "阶段", selectHero: "英雄选择", ctrlShoot: "射击",
@@ -179,7 +183,8 @@ const i18n = {
     donateStory: "你知道Luna, Frida, Cinder和游戏中所有的角色都是我们现实生活中的宠物吗？<br><br>您的任何捐款都将帮助我们为它们购买食物和零食。您想伸出援手吗？",
     donatePix: "复制 PIX 密钥",
     donateKofi: "在 Ko-fi 上支持 ☕",
-    closeBtn: "关闭"
+    closeBtn: "关闭",
+    exitBtn: "退出"
   }
 };
 
@@ -190,7 +195,7 @@ function translateUI() {
   const dict = i18n[currentLang];
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (dict[key]) el.innerText = dict[key];
+    if (dict[key]) el.innerHTML = dict[key];
   });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.getAttribute('data-i18n-placeholder');
@@ -1401,6 +1406,7 @@ function startGame() {
   UI.gameOverScreen.classList.add('hidden'); // Esconde a tela de derrota
   UI.playerNameInput.value = '';             // Limpa a caixinha de nome
   if(UI.phaseTransition) UI.phaseTransition.classList.add('hidden');
+  if(UI.exitBtn) UI.exitBtn.classList.remove('hidden'); // Mostra botão de sair
   
   startBGM(); // Inicia a música de fundo
 }
@@ -3837,5 +3843,26 @@ if(copyPixBtn) {
         copyPixBtn.innerText = originalText;
       }, 2000);
     });
+  });
+}
+
+// === EXIT GAME LOGIC ===
+if (UI.exitBtn) {
+  UI.exitBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    gameState = 'MENU';
+    if(bgm) { bgm.pause(); bgm.currentTime = 0; }
+    if(lunaLateAudio) { lunaLateAudio.pause(); lunaLateAudio.currentTime = 0; }
+    UI.startScreen.classList.remove('hidden');
+    UI.gameOverScreen.classList.add('hidden');
+    if(UI.phaseTransition) UI.phaseTransition.classList.add('hidden');
+    if(UI.continueScreen) UI.continueScreen.classList.add('hidden');
+    if(UI.phaseCompleteScreen) UI.phaseCompleteScreen.classList.add('hidden');
+    UI.exitBtn.classList.add('hidden');
+    bullets = [];
+    upBullets = [];
+    enemies = [];
+    ufos = [];
+    bombs = [];
   });
 }
